@@ -22,7 +22,7 @@ function Login() {
     };
 
     return (
-        <main className="flex justify-center items-center min-h-screen">
+        <div className="flex justify-center items-center min-h-screen">
             <Card className="w-full max-w-sm">
                 <CardHeader>
                     <CardTitle>Student Login</CardTitle>
@@ -37,7 +37,7 @@ function Login() {
                     )}
                 </CardContent>
             </Card>
-        </main>
+        </div>
     );
 }
 
