@@ -1,7 +1,4 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarDays, Hourglass } from "lucide-react";
-import React from "react";
+import EligibilityTest from "../EligibilityTest";
 import ExamCard from "./ExamCard";
 
 const exams = [
@@ -28,7 +25,7 @@ function OngoingExams() {
       <div className="grid grid-cols-1 gap-4 mt-4">
         {exams
           .map((exam, index) => (
-            <ExamCard key={index} {...exam} action={<Button>Enter Exam</Button>}  />
+            <ExamCard key={index} {...exam} action={<EligibilityTest />}  />
           ))}
       </div>
     </section>
