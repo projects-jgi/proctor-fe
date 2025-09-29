@@ -1,4 +1,4 @@
-import EligibilityTest from "../EligibilityTest";
+import EligibilityTest from "@/containers/student/EligibilityTest";
 import ExamCard from "./ExamCard";
 
 const exams = [

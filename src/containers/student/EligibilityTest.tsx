@@ -1,255 +1,181 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
-    Dialog,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { LoaderCircle, Lock, MoveRight } from "lucide-react";
+import { useState } from "react";
 
-function safePermissionQuery(name: string) {
-  if (!navigator.permissions || !navigator.permissions.query) return Promise.resolve('prompt');
-  return navigator.permissions.query({ name: name as PermissionName }).then(p => p.state).catch(() => 'prompt');
+enum PermissionStatus {
+    NOT_CHECKED = "Not Checked",
+    CHECKING = "Checking...",
+    GRANTED = "Success",
+    DENIED = "Failed"
 }
 
-// try to request fullscreen on an element (document.documentElement by default)
-// returns true if fullscreen entered, false otherwise
-async function tryEnterFullscreen(element = document.documentElement) {
-  if (!element) return false;
-
-  // standard API
-  if (element.requestFullscreen) {
-    try {
-      await element.requestFullscreen();
-      return true;
-    } catch (e) {
-      // rejected or failed
-      return false;
+function StatusMessage({status}: {status: PermissionStatus}) {
+    if(status === PermissionStatus.NOT_CHECKED) {
+        return (
+            <span className="inline-flex items-center gap-2">
+                {status}
+            </span>
+        )
     }
-  }
 
-  // WebKit fallback (Safari)
-  // @ts-ignore
-  if (element.webkitRequestFullscreen) {
-    try {
-      // @ts-ignore
-      element.webkitRequestFullscreen();
-      // Safari's webkit method does not return a promise; assume success if no exception
-      return true;
-    } catch (e) {
-      return false;
+    if(status === PermissionStatus.CHECKING) {
+        return (
+            <span className="inline-flex items-center gap-2">
+                <LoaderCircle className="animate-spin text-primary" size={15} />
+                Checking...
+            </span>
+        )
     }
-  }
 
-  // no fullscreen support
-  return false;
+    const variant = status === PermissionStatus.GRANTED ? "success" : status === PermissionStatus.DENIED ? "destructive" : "outline";
+    return(
+        <Badge variant={variant}>{status}</Badge>
+    )
 }
 
-export default function EligibilityTest() {
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
+function EligibilityTest() {
+    const [audioStatus, setAudioStatus] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
+    const [videoStatus, setVideoStatus] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
+    const [fullscreenStatus, setFullscreenStatus] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
+    const [internetStatus, setInternetStatus] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
+    const [isEligible, setIsEligible] = useState<boolean>(false);
 
-  const [systemCheck, setSystemCheck] = useState({
-    audio: 'Not Checked',
-    video: 'Not Checked',
-    fullscreen: 'Not Checked',
-    internet: 'Not Checked',
-  });
-
-  const [isChecking, setIsChecking] = useState(false);
-  const [accepted, setAccepted] = useState(false);
-  const [isEligible, setIsEligible] = useState(false);
-
-  // Run checks (audio/video/online). This runs in response to a user action (open dialog)
-  const performSystemCheck = async () => {
-    if (isChecking) return;
-    setIsChecking(true);
-    setSystemCheck({
-      audio: 'Checking...',
-      video: 'Checking...',
-      fullscreen: 'Checking...',
-      internet: 'Checking...',
-    });
-    setIsEligible(false);
-
-    const results = {
-      audio: 'Failed',
-      video: 'Failed',
-      fullscreen: 'Failed',
-      internet: 'Failed',
-    };
-
-    // Internet
-    results.internet = navigator.onLine ? 'Stable' : 'Failed';
-    setSystemCheck(prev => ({ ...prev, internet: results.internet }));
-
-    // Fullscreen *capability* (not guarantee it will enter)
-    results.fullscreen = !!document?.fullscreenEnabled ? 'Working' : 'Failed';
-    setSystemCheck(prev => ({ ...prev, fullscreen: results.fullscreen }));
-
-    // Audio (permission-aware)
-    try {
-      const micState = await safePermissionQuery('microphone');
-      if (micState === 'denied') {
-        results.audio = 'Failed';
-        setSystemCheck(prev => ({ ...prev, audio: results.audio }));
-      } else {
-        try {
-          const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-          audioStream.getTracks().forEach(t => t.stop());
-          results.audio = 'Working';
-          setSystemCheck(prev => ({ ...prev, audio: results.audio }));
-        } catch {
-          results.audio = 'Failed';
-          setSystemCheck(prev => ({ ...prev, audio: results.audio }));
+    async function audioPrompt(){
+        setAudioStatus(PermissionStatus.CHECKING);
+        try{
+            await navigator.mediaDevices.getUserMedia({audio: true})
+            setAudioStatus(PermissionStatus.GRANTED);
+            return Promise.resolve('granted')
+        }catch(err){
+            setAudioStatus(PermissionStatus.DENIED);
+            return Promise.reject('denied')
         }
-      }
-    } catch {
-      results.audio = 'Failed';
-      setSystemCheck(prev => ({ ...prev, audio: results.audio }));
     }
 
-    // Video
-    try {
-      const camState = await safePermissionQuery('camera');
-      if (camState === 'denied') {
-        results.video = 'Failed';
-        setSystemCheck(prev => ({ ...prev, video: results.video }));
-      } else {
-        try {
-          const videoStream = await navigator.mediaDevices.getUserMedia({ video: true });
-          videoStream.getTracks().forEach(t => t.stop());
-          results.video = 'Working';
-          setSystemCheck(prev => ({ ...prev, video: results.video }));
-        } catch {
-          results.video = 'Failed';
-          setSystemCheck(prev => ({ ...prev, video: results.video }));
+    async function videoPrompt(){
+        setVideoStatus(PermissionStatus.CHECKING);
+
+        try{
+            await navigator.mediaDevices.getUserMedia({video: true})
+            setVideoStatus(PermissionStatus.GRANTED);
+            return Promise.resolve('granted')
+        }catch(err){
+            setVideoStatus(PermissionStatus.DENIED);
+            return Promise.reject('denied')
         }
-      }
-    } catch {
-      results.video = 'Failed';
-      setSystemCheck(prev => ({ ...prev, video: results.video }));
     }
 
-    const ok =
-      results.audio === 'Working' &&
-      results.video === 'Working' &&
-      results.internet === 'Stable' &&
-      results.fullscreen === 'Working';
-
-    setIsEligible(ok);
-    setIsChecking(false);
-  };
-
-  // Called when the external Enter Exam button is clicked:
-  // open the dialog and run the checks (permission prompts appear inside dialog)
-  const openDialogAndCheck = () => {
-    setOpen(true);
-    // run checks immediately (still considered a user flow). If you see permission prompts not attached,
-    // ensure the browser hasn't permanently blocked them for the site
-    setTimeout(performSystemCheck, 50);
-  };
-
-  // FINAL action: attempt to enter fullscreen (user gesture required), then navigate if success
-  const enterExamAndFullscreen = async () => {
-    if (isChecking || !accepted) return;
-
-    // Attempt to actually enter fullscreen now. This must be called from the click handler (user gesture).
-    const fsSuccess = await tryEnterFullscreen(document.documentElement);
-    // Update UI with actual fullscreen result
-    setSystemCheck(prev => ({ ...prev, fullscreen: fsSuccess ? 'Working' : 'Failed' }));
-
-    // Re-evaluate eligibility: fullscreen must be Working now
-    const finalOk =
-      systemCheck.audio === 'Working' &&
-      systemCheck.video === 'Working' &&
-      systemCheck.internet === 'Stable' &&
-      fsSuccess;
-
-    setIsEligible(finalOk);
-
-    if (!finalOk) {
-      // If fullscreen failed, show a helpful message (browser might have blocked it)
-      // The user can re-run checks or allow site permissions manually.
-      return;
+    async function fullscreenPrompt(){
+        setFullscreenStatus(PermissionStatus.CHECKING);
+        try{
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                await elem.requestFullscreen();
+            }
+            setFullscreenStatus(PermissionStatus.GRANTED);
+            return Promise.resolve('granted')
+        }catch(err){
+            setFullscreenStatus(PermissionStatus.DENIED);
+            return Promise.reject('denied')
+        }
     }
 
-    // All good — navigate to exam (replace route as needed)
-    router.push('/exam'); // change to your exam route
-  };
+    async function internetCheck(){
+        setInternetStatus(PermissionStatus.CHECKING);
+        try{
+            if(navigator.onLine){
+                setInternetStatus(PermissionStatus.GRANTED);
+                return Promise.resolve('online')
+            }else{
+                setInternetStatus(PermissionStatus.DENIED);
+                return Promise.reject('offline')
+            }
+        }catch(err){
+            setInternetStatus(PermissionStatus.DENIED);
+            return Promise.reject('error')
+        }
+    }
 
-  return (
-    <>
-      <Button onClick={openDialogAndCheck}>Enter Exam</Button>
+    async function eligibilityCheck(){
+        return Promise.all([audioPrompt(), videoPrompt(), internetCheck()]).then((res) => {
+            setIsEligible(true);
+        }).catch((err) => { 
+            setIsEligible(false);
+            console.log("One or more permissions denied", err)
+        })
+    }
 
-      <Dialog open={open} onOpenChange={v => setOpen(v)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Exam Eligibility Check</DialogTitle>
-          </DialogHeader>
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button>Enter Exam</Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Exam Eligibility Check</DialogTitle>
+                </DialogHeader>
+                <div>
+                    <h3 className="text-lg font-semibold">Terms & Conditions</h3>
+                    <ul className="list-disc pl-5 text-sm">
+                        <li>
+                        I agree to maintain academic integrity throughout this
+                        examination.
+                        </li>
+                        <li>I will not use any unauthorized materials during the exam.</li>
+                        <li>
+                        I understand that any attempt to cheat will result in immediate
+                        disqualification.
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 className="text-lg font-semibold">System Check</h3>
+                    <ul className="text-sm flex flex-col gap-1">
+                        <li>Audio System: <StatusMessage status={audioStatus} /></li>
+                        <li>Video System: <StatusMessage status={videoStatus} /></li>
+                        <li>Fullscreen Mode: <StatusMessage status={fullscreenStatus} /></li>
+                        <li>Internet Connection: <StatusMessage status={internetStatus} /></li>
+                    </ul>
+                    <p className="text-xs text-muted-foreground mt-2">NOTE: Click the <Lock className="inline" size={10} /> lock icon in the address bar <MoveRight size={10} className="inline" /> Site settings <MoveRight size={10} className="inline" /> Allow Camera and Microphone access.</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <Checkbox id="terms" />
+                    <Label htmlFor="terms">Accept terms and conditions</Label>
+                </div>
+                <DialogFooter>
+                    <DialogClose asChild>
+                        <Button variant="secondary">Cancel</Button>
+                    </DialogClose>
 
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold">Terms & Conditions</h3>
-              <ul className="list-disc pl-5 text-sm">
-                <li>I agree to maintain academic integrity throughout this examination.</li>
-                <li>I will not use any unauthorized materials during the exam.</li>
-                <li>I understand that any attempt to cheat will result in immediate disqualification.</li>
-              </ul>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <Checkbox id="terms" checked={accepted} onCheckedChange={v => setAccepted(!!v)} />
-              <Label htmlFor="terms">Accept terms and conditions (required)</Label>
-            </div>
-
-            <div>
-              <h3 className="text-lg font-semibold">System Check</h3>
-              <ul className="text-sm">
-                <li>Audio System: {systemCheck.audio}</li>
-                <li>Video System: {systemCheck.video}</li>
-                <li>Fullscreen Mode: {systemCheck.fullscreen}</li>
-                <li>Internet Connection: {systemCheck.internet}</li>
-              </ul>
-
-              <div className="text-xs mt-2 text-muted-foreground">
-                {isChecking ? 'Checking systems... (permission prompts may appear)' : 'Click Re-run check to recheck'}
-              </div>
-
-              <div style={{ marginTop: 8, fontSize: 13, color: '#444' }}>
-                <strong>Note:</strong> Actually entering fullscreen requires a direct user click. If Fullscreen shows{' '}
-                <em>Failed</em> after clicking the final button, open the lock icon in the address bar → Site settings → ensure Fullscreen access is allowed (or try another browser). Some browsers block fullscreen when not in a user gesture.
-              </div>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button variant="secondary" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-
-            <div style={{ display: 'flex', gap: 8 }}>
-              <Button onClick={performSystemCheck} disabled={isChecking}>
-                {isChecking ? 'Checking…' : 'Re-run check'}
-              </Button>
-
-              <Button
-                variant="default"
-                disabled={!accepted || isChecking}
-                onClick={enterExamAndFullscreen}
-              >
-                Check Eligibility & Enter Exam
-              </Button>
-            </div>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
+                    <div>
+                        {
+                            !isEligible ?
+                            <Button onClick={eligibilityCheck}>Check Eligibility</Button>
+                            :
+                            fullscreenStatus === PermissionStatus.GRANTED ? 
+                            <Button variant="default">Enter Exam</Button>
+                            : 
+                            <Button variant="default" onClick={fullscreenPrompt}>Enter Fullscreen Mode</Button>
+                        }
+                    </div>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
 }
+
+export default EligibilityTest;
