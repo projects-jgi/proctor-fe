@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, CalendarDays, Hourglass } from "lucide-react";
-import React from "react";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import ExamCard from "./ExamCard";
 import Link from "next/link";
 
@@ -40,7 +39,7 @@ function CompletedExams() {
       <div className="grid grid-cols-1 gap-4 mt-4">
         {exams
           .map((exam, index) => (
-            <ExamCard key={index} {...exam} action={<Button>View Details</Button>}  />
+            <ExamCard key={index} {...exam} action={<Link href="/student/results"><Button>View Results</Button></Link>}  />
           ))}
       </div>
     </section>
