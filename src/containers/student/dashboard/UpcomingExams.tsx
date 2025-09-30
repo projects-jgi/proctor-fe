@@ -3,6 +3,7 @@ import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle }
 import { AlarmClock, ArrowRight, CalendarDays, Hourglass } from "lucide-react";
 import React from "react";
 import ExamCard from "./ExamCard";
+import Link from "next/link";
 
 const exams = [
     {
@@ -26,12 +27,14 @@ function UpcomingExams() {
     <section className="mt-8">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">Upcoming Exams</h2>
-        <Button variant={"outline"}>
-          View All
-          <span>
-            <ArrowRight />
-          </span>
-        </Button>
+        <Link href="/student/exams/upcoming">
+          <Button variant={"outline"}>
+            View All
+            <span>
+              <ArrowRight />
+            </span>
+          </Button>
+        </Link>
       </div>
       <div className="grid grid-cols-1 gap-4 mt-4">
         {exams
