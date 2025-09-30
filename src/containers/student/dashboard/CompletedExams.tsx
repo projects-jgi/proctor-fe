@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import Link from "next/link";
 import ExamCard from "./ExamCard";
 import Link from "next/link";
 
