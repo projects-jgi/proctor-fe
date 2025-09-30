@@ -1,9 +1,7 @@
-import React from 'react'
-import Image from 'next/image'
 import { ThemeToggle } from '@/components/ThemeToggle'
-import { Button } from '@/components/ui/button'
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { User } from 'lucide-react'
+import Link from 'next/link'
 
 function Topbar() {
   return (
@@ -23,7 +21,9 @@ function Topbar() {
           <DropdownMenuContent align="end">
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem className="text-destructive">Logout</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/student/login" className="text-destructive">Logout</Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
