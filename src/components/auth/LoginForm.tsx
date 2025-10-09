@@ -4,13 +4,13 @@ import React, { useState } from 'react'
 
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, LoaderCircle } from "lucide-react";
 import { Button } from '@/components/ui/button';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from 'react-hook-form';
 import { loginSchema, LoginSchema } from '@/lib/zod/login';
 
-function LoginForm({ handleLogin}: { handleLogin: (values: any) => void }) {
+function LoginForm({ handleLogin, error, isValidating }: { handleLogin: (values: any) => void, error: string, isValidating: boolean }) {
     const [showPassword, setShowPassword] = useState(false);
     
     const form = useForm<LoginSchema>({
@@ -24,6 +24,7 @@ function LoginForm({ handleLogin}: { handleLogin: (values: any) => void }) {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-4">
+              { error && <p className='text-center text-destructive text-sm'>{error}</p>}
               <FormField
                 control={form.control}
                 name="email"
@@ -64,7 +65,15 @@ function LoginForm({ handleLogin}: { handleLogin: (values: any) => void }) {
                   </FormItem>
                 )}
               />
-              <Button variant={"default"} type="submit" className="w-full">Login</Button>
+              <Button disabled={isValidating} variant={"default"} type="submit" className="w-full">
+                {
+                  isValidating && 
+                  <span className="animate-spin">
+                    <LoaderCircle />
+                  </span>
+                }
+                Login
+              </Button>
             </form>
           </Form>
     )

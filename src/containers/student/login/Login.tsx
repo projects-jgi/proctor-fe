@@ -8,13 +8,26 @@ import { OTPInput } from "input-otp";
 import { loginSchema, LoginSchema, OtpSchema } from "@/lib/zod/login";
 import LoginForm from "@/components/auth/LoginForm";
 import OTPForm from "@/components/auth/OTPForm";
+import { login } from "@/lib/server_api/auth";
+import { useRouter } from "next/navigation";
 
 function Login() {
     const [isFormValidated, setIsFormValidated] = useState(false);
+    const [loginError, setLoginError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const router = useRouter();
 
-    const handleLogin = (values: LoginSchema) => {
-        setIsFormValidated(true);
-        console.log(values)
+    const handleLogin = async (values: LoginSchema) => {
+        setIsLoading(true)
+        try{
+            const res = await login(values)
+            router.push("/student/dashboard")
+            setLoginError("")
+        }catch(err){
+            setLoginError(JSON.parse((err as Error).message).message)
+        }finally{
+            setIsLoading(false)
+        }
     };
 
     const handleOtpSubmit = (e: OtpSchema) => {
@@ -31,7 +44,7 @@ function Login() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <LoginForm handleLogin={handleLogin} />
+                    <LoginForm isValidating={isLoading} handleLogin={handleLogin} error={loginError} />
                     {isFormValidated && (
                         <OTPForm handleOtpSubmit={handleOtpSubmit} />
                     )}
