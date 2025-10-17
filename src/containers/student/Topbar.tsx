@@ -1,9 +1,20 @@
+'use client';
+
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { logout } from '@/lib/server_api/auth'
 import { User } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation';
 
 function Topbar() {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await logout()
+    router.push("/auth/student")  
+  }
   return (
     <nav className="mb-2 w-full h-16 flex items-center justify-between px-6 border-b shadow-lg">
       <div className="flex items-center gap-2">
@@ -22,7 +33,7 @@ function Topbar() {
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/student/login" className="text-destructive">Logout</Link>
+              <Button variant={'link'} className='text-destructive' onClick={handleLogout}>Logout</Button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

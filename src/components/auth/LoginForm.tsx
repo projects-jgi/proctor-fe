@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from 'react-hook-form';
 import { loginSchema, LoginSchema } from '@/lib/zod/login';
+import Loading from '../Loading';
 
 function LoginForm({ handleLogin, error, isValidating }: { handleLogin: (values: any) => void, error: string, isValidating: boolean }) {
     const [showPassword, setShowPassword] = useState(false);
@@ -68,9 +69,7 @@ function LoginForm({ handleLogin, error, isValidating }: { handleLogin: (values:
               <Button disabled={isValidating} variant={"default"} type="submit" className="w-full">
                 {
                   isValidating && 
-                  <span className="animate-spin">
-                    <LoaderCircle />
-                  </span>
+                  <Loading />
                 }
                 Login
               </Button>
