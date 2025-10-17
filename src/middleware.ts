@@ -9,6 +9,7 @@ export async function middleware(request: NextRequest){
 
     const pathname = request.nextUrl.pathname.toLocaleLowerCase()
     const is_authorized = await isAuthorized();
+    console.log(is_authorized)
 
     // TODO: login and redirect are currently only works for student routes
 

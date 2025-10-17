@@ -11,7 +11,8 @@ interface SessionData {
 const PASSWORD = "hR7Wcv5@W#C)rbU%2LZuR]-e:.gu7Rd+!pT?9a77Rj6Qecs0K12)g6Q8-4!40.:uH@RwRto_kFC_DYgk?D,DwCC4TDLppDZDqD7G"
 
 export async function loginSession(data: { data: object}){
-    const session = await getIronSession(await cookies(), { password: PASSWORD, cookieName: SessionTypes.USER_SESSION})
+    // TODO: set the ttl as the backend authorization ttl
+    const session = await getIronSession(await cookies(), { password: PASSWORD, cookieName: SessionTypes.USER_SESSION, ttl: 3600})
     session.user = {
         token: data
     }

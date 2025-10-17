@@ -3,9 +3,9 @@ import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader,
 import { CalendarDays, Hourglass } from "lucide-react";
 import React from "react";
 
-type ExamType = { name?: string; description?: string; startDate?: string; endDate?: string; duration?: string; action: React.ReactNode };
+type ExamType = { name?: string; description?: string; start_time?: string; end_time?: string; duration_in_minutes?: string; action: React.ReactNode };
 
-function ExamCard({ name, description, startDate, endDate, duration, action }: ExamType) {
+function ExamCard({ name, description = "", start_time, end_time, duration_in_minutes, action }: ExamType) {
   return (
     <Card className="w-full">
       <CardHeader className="grid">
@@ -21,13 +21,13 @@ function ExamCard({ name, description, startDate, endDate, duration, action }: E
             <span className="inline">
               <CalendarDays size={20} />
             </span>
-            <span className="inline">{startDate} to {endDate}</span>
+            <span className="inline">{start_time} to {end_time}</span>
           </div>
           <div className="flex gap-2 items-center">
             <span className="inline">
               <Hourglass size={20} />
             </span>
-            <span className="inline">{duration} Minutes</span>
+            <span className="inline">{duration_in_minutes} Minutes</span>
           </div>
         </div>
       </CardContent>

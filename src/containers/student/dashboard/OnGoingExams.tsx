@@ -1,35 +1,35 @@
+"use client";
+
 import EligibilityTest from "@/containers/student/EligibilityTest";
 import ExamCard from "./ExamCard";
-
-const exams = [
-    {
-        name: "MATHEMATICS FINAL EXAM",
-        description: "Master of Computer Applications",
-        startDate: "01/01/2025",
-        endDate: "03/01/2025",
-        duration: "90"
-    },
-    {
-        name: "PHYSICS FINAL EXAM",
-        description: "Bachelor of Science",
-        startDate: "05/01/2025",
-        endDate: "07/01/2025",
-        duration: "120"
-    }
-]
+import { useQuery } from "@tanstack/react-query";
+import { get_student_exams } from "@/lib/server_api/student";
 
 function OngoingExams() {
-  return (
-    <section className="">
-      <h2 className="text-xl font-bold">Ongoing Exams</h2>
-      <div className="grid grid-cols-1 gap-4 mt-4">
-        {exams
-          .map((exam, index) => (
-            <ExamCard key={index} {...exam} action={<EligibilityTest />}  />
-          ))}
-      </div>
-    </section>
-  );
+    const ongoing_exams = useQuery({
+        queryKey: ["exams", { status: "ongoing" }],
+        queryFn: async ({ queryKey }) =>
+        await get_student_exams({ status: queryKey[1].status }),
+    });
+
+    if (
+        ongoing_exams.isLoading ||
+        ongoing_exams.isError ||
+        ongoing_exams.data.length == 0
+    ) {
+        return <></>;
+    }
+
+    return (
+        <section className="">
+            <h2 className="text-xl font-bold">Ongoing Exams</h2>
+            <div className="grid grid-cols-1 gap-4 mt-4">
+                {ongoing_exams.map((exam, index) => (
+                <ExamCard key={index} {...exam} action={<EligibilityTest />} />
+                ))}
+            </div>
+        </section>
+    );
 }
 
 export default OngoingExams;

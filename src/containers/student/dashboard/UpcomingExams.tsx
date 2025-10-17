@@ -1,28 +1,23 @@
+'use client';
+
 import { Button } from "@/components/ui/button";
-import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlarmClock, ArrowRight, CalendarDays, Hourglass } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import React from "react";
 import ExamCard from "./ExamCard";
 import Link from "next/link";
-
-const exams = [
-    {
-        name: "MATHEMATICS FINAL EXAM",
-        description: "Master of Computer Applications",
-        startDate: "01/01/2025",
-        endDate: "03/01/2025",
-        duration: "90"
-    },
-    {
-        name: "PHYSICS FINAL EXAM",
-        description: "Bachelor of Science",
-        startDate: "05/01/2025",
-        endDate: "07/01/2025",
-        duration: "120"
-    }
-]
+import { useQuery } from "@tanstack/react-query";
+import { get_student_exams } from "@/lib/server_api/student";
 
 function UpcomingExams() {
+  const upcoming_exams = useQuery({
+    queryKey: ["exams", {status: "upcoming"}],
+    queryFn: async ({ queryKey }) => await get_student_exams({ status: queryKey[1].status })
+  })
+
+  if(upcoming_exams.isLoading || upcoming_exams.isError || upcoming_exams.data.length == 0){
+    return <></>
+  }
+
   return (
     <section className="mt-8">
       <div className="flex justify-between items-center">
@@ -37,10 +32,11 @@ function UpcomingExams() {
         </Link>
       </div>
       <div className="grid grid-cols-1 gap-4 mt-4">
-        {exams
-          .map((exam, index) => (
+        {
+          upcoming_exams.data!.map((exam, index) => (
             <ExamCard key={index} {...exam} action={<Button>View Details</Button>}  />
-          ))}
+          ))          
+        }
       </div>
     </section>
   );
