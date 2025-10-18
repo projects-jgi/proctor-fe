@@ -13,3 +13,18 @@ export async function get_student_exams({ status = "completed" }: { status?: str
             return Promise.reject(error.response.data.message)
         })
 }
+
+export async function make_student_exam_attempt({ exam_id }: { exam_id: number }){
+    return Request({
+        url: process.env.BACKEND_HOST + `/api/students/exams/${exam_id}/attempts`,
+        method: "POST",
+        isAuthorized: true
+    }).then(function(response){
+        return (response.data.data)
+    }).catch(function(error){
+        if(error.response){
+            return Promise.reject(error.response.data.message)
+        }
+        return Promise.reject("Unknown error occured while starting exam")
+    })
+}

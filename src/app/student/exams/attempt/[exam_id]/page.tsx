@@ -1,5 +1,6 @@
 'use client';
 
+import Loading from '@/components/Loading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,17 +8,69 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Label } from '@/components/ui/label';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
-import { AppSidebar } from '@/containers/student/exams/attempt/Sidebar';
+import { ExamSidebar } from '@/containers/student/exams/attempt/ExamSidebar';
+import QuestionCard from '@/containers/student/exams/attempt/QuestionCard';
 import Topbar from '@/containers/student/exams/attempt/Topbar'
+import { make_student_exam_attempt } from '@/lib/server_api/student';
+import { ExamQuestion } from '@/types/exam';
+import { useQuery } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight, TriangleAlert } from 'lucide-react';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+
+function ExamLoadingScreen(){
+    return (
+        <div className="w-screen h-screen flex flex-col items-center justify-center">
+            <p className='mb-4'><Loading /></p>
+            <p>Please wait while we load questions...</p>
+        </div>
+    )
+}
+
+function ExamErrorScreen(){
+    // TODO: support team contact details
+    return (
+        <div className="w-screen h-screen flex flex-col items-center justify-center">
+            <p>Unable to load exam questions. Please contact support team!</p>
+        </div>
+    )
+}
 
 function ExamHall() {
+    const [questionCounter, setQuestionCounter] = useState(1);
+    const [questionId, setQuestionId] = useState<number | null>(null)
+    const [currentQuestion, setCurrentQuestion] = useState<ExamQuestion | null>(null)
+
+    const exam_questions = useQuery({
+        queryKey: ["exams", "attempt", 1],
+        queryFn: async() => await make_student_exam_attempt({exam_id: 1}),
+    })
+
+    useEffect(() => {
+        if(exam_questions.isSuccess && exam_questions.data){
+            const question = Object.values(Object.values(exam_questions.data).flat()[0] as Object)[0] as ExamQuestion
+            setQuestionId(question.id)
+        }
+    }, [exam_questions.isSuccess])
+
+    useEffect(() => {
+        if(exam_questions.data){
+            setCurrentQuestion((Object.values(exam_questions.data).flat()[0] as {[key: string]: ExamQuestion})[questionId])
+        }
+    }, [questionId])
+
+    if(exam_questions.isLoading){
+        return <ExamLoadingScreen />
+    }
+
+    if(exam_questions.isError){
+        return <ExamErrorScreen />
+    }
+
     return (
         <>
             <SidebarProvider>
                 <aside>
-                    <AppSidebar />
+                    <ExamSidebar setQuestionCounter={setQuestionCounter} setQuestionId={setQuestionId} questionCounter={questionCounter} questions={exam_questions.data} />
                 </aside>
                 <main className='w-full'>
                     <Topbar />
@@ -37,79 +90,7 @@ function ExamHall() {
                             </div>
                         </div>
                         <section className='mt-4'>
-                            <Card>
-                                <CardHeader>
-                                    <CardDescription className='text-sm mb-2'>Question 1 of 30</CardDescription>
-                                    <CardTitle>1. Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi placeat provident reprehenderit ut, tenetur explicabo ad consequuntur numquam, consectetur, vero officia at perspiciatis! Porro necessitatibus pariatur in laborum ab, eius, veniam labore a ullam ex inventore architecto reprehenderit. Beatae dolore ipsa voluptas! Error, molestias? A quisquam laudantium incidunt dignissimos in!</CardTitle>
-                                    <CardAction className='text-sm font-bold'>
-                                        Score: 1
-                                    </CardAction>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="flex flex-col gap-4">
-                                        <Label className="hover:bg-accent/50 flex items-start gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-blue-600 has-[[aria-checked=true]]:bg-blue-50 dark:has-[[aria-checked=true]]:border-blue-900 dark:has-[[aria-checked=true]]:bg-blue-950">
-                                            <Checkbox
-                                                id="toggle-2"
-                                                className="data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white dark:data-[state=checked]:border-blue-700 dark:data-[state=checked]:bg-blue-700"
-                                            />
-                                            <div className="grid gap-1.5 font-normal">
-                                                <p className="text-sm leading-none font-medium">
-                                                    First Option
-                                                </p>
-                                            </div>
-                                        </Label>
-                                        <Label className="hover:bg-accent/50 flex items-start gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-blue-600 has-[[aria-checked=true]]:bg-blue-50 dark:has-[[aria-checked=true]]:border-blue-900 dark:has-[[aria-checked=true]]:bg-blue-950">
-                                            <Checkbox
-                                                id="toggle-2"
-                                                className="data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white dark:data-[state=checked]:border-blue-700 dark:data-[state=checked]:bg-blue-700"
-                                            />
-                                            <div className="grid gap-1.5 font-normal">
-                                                <p className="text-sm leading-none font-medium">
-                                                    Second Option
-                                                </p>
-                                            </div>
-                                        </Label>
-                                        <Label className="hover:bg-accent/50 flex items-start gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-blue-600 has-[[aria-checked=true]]:bg-blue-50 dark:has-[[aria-checked=true]]:border-blue-900 dark:has-[[aria-checked=true]]:bg-blue-950">
-                                            <Checkbox
-                                                id="toggle-2"
-                                                className="data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white dark:data-[state=checked]:border-blue-700 dark:data-[state=checked]:bg-blue-700"
-                                            />
-                                            <div className="grid gap-1.5 font-normal">
-                                                <p className="text-sm leading-none font-medium">
-                                                    Third Option
-                                                </p>
-                                            </div>
-                                        </Label>
-                                        <Label className="hover:bg-accent/50 flex items-start gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-blue-600 has-[[aria-checked=true]]:bg-blue-50 dark:has-[[aria-checked=true]]:border-blue-900 dark:has-[[aria-checked=true]]:bg-blue-950">
-                                            <Checkbox
-                                                id="toggle-2"
-                                                className="data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white dark:data-[state=checked]:border-blue-700 dark:data-[state=checked]:bg-blue-700"
-                                            />
-                                            <div className="grid gap-1.5 font-normal">
-                                                <p className="text-sm leading-none font-medium">
-                                                    Fourth Option
-                                                </p>
-                                            </div>
-                                        </Label>
-                                    </div>
-                                </CardContent>
-                                <CardFooter>
-                                    <div className="w-full flex items-center justify-between">
-                                        <Button variant="outline">
-                                            <ChevronLeft />
-                                            Previous
-                                        </Button>
-                                        <Button className='bg-warning text-warning-foreground'>
-                                            <TriangleAlert />
-                                            Mark for Review
-                                        </Button>
-                                        <Button>
-                                            Next
-                                            <ChevronRight />
-                                        </Button>
-                                    </div>
-                                </CardFooter>
-                            </Card>
+                            { currentQuestion && <QuestionCard setQuestionCounter={setQuestionCounter} question_no={questionCounter} question={currentQuestion} /> } 
                         </section>
                     </div>
                 </main>

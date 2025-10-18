@@ -21,6 +21,8 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { ExamQuestion, ExamTypeQuestion } from "@/types/exam";
+import { cn } from "@/lib/utils";
 
 // This is sample data.
 const data = {
@@ -44,17 +46,26 @@ const data = {
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function ExamSidebar({ setQuestionCounter, setQuestionId, questionCounter, questions }: { setQuestionCounter: React.Dispatch<React.SetStateAction<number>>, setQuestionId: React.Dispatch<React.SetStateAction<number>>, questionCounter: number, questions: ExamTypeQuestion }) {
+
+  function handleItemClick(event: any){
+    // setQuestionCounter(counter)
+    let {questionCounter} = event.currentTarget.dataset
+    let {questionId} = event.currentTarget.dataset
+
+    setQuestionCounter(questionCounter)
+    setQuestionId(questionId)
+  }
   return (
-    <Sidebar {...props}>
+    <Sidebar>
         <SidebarHeader>
             <span className="text-lg inline-block text-center font-bold p-4">LOGO</span>
         </SidebarHeader>
       <SidebarContent className="gap-0">
-        {data.navMain.map((item) => (
+        {Object.keys(questions).map((exam_type: string, index) => (
           <Collapsible
-            key={item.title}
-            title={item.title}
+            key={exam_type}
+            title={exam_type}
             defaultOpen
             className="group/collapsible"
           >
@@ -64,17 +75,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 className="group/label text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-md font-bold mb-2"
               >
                 <CollapsibleTrigger>
-                  {item.title}{" "}
+                  {exam_type}{" "}
                   <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
                 </CollapsibleTrigger>
               </SidebarGroupLabel>
               <CollapsibleContent>
                 <SidebarGroupContent>
                   <SidebarMenu className="grid grid-cols-4 gap-3">
-                    {Array(10).fill(0).map((_, index) => (
-                        <SidebarMenuItem key={index} className="w-full aspect-square bg-secondary text-secondary-foreground ring-2 ring-border">
-                            <SidebarMenuButton asChild isActive={false} className="inline-flex w-full h-full items-center justify-center">
-                                <a href={item.url}>10</a>
+                    {Object.values(questions[exam_type]).map((question: ExamQuestion, index) => (
+                        <SidebarMenuItem
+                          key={index}
+                          className={cn(
+                            "w-full aspect-square bg-secondary text-secondary-foreground ring-2 ring-border",
+                            (questionCounter == index + 1) && 'bg-primary'
+                          )}
+                          onClick={handleItemClick}
+                          data-question-counter={++index}
+                          data-question-id={question.id}
+                        >
+                            <SidebarMenuButton isActive={false} className="inline-flex w-full h-full items-center justify-center" data-question-id={question.id}>
+                                {index}
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     ))}
