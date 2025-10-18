@@ -24,7 +24,11 @@ function Login() {
             router.push("/student/dashboard")
             setLoginError("")
         }catch(err){
-            setLoginError(JSON.parse((err as Error).message).message)
+            let err_message = "Unable to login. Please try again!"
+            if(err.message){
+                err_message = err.message
+            }
+            setLoginError(err_message)
         }finally{
             setIsLoading(false)
         }

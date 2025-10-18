@@ -10,26 +10,14 @@ export async function login({ email, password }: {email: string, password: strin
     }
 
     try{
-        const res = await Request({url: "http://localhost/api/auth/student/login", method: 'POST', body: JSON.stringify(body)})
-        await loginSession(res)
-        return {
-            status: true,
-            message: "Student authentication successful"
+        const response = await Request({url: "http://localhost/api/auth/student/login", method: 'POST', body: body})
+        await loginSession(response.data)
+        return {}
+    }catch(error){
+        if(error.response){
+            return Promise.reject(error.response.data.message)
         }
-    }catch(err){
-        let err_message = undefined;
-        if(typeof(err) == "string"){
-            err_message = err
-        }else if(err instanceof Error){
-            err_message = err.message
-        }else{
-            err_message = "Invalid login credentials"
-        }
-
-        throw new Error(JSON.stringify({
-            status: false,
-            message: err_message
-        }))
+        return Promise.reject("Unknown error occured")
     }
 
 }

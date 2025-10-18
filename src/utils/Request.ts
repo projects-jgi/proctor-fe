@@ -1,20 +1,16 @@
+import axios from "axios";
+
 import { getSession } from "./session"
 
 interface RequestParams {
-    url: string | URL,
+    url: string,
     method?: string | undefined,
-    body?: string,
+    body?: object,
     isAuthorized?: boolean
 }
 
 export default async function Request({ url, method = "GET", isAuthorized = false, body }: RequestParams){
-    let params: RequestInit = {
-        headers: {
-            "Accept": "application/json"
-        },
-        method
-    }
-
+    let headers: any = {}
     
     if(isAuthorized){
         const session = await getSession();
@@ -24,24 +20,12 @@ export default async function Request({ url, method = "GET", isAuthorized = fals
         }else{
             token = "";
         }
-
-        params.headers["Authorization"] = "Bearer " + token
-        console.log(params)
+        headers['Authorization'] = 'Bearer ' + token
     }
 
-    if(body){
-        params.headers = {
-            ...params.headers,
-            "Content-Type": "application/json"
-        }
-        params.body = body
-    }
-    
-    const request = await fetch(url, params);
-
-    if(!request.ok){
-        return Promise.reject(await request.json());
-    }
-
-    return Promise.resolve(await request.json());
+    return axios(url, {
+        method: method,
+        data: body,
+        headers: headers
+    })
 }
