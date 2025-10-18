@@ -10,7 +10,7 @@ export async function login({ email, password }: {email: string, password: strin
     }
 
     try{
-        const response = await Request({url: "http://localhost/api/auth/student/login", method: 'POST', body: body})
+        const response = await Request({url: process.env.BACKEND_HOST + "/api/auth/student/login", method: 'POST', body: body})
         await loginSession(response.data)
         return {}
     }catch(error){
