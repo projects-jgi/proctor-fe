@@ -1,62 +1,20 @@
+import ExamCard from "@/components/exam/ExamCard";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import ExamCard from "@/containers/student/dashboard/ExamCard";
+import ExamCompletedList from "@/containers/student/exams/ExamCompletedList";
+import ExamOngoingList from "@/containers/student/exams/ExamOngoingList";
+import ExamUpcomingList from "@/containers/student/exams/ExamUpcomingList";
 import Topbar from "@/containers/student/Topbar";
+import { ExamStatus } from "@/types/exam";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import React from "react";
 
-const exams = [
-    {
-        name: "MATHEMATICS FINAL EXAM",
-        description: "Master of Computer Applications",
-        startDate: "01/01/2025",
-        endDate: "03/01/2025",
-        duration: "90"
-    },
-    {
-        name: "PHYSICS FINAL EXAM",
-        description: "Bachelor of Science",
-        startDate: "05/01/2025",
-        endDate: "07/01/2025",
-        duration: "120"
-    },
-    {
-        name: "MATHEMATICS FINAL EXAM",
-        description: "Master of Computer Applications",
-        startDate: "01/01/2025",
-        endDate: "03/01/2025",
-        duration: "90"
-    },
-    {
-        name: "PHYSICS FINAL EXAM",
-        description: "Bachelor of Science",
-        startDate: "05/01/2025",
-        endDate: "07/01/2025",
-        duration: "120"
-    },
-    {
-        name: "MATHEMATICS FINAL EXAM",
-        description: "Master of Computer Applications",
-        startDate: "01/01/2025",
-        endDate: "03/01/2025",
-        duration: "90"
-    },
-    {
-        name: "PHYSICS FINAL EXAM",
-        description: "Bachelor of Science",
-        startDate: "05/01/2025",
-        endDate: "07/01/2025",
-        duration: "120"
-    },
-]
-
-
-async function page({ params }: { params: Promise<{ exam_status: "upcoming" | "completed" }> }) {
-  const { exam_status } = await params;
-
-  if(exam_status !== "upcoming" && exam_status !== "completed") {
+async function page({ params }: { params: any }) {
+  let { exam_status } = await params;
+  
+  if(exam_status !== ExamStatus.UPCOMING && exam_status !== ExamStatus.COMPLETED && exam_status != ExamStatus.ONGOING) { 
     return notFound();
   }
 
@@ -89,12 +47,13 @@ async function page({ params }: { params: Promise<{ exam_status: "upcoming" | "c
           </Card>
         </div>
         <section className="container">
-            <div className="grid grid-cols-1 gap-4 mt-4">
-                {exams
-                .map((exam, index) => (
-                    <ExamCard key={index} {...exam} action={<Button>View Details</Button>}  />
-                ))}
-            </div>
+          {
+            exam_status == ExamStatus.COMPLETED ? 
+            <ExamCompletedList /> :
+            exam_status == ExamStatus.UPCOMING ?
+            <ExamUpcomingList /> : 
+            <ExamOngoingList />
+          }
         </section>
       </main>
     </>
