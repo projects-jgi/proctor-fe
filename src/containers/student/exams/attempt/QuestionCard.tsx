@@ -8,7 +8,7 @@ import { ExamQuestion } from "@/types/exam";
 import { ChevronLeft, ChevronRight, TriangleAlert } from "lucide-react";
 import React from "react";
 
-function QuestionCard({ setQuestionCounter, question_no, question }: { setQuestionCounter: React.Dispatch<React.SetStateAction<number>>, question_no: number, question: ExamQuestion }) {
+function QuestionCard({ setQuestionCounter, questionCounter, question, hasNext, hasPrev }: { setQuestionCounter: React.Dispatch<React.SetStateAction<number>>, questionCounter: number, question: ExamQuestion, hasNext: boolean, hasPrev: boolean }) {
     const options: {
         [option: string]: string | undefined
     } = {
@@ -23,7 +23,7 @@ function QuestionCard({ setQuestionCounter, question_no, question }: { setQuesti
         <Card>
             <CardHeader>
                 <CardDescription className="text-sm mb-2">
-                Question {question_no} of 30
+                Question {questionCounter} of 30
                 </CardDescription>
                 <CardTitle>
                 {question.question_text}
@@ -50,7 +50,7 @@ function QuestionCard({ setQuestionCounter, question_no, question }: { setQuesti
             </CardContent>
             <CardFooter>
                 <div className="w-full flex items-center justify-between">
-                <Button variant="outline" onClick={() => setQuestionCounter(question_no - 1)}>
+                <Button disabled={!hasPrev} variant="outline" onClick={() => setQuestionCounter(questionCounter - 1)}>
                     <ChevronLeft />
                     Previous
                 </Button>
@@ -58,7 +58,7 @@ function QuestionCard({ setQuestionCounter, question_no, question }: { setQuesti
                     <TriangleAlert />
                     Mark for Review
                 </Button>
-                <Button onClick={() => setQuestionCounter(question_no + 1)}>
+                <Button disabled={!hasNext} onClick={() => setQuestionCounter(questionCounter + 1)}>
                     Next
                     <ChevronRight />
                 </Button>

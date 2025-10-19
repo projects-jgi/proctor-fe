@@ -2,11 +2,6 @@
 
 import Loading from '@/components/Loading';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Label } from '@/components/ui/label';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { ExamSidebar } from '@/containers/student/exams/attempt/ExamSidebar';
 import QuestionCard from '@/containers/student/exams/attempt/QuestionCard';
@@ -14,8 +9,7 @@ import Topbar from '@/containers/student/exams/attempt/Topbar'
 import { make_student_exam_attempt } from '@/lib/server_api/student';
 import { ExamQuestion } from '@/types/exam';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronLeft, ChevronRight, TriangleAlert } from 'lucide-react';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 function ExamLoadingScreen(){
     return (
@@ -36,8 +30,8 @@ function ExamErrorScreen(){
 }
 
 function ExamHall() {
-    const [questionCounter, setQuestionCounter] = useState(1);
-    const [questionId, setQuestionId] = useState<number | null>(null)
+    const [questionCounter, setQuestionCounter] = useState<number | null>(null);
+    // const [questionId, setQuestionId] = useState<number | null>(null)
     const [currentQuestion, setCurrentQuestion] = useState<ExamQuestion | null>(null)
 
     const exam_questions = useQuery({
@@ -45,18 +39,30 @@ function ExamHall() {
         queryFn: async() => await make_student_exam_attempt({exam_id: 1}),
     })
 
-    useEffect(() => {
-        if(exam_questions.isSuccess && exam_questions.data){
-            const question = Object.values(Object.values(exam_questions.data).flat()[0] as Object)[0] as ExamQuestion
-            setQuestionId(question.id)
+    const questions_length = useMemo(() => {
+        if(exam_questions.data){
+            return Object.keys(Object.values(exam_questions.data).flat()[0] as object).length
         }
+        return 0
     }, [exam_questions.isSuccess])
 
     useEffect(() => {
-        if(exam_questions.data){
-            setCurrentQuestion((Object.values(exam_questions.data).flat()[0] as {[key: string]: ExamQuestion})[questionId])
+        if(exam_questions.data && questionCounter == null){
+            setQuestionCounter(1);
+        }    
+    }, [exam_questions.isSuccess])
+
+    useEffect(() => {
+        if(questionCounter != null && questionCounter > 0){
+            let current_ele: HTMLElement | null = document.querySelector(`[data-question-counter='${questionCounter}']`)
+            console.log(current_ele)
+            let question_id: string | undefined = current_ele?.dataset.questionId
+            if(question_id != undefined){
+                setCurrentQuestion((Object.values(exam_questions.data).flat()[0] as {[key: string]: ExamQuestion})[question_id])
+            }
+            // setQuestionId(question_id);
         }
-    }, [questionId])
+    }, [questionCounter])
 
     if(exam_questions.isLoading){
         return <ExamLoadingScreen />
@@ -70,7 +76,7 @@ function ExamHall() {
         <>
             <SidebarProvider>
                 <aside>
-                    <ExamSidebar setQuestionCounter={setQuestionCounter} setQuestionId={setQuestionId} questionCounter={questionCounter} questions={exam_questions.data} />
+                    <ExamSidebar setQuestionCounter={setQuestionCounter} questionCounter={questionCounter} questions={exam_questions.data} />
                 </aside>
                 <main className='w-full'>
                     <Topbar />
@@ -90,7 +96,16 @@ function ExamHall() {
                             </div>
                         </div>
                         <section className='mt-4'>
-                            { currentQuestion && <QuestionCard setQuestionCounter={setQuestionCounter} question_no={questionCounter} question={currentQuestion} /> } 
+                            { currentQuestion && (
+                                <QuestionCard 
+                                    setQuestionCounter={setQuestionCounter} 
+                                    questionCounter={questionCounter}
+                                    question={currentQuestion}
+                                    hasNext={questionCounter != null && questionCounter < questions_length}
+                                    hasPrev={questionCounter != null && questionCounter > 1}
+                                />
+                                ) 
+                            } 
                         </section>
                     </div>
                 </main>

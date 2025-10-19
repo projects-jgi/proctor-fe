@@ -46,15 +46,15 @@ const data = {
   ],
 }
 
-export function ExamSidebar({ setQuestionCounter, setQuestionId, questionCounter, questions }: { setQuestionCounter: React.Dispatch<React.SetStateAction<number>>, setQuestionId: React.Dispatch<React.SetStateAction<number>>, questionCounter: number, questions: ExamTypeQuestion }) {
+export function ExamSidebar({ setQuestionCounter, questionCounter, questions }: { setQuestionCounter: React.Dispatch<React.SetStateAction<number>>, questionCounter: number, questions: ExamTypeQuestion }) {
+
+  let question_counter = 1;
 
   function handleItemClick(event: any){
     // setQuestionCounter(counter)
     let {questionCounter} = event.currentTarget.dataset
-    let {questionId} = event.currentTarget.dataset
 
-    setQuestionCounter(questionCounter)
-    setQuestionId(questionId)
+    setQuestionCounter(parseInt(questionCounter))
   }
   return (
     <Sidebar>
@@ -90,11 +90,11 @@ export function ExamSidebar({ setQuestionCounter, setQuestionId, questionCounter
                             (questionCounter == index + 1) && 'bg-primary'
                           )}
                           onClick={handleItemClick}
-                          data-question-counter={++index}
+                          data-question-counter={question_counter}
                           data-question-id={question.id}
                         >
-                            <SidebarMenuButton isActive={false} className="inline-flex w-full h-full items-center justify-center" data-question-id={question.id}>
-                                {index}
+                            <SidebarMenuButton isActive={false} className="inline-flex w-full h-full items-center justify-center">
+                                {question_counter++}
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     ))}
