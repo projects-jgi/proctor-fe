@@ -8,7 +8,7 @@ import { ExamQuestion } from "@/types/exam";
 import { ChevronLeft, ChevronRight, TriangleAlert } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
-function QuestionCard({ setQuestionCounter, questionCounter, question, hasNext, hasPrev }: { setQuestionCounter: React.Dispatch<React.SetStateAction<number>>, questionCounter: number, question: ExamQuestion, hasNext: boolean, hasPrev: boolean }) {
+function QuestionCard({ totalQuestions, setQuestionCounter, questionCounter, question, hasNext, hasPrev }: { totalQuestions: number, setQuestionCounter: React.Dispatch<React.SetStateAction<number>>, questionCounter: number, question: ExamQuestion, hasNext: boolean, hasPrev: boolean }) {
     const options: {
         [option: string]: string | undefined
     } = {
@@ -67,7 +67,7 @@ function QuestionCard({ setQuestionCounter, questionCounter, question, hasNext, 
         <Card className="card__question" data-question-id={question.id}>
             <CardHeader>
                 <CardDescription className="text-sm mb-2">
-                Question {questionCounter} of 30
+                Question {questionCounter} of {totalQuestions}
                 </CardDescription>
                 <CardTitle>
                 {question.question_text}

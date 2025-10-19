@@ -87,7 +87,7 @@ export function ExamSidebar({ setQuestionCounter, questionCounter, questions }: 
                           key={index}
                           className={cn(
                             "w-full aspect-square bg-secondary text-secondary-foreground ring-2 ring-border",
-                            (questionCounter == index + 1) && 'bg-primary'
+                            (questionCounter == question_counter) && 'bg-primary'
                           )}
                           onClick={handleItemClick}
                           data-question-counter={question_counter}

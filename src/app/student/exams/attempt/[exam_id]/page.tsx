@@ -2,7 +2,7 @@
 
 import Loading from '@/components/Loading';
 import { Badge } from '@/components/ui/badge';
-import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { SidebarProvider } from '@/components/ui/sidebar'
 import { ExamSidebar } from '@/containers/student/exams/attempt/ExamSidebar';
 import QuestionCard from '@/containers/student/exams/attempt/QuestionCard';
 import Topbar from '@/containers/student/exams/attempt/Topbar'
@@ -41,7 +41,7 @@ function ExamHall() {
 
     const questions_length = useMemo(() => {
         if(exam_questions.data){
-            return Object.keys(Object.values(exam_questions.data.questions).flat()[0] as object).length
+            return Object.values(Object.assign({}, ...Object.values(exam_questions.data.questions))).length
         }
         return 0
     }, [exam_questions.isSuccess])
@@ -57,7 +57,7 @@ function ExamHall() {
             let current_ele: HTMLElement | null = document.querySelector(`[data-question-counter='${questionCounter}']`)
             let question_id: string | undefined = current_ele?.dataset.questionId
             if(question_id != undefined){
-                setCurrentQuestion((Object.values(exam_questions.data.questions).flat()[0] as {[key: string]: ExamQuestion})[question_id])
+                setCurrentQuestion((Object.assign({}, ...Object.values(exam_questions.data.questions)) as {[key: string]: ExamQuestion})[question_id])
             }
             // setQuestionId(question_id);
         }
@@ -82,7 +82,7 @@ function ExamHall() {
                     <div className="m-8">
                         <div className="flex flex-wrap gap-12 items-center">
                             <div className='text-md font-bold'>
-                                Questions: <Badge>40</Badge>
+                                Questions: <Badge>{questions_length}</Badge>
                             </div>
                             <div className='text-md font-bold'>
                                 Answered: <Badge variant="success">30</Badge>
@@ -97,6 +97,7 @@ function ExamHall() {
                         <section className='mt-4'>
                             { currentQuestion && (
                                 <QuestionCard 
+                                    totalQuestions={questions_length}
                                     setQuestionCounter={setQuestionCounter} 
                                     questionCounter={questionCounter}
                                     question={currentQuestion}
