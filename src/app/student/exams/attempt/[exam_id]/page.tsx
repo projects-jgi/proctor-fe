@@ -55,7 +55,6 @@ function ExamHall() {
     useEffect(() => {
         if(questionCounter != null && questionCounter > 0){
             let current_ele: HTMLElement | null = document.querySelector(`[data-question-counter='${questionCounter}']`)
-            console.log(current_ele)
             let question_id: string | undefined = current_ele?.dataset.questionId
             if(question_id != undefined){
                 setCurrentQuestion((Object.values(exam_questions.data.questions).flat()[0] as {[key: string]: ExamQuestion})[question_id])

@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ExamQuestion } from "@/types/exam";
 import { ChevronLeft, ChevronRight, TriangleAlert } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 function QuestionCard({ setQuestionCounter, questionCounter, question, hasNext, hasPrev }: { setQuestionCounter: React.Dispatch<React.SetStateAction<number>>, questionCounter: number, question: ExamQuestion, hasNext: boolean, hasPrev: boolean }) {
     const options: {
@@ -19,8 +19,52 @@ function QuestionCard({ setQuestionCounter, questionCounter, question, hasNext, 
         option_5: question.option_5,
     }
 
+    // stored all the selected answers in memory
+    const [selectedOptions, setSelectedOptions] = useState<null | string[]>(null)
+
+    // load the selected options for a question from localStorage
+    useEffect(() => {
+        const local_storage: string | null = localStorage.getItem("user_answers")
+        if(local_storage != null){
+            const user_answers = JSON.parse(local_storage);
+            setSelectedOptions(user_answers[question.id])
+        }
+
+    }, [question])
+
+    // save the selected options from state to localStorage
+    useEffect(() => {
+        if(selectedOptions != null){
+            let prev_user_answers_str: string | null = localStorage.getItem("user_answers");
+            let prev_user_answers: object = {};
+            if(prev_user_answers_str != null){
+                prev_user_answers = JSON.parse(prev_user_answers_str)
+            }
+            let new_values = {
+                ...prev_user_answers,
+                [question.id]: selectedOptions
+            }
+            localStorage.setItem("user_answers", JSON.stringify(new_values))
+        }
+
+    }, [selectedOptions])
+
+    function onOptionClicked(option: string){
+        setSelectedOptions(prev => {
+            if (prev) {
+                if (prev.includes(option)) {
+                    return prev.filter(item => item !== option);
+                } else {
+                    return [...prev, option];
+                }
+            } else {
+                return [option];
+            }
+        })
+    }
+
     return (
-        <Card>
+        <Card className="card__question" data-question-id={question.id}>
             <CardHeader>
                 <CardDescription className="text-sm mb-2">
                 Question {questionCounter} of 30
@@ -35,9 +79,17 @@ function QuestionCard({ setQuestionCounter, questionCounter, question, hasNext, 
                     {Object.keys(options).map((option: string, index) => {
                         if(options[option]){
                             return (
-                                <Label key={index} data-option-name={option} className="hover:bg-accent/50 flex items-start gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-blue-600 has-[[aria-checked=true]]:bg-blue-50 dark:has-[[aria-checked=true]]:border-blue-900 dark:has-[[aria-checked=true]]:bg-blue-950">
+                                <Label
+                                    key={`toggle-${question.id}-${option}`}
+                                    className="hover:bg-accent/50 flex items-start gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-blue-600 has-[[aria-checked=true]]:bg-blue-50 dark:has-[[aria-checked=true]]:border-blue-900 dark:has-[[aria-checked=true]]:bg-blue-950"
+                                >
                                     <Checkbox
-                                    className="data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white dark:data-[state=checked]:border-blue-700 dark:data-[state=checked]:bg-blue-700"
+                                        id={`toggle-${question.id}-${option}`}
+                                        className="data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white dark:data-[state=checked]:border-blue-700 dark:data-[state=checked]:bg-blue-700"
+                                        data-option-name={option}
+                                        data-question-id={question.id}
+                                        onCheckedChange={() => onOptionClicked(option)}
+                                        checked={selectedOptions != null && selectedOptions.includes(option)}
                                     />
                                     <div className="grid gap-1.5 font-normal">
                                     <p className="text-sm leading-none font-medium">{options[option]}</p>
