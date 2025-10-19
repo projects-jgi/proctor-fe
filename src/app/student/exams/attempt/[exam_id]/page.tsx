@@ -41,7 +41,7 @@ function ExamHall() {
 
     const questions_length = useMemo(() => {
         if(exam_questions.data){
-            return Object.keys(Object.values(exam_questions.data).flat()[0] as object).length
+            return Object.keys(Object.values(exam_questions.data.questions).flat()[0] as object).length
         }
         return 0
     }, [exam_questions.isSuccess])
@@ -58,7 +58,7 @@ function ExamHall() {
             console.log(current_ele)
             let question_id: string | undefined = current_ele?.dataset.questionId
             if(question_id != undefined){
-                setCurrentQuestion((Object.values(exam_questions.data).flat()[0] as {[key: string]: ExamQuestion})[question_id])
+                setCurrentQuestion((Object.values(exam_questions.data.questions).flat()[0] as {[key: string]: ExamQuestion})[question_id])
             }
             // setQuestionId(question_id);
         }
@@ -76,10 +76,10 @@ function ExamHall() {
         <>
             <SidebarProvider>
                 <aside>
-                    <ExamSidebar setQuestionCounter={setQuestionCounter} questionCounter={questionCounter} questions={exam_questions.data} />
+                    <ExamSidebar setQuestionCounter={setQuestionCounter} questionCounter={questionCounter} questions={exam_questions.data.questions} />
                 </aside>
                 <main className='w-full'>
-                    <Topbar />
+                    <Topbar startTime={exam_questions.data.attempt.started_at} duration={exam_questions.data.attempt.exam.duration_in_minutes} />
                     <div className="m-8">
                         <div className="flex flex-wrap gap-12 items-center">
                             <div className='text-md font-bold'>
