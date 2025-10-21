@@ -28,3 +28,22 @@ export async function make_student_exam_attempt({ exam_id }: { exam_id: number }
         return Promise.reject("Unknown error occured while starting exam")
     })
 }
+
+export async function save_student_exam_attempt({ exam_id, answers }: {exam_id: number, answers: object}){
+    return Request({
+        url: process.env.BACKEND_HOST + `/api/students/exams/${exam_id}/attempts/answers`,
+        method: 'POST',
+        isAuthorized: true,
+        body: {
+            "is_auto_submitted": false,
+            "answer": JSON.stringify(answers)
+        }
+    }).then(function(response){
+        return (response.data)
+    }).catch(function(error){
+        if(error.response){
+            return Promise.reject(error.response.data.message)
+        }
+        return Promise.reject("Unknown error occured while starting exam")
+    })
+}
