@@ -25,7 +25,7 @@ function UpcomingExams() {
     <section className="mt-8">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">Upcoming Exams</h2>
-        <Link href="/student/exams/upcoming">
+        <Link href="/student/exams/status/upcoming">
           <Button variant={"outline"}>
             View All
             <span>

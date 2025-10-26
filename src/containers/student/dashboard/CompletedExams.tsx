@@ -28,7 +28,7 @@ function CompletedExams() {
         <section className="mt-8">
             <div className="flex justify-between items-center">
                 <h2 className="text-xl font-bold">Completed Exams</h2>
-                <Link href="/student/exams/completed">
+                <Link href="/student/exams/status/completed">
                     <Button variant={"outline"}>
                         View All
                         <span>
