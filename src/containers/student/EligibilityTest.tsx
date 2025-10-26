@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { LoaderCircle, Lock, MoveRight } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 enum PermissionStatus {
@@ -47,7 +48,7 @@ function StatusMessage({status}: {status: PermissionStatus}) {
     )
 }
 
-function EligibilityTest() {
+function EligibilityTest({ exam_url }: { exam_url: string }) {
     const [audioStatus, setAudioStatus] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
     const [videoStatus, setVideoStatus] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
     const [fullscreenStatus, setFullscreenStatus] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
@@ -167,7 +168,9 @@ function EligibilityTest() {
                             <Button onClick={eligibilityCheck}>Check Eligibility</Button>
                             :
                             fullscreenStatus === PermissionStatus.GRANTED ? 
-                            <Button variant="default">Enter Exam</Button>
+                            <Button variant="default" asChild>
+                                <Link href={exam_url}>Enter Exam</Link>
+                            </Button>
                             : 
                             <Button variant="default" onClick={fullscreenPrompt}>Enter Fullscreen Mode</Button>
                         }

@@ -112,10 +112,6 @@ export function ExamSidebar({ setQuestionCounter, questionCounter, questions }: 
                 <span className="text-sm">Answered</span>
             </SidebarMenuItem>
             <SidebarMenuItem className="inline-flex gap-2 items-center mb-4">
-                <span className="w-[15px] h-[15px] inline-block aspect-square bg-secondary ring-2 ring-destructive"></span>
-                <span className="text-sm">Marked for Review</span>
-            </SidebarMenuItem>
-            <SidebarMenuItem className="inline-flex gap-2 items-center mb-4">
                 <span className="w-[15px] h-[15px] inline-block aspect-square bg-secondary ring-2 ring-warning"></span>
                 <span className="text-sm">Marked for Review</span>
             </SidebarMenuItem>

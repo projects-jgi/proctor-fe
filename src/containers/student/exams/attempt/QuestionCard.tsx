@@ -8,7 +8,7 @@ import { ExamQuestion } from "@/types/exam";
 import { ChevronLeft, ChevronRight, TriangleAlert } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
-function QuestionCard({ totalQuestions, setQuestionCounter, questionCounter, question, hasNext, hasPrev }: { totalQuestions: number, setQuestionCounter: React.Dispatch<React.SetStateAction<number>>, questionCounter: number, question: ExamQuestion, hasNext: boolean, hasPrev: boolean }) {
+function QuestionCard({ totalQuestions, setQuestionCounter, questionCounter, question, hasNext, hasPrev }: { totalQuestions: number, setQuestionCounter: React.Dispatch<React.SetStateAction<number | null>>, questionCounter: number | null, question: ExamQuestion, hasNext: boolean, hasPrev: boolean }) {
     const options: {
         [option: string]: string | undefined
     } = {
@@ -63,6 +63,26 @@ function QuestionCard({ totalQuestions, setQuestionCounter, questionCounter, que
         })
     }
 
+    function incrementCounter(){
+        setQuestionCounter(prev => {
+            if(prev != null){
+                return prev + 1;
+            }
+
+            return null;
+        })
+    }
+
+    function decrementCounter(){
+        setQuestionCounter(prev => {
+            if(prev != null){
+                return prev - 1;
+            }
+
+            return null;
+        })
+    }
+
     return (
         <Card className="card__question" data-question-id={question.id}>
             <CardHeader>
@@ -102,7 +122,7 @@ function QuestionCard({ totalQuestions, setQuestionCounter, questionCounter, que
             </CardContent>
             <CardFooter>
                 <div className="w-full flex items-center justify-between">
-                <Button disabled={!hasPrev} variant="outline" onClick={() => setQuestionCounter(questionCounter - 1)}>
+                <Button disabled={!hasPrev} variant="outline" onClick={decrementCounter}>
                     <ChevronLeft />
                     Previous
                 </Button>
@@ -110,7 +130,7 @@ function QuestionCard({ totalQuestions, setQuestionCounter, questionCounter, que
                     <TriangleAlert />
                     Mark for Review
                 </Button>
-                <Button disabled={!hasNext} onClick={() => setQuestionCounter(questionCounter + 1)}>
+                <Button disabled={!hasNext} onClick={incrementCounter}>
                     Next
                     <ChevronRight />
                 </Button>

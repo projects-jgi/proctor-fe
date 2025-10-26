@@ -1,117 +1,41 @@
-'use client';
-
-import Loading from '@/components/Loading';
-import { Badge } from '@/components/ui/badge';
-import { SidebarProvider } from '@/components/ui/sidebar'
-import { ExamSidebar } from '@/containers/student/exams/attempt/ExamSidebar';
-import QuestionCard from '@/containers/student/exams/attempt/QuestionCard';
-import Topbar from '@/containers/student/exams/attempt/Topbar'
-import { make_student_exam_attempt } from '@/lib/server_api/student';
-import { ExamQuestion } from '@/types/exam';
+import React from 'react'
+import { signal } from '@preact/signals-react';
+import { Button } from '@/components/ui/button';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import { useQuery } from '@tanstack/react-query';
-import React, { useEffect, useMemo, useState } from 'react'
+import { make_student_exam_attempt } from '@/lib/server_api/student';
+import ExamContainer from '@/containers/student/exams/attempt/ExamContainer';
 
-function ExamLoadingScreen(){
+interface PageParams {
+    exam_id: number
+}
+
+// TODO: Exam not found component
+function ExamNotFoundScreen(){
     return (
-        <div className="w-screen h-screen flex flex-col items-center justify-center">
-            <p className='mb-4'><Loading /></p>
-            <p>Please wait while we load questions...</p>
-        </div>
+        <p>Exam Not Found</p>
     )
 }
 
-function ExamErrorScreen(){
-    // TODO: support team contact details
-    return (
-        <div className="w-screen h-screen flex flex-col items-center justify-center">
-            <p>Unable to load exam questions. Please contact support team!</p>
-        </div>
-    )
-}
+async function page({ params }: { params: PageParams}) {
+    const {exam_id} = await params
 
-function ExamHall() {
-    const [questionCounter, setQuestionCounter] = useState<number | null>(null);
-    // const [questionId, setQuestionId] = useState<number | null>(null)
-    const [currentQuestion, setCurrentQuestion] = useState<ExamQuestion | null>(null)
+    let exam_questions;
 
-    const exam_questions = useQuery({
-        queryKey: ["exams", "attempt", 1],
-        queryFn: async() => await make_student_exam_attempt({exam_id: 1}),
-    })
-
-    const questions_length = useMemo(() => {
-        if(exam_questions.data){
-            return Object.values(Object.assign({}, ...Object.values(exam_questions.data.questions))).length
-        }
-        return 0
-    }, [exam_questions.isSuccess])
-
-    useEffect(() => {
-        if(exam_questions.data && questionCounter == null){
-            setQuestionCounter(1);
-        }    
-    }, [exam_questions.isSuccess])
-
-    useEffect(() => {
-        if(questionCounter != null && questionCounter > 0){
-            let current_ele: HTMLElement | null = document.querySelector(`[data-question-counter='${questionCounter}']`)
-            let question_id: string | undefined = current_ele?.dataset.questionId
-            if(question_id != undefined){
-                setCurrentQuestion((Object.assign({}, ...Object.values(exam_questions.data.questions)) as {[key: string]: ExamQuestion})[question_id])
-            }
-            // setQuestionId(question_id);
-        }
-    }, [questionCounter])
-
-    if(exam_questions.isLoading){
-        return <ExamLoadingScreen />
+    try{
+        exam_questions = await make_student_exam_attempt({ exam_id: exam_id })
+    }catch(err){
+        return <ExamNotFoundScreen />
     }
-
-    if(exam_questions.isError){
-        return <ExamErrorScreen />
-    }
+    console.log(exam_questions)
 
     return (
         <>
             <SidebarProvider>
-                <aside>
-                    <ExamSidebar setQuestionCounter={setQuestionCounter} questionCounter={questionCounter} questions={exam_questions.data.questions} />
-                </aside>
-                <main className='w-full'>
-                    <Topbar startTime={exam_questions.data.attempt.started_at} duration={exam_questions.data.attempt.exam.duration_in_minutes} />
-                    <div className="m-8">
-                        <div className="flex flex-wrap gap-12 items-center">
-                            <div className='text-md font-bold'>
-                                Questions: <Badge>{questions_length}</Badge>
-                            </div>
-                            <div className='text-md font-bold'>
-                                Answered: <Badge variant="success">30</Badge>
-                            </div>
-                            <div className='text-md font-bold'>
-                                Skipped: <Badge variant="destructive">05</Badge>
-                            </div>
-                            <div className='text-md font-bold'>
-                                Marked for Review: <Badge variant="warning">05</Badge>
-                            </div>
-                        </div>
-                        <section className='mt-4'>
-                            { currentQuestion && (
-                                <QuestionCard 
-                                    totalQuestions={questions_length}
-                                    setQuestionCounter={setQuestionCounter} 
-                                    questionCounter={questionCounter}
-                                    question={currentQuestion}
-                                    hasNext={questionCounter != null && questionCounter < questions_length}
-                                    hasPrev={questionCounter != null && questionCounter > 1}
-                                />
-                                ) 
-                            } 
-                        </section>
-                    </div>
-                </main>
+                <ExamContainer exam_id={exam_id} exam_questions={exam_questions} />
             </SidebarProvider>
         </>
     )
 }
 
-export default ExamHall
+export default page

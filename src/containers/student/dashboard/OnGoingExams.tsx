@@ -28,7 +28,7 @@ function OngoingExams() {
             <h2 className="text-xl font-bold">Ongoing Exams</h2>
             <div className="grid grid-cols-1 gap-4 mt-4">
                 {ongoing_exams.data.slice(0, card_count).map((exam, index) => (
-                <ExamCard key={index} {...exam} action={<EligibilityTest />} />
+                <ExamCard key={index} {...exam} action={<EligibilityTest exam_url={`/student/exams/${exam.id}/attempt/`} />} />
                 ))}
             </div>
         </section>
