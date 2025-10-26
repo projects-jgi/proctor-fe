@@ -6,7 +6,6 @@ export enum ExamStatus {
 
 export interface ExamQuestion {
     id: number,
-    exam_id: number,
     exam_type_id: number,
     question_text: string,
     option_1?: string,

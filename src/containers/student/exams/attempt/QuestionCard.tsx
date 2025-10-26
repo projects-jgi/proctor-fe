@@ -4,11 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { ExamQuestion } from "@/types/exam";
+import { setQuestionCounter, setSelectedAnswers } from "@/lib/redux/state/ExamAttempt";
 import { ChevronLeft, ChevronRight, TriangleAlert } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-function QuestionCard({ totalQuestions, setQuestionCounter, questionCounter, question, hasNext, hasPrev }: { totalQuestions: number, setQuestionCounter: React.Dispatch<React.SetStateAction<number | null>>, questionCounter: number | null, question: ExamQuestion, hasNext: boolean, hasPrev: boolean }) {
+function QuestionCard() {
+    const question = useSelector(state => state.exam_attempt.currentQuestion);
+    const totalQuestions = useSelector(state => state.exam_attempt.questionsLength);
+    const questionCounter = useSelector(state => state.exam_attempt.questionCounter);
+    const dispatch = useDispatch();
+    
     const options: {
         [option: string]: string | undefined
     } = {
@@ -44,6 +50,7 @@ function QuestionCard({ totalQuestions, setQuestionCounter, questionCounter, que
                 ...prev_user_answers,
                 [question.id]: selectedOptions
             }
+            dispatch(setSelectedAnswers(new_values));
             localStorage.setItem("user_answers", JSON.stringify(new_values))
         }
 
@@ -64,23 +71,11 @@ function QuestionCard({ totalQuestions, setQuestionCounter, questionCounter, que
     }
 
     function incrementCounter(){
-        setQuestionCounter(prev => {
-            if(prev != null){
-                return prev + 1;
-            }
-
-            return null;
-        })
+        dispatch(setQuestionCounter(questionCounter + 1))
     }
 
     function decrementCounter(){
-        setQuestionCounter(prev => {
-            if(prev != null){
-                return prev - 1;
-            }
-
-            return null;
-        })
+        dispatch(setQuestionCounter(questionCounter - 1))
     }
 
     return (
@@ -122,7 +117,7 @@ function QuestionCard({ totalQuestions, setQuestionCounter, questionCounter, que
             </CardContent>
             <CardFooter>
                 <div className="w-full flex items-center justify-between">
-                <Button disabled={!hasPrev} variant="outline" onClick={decrementCounter}>
+                <Button disabled={!(questionCounter != null && questionCounter > 1)} variant="outline" onClick={decrementCounter}>
                     <ChevronLeft />
                     Previous
                 </Button>
@@ -130,7 +125,7 @@ function QuestionCard({ totalQuestions, setQuestionCounter, questionCounter, que
                     <TriangleAlert />
                     Mark for Review
                 </Button>
-                <Button disabled={!hasNext} onClick={incrementCounter}>
+                <Button disabled={!(questionCounter != null && questionCounter < totalQuestions)} onClick={incrementCounter}>
                     Next
                     <ChevronRight />
                 </Button>

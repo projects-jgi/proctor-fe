@@ -23,6 +23,8 @@ import {
 } from "@/components/ui/sidebar"
 import { ExamQuestion, ExamTypeQuestion } from "@/types/exam";
 import { cn } from "@/lib/utils";
+import { useDispatch, useSelector } from "react-redux";
+import { setQuestionCounter } from "@/lib/redux/state/ExamAttempt";
 
 // This is sample data.
 const data = {
@@ -46,7 +48,10 @@ const data = {
   ],
 }
 
-export function ExamSidebar({ setQuestionCounter, questionCounter, questions }: { setQuestionCounter: React.Dispatch<React.SetStateAction<number>>, questionCounter: number, questions: ExamTypeQuestion }) {
+export function ExamSidebar({ questions }: { questions: ExamTypeQuestion }) {
+  const questionCounter = useSelector(state => state.exam_attempt.questionCounter);
+  const selectedAnswers = useSelector(state => state.exam_attempt.selectedAnswers);
+  const dispatch = useDispatch();
 
   let question_counter = 1;
 
@@ -54,7 +59,7 @@ export function ExamSidebar({ setQuestionCounter, questionCounter, questions }: 
     // setQuestionCounter(counter)
     let {questionCounter} = event.currentTarget.dataset
 
-    setQuestionCounter(parseInt(questionCounter))
+    dispatch(setQuestionCounter(parseInt(questionCounter)))
   }
   return (
     <Sidebar>
@@ -87,6 +92,7 @@ export function ExamSidebar({ setQuestionCounter, questionCounter, questions }: 
                           key={index}
                           className={cn(
                             "w-full aspect-square bg-secondary text-secondary-foreground ring-2 ring-border",
+                            selectedAnswers[question.id] != null && selectedAnswers[question.id].length > 0 && "ring-success",
                             (questionCounter == question_counter) && 'bg-primary'
                           )}
                           onClick={handleItemClick}
