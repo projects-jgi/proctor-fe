@@ -13,6 +13,16 @@ export interface ExamQuestion {
     option_3?: string,
     option_4?: string,
     option_5?: string,
+    is_correct_1?: string,
+    is_correct_2?: string,
+    is_correct_3?: string,
+    is_correct_4?: string,
+    is_correct_5?: string,
+    explanation_1?: string,
+    explanation_2?: string,
+    explanation_3?: string,
+    explanation_4?: string,
+    explanation_5?: string,
     score: number
 }
 
