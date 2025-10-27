@@ -63,7 +63,7 @@ async function page({ params }: { params: Promise<{ exam_status: "upcoming" | "c
   return (
     <>
       <Topbar />
-      <main>
+      <main className="pt-16">
         <div className="w-full bg-primary">
           <Card className="text-primary-foreground bg-transparent border-0 shadow-none container mx-auto">
             <CardHeader>

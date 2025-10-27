@@ -1,24 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { useEffect, useState } from "react";
 
 // Types
 interface Question {
   id: number;
+  globalId: number;
   text: string;
   options: string[];
   answer?: string;
@@ -32,353 +19,243 @@ interface Section {
 }
 
 export default function ExamInterface() {
+  // Build sections/questions dynamically but keep data minimal and easy to follow.
+  let globalId = 1;
   const sections: Section[] = [
     {
       name: "Quantitative Aptitude",
-      total: 30,
-      questions: Array.from({ length: 30 }, (_, i) => ({
+      total: 10,
+      questions: Array.from({ length: 10 }, (_, i) => ({
         id: i + 1,
+        globalId: globalId++,
         text: `Quantitative Aptitude Question ${i + 1}`,
-        options: ["Option A", "Option B", "Option C", "Option D"],
+        options: ["A", "B", "C", "D"],
       })),
     },
     {
       name: "English",
-      total: 30,
-      questions: Array.from({ length: 30 }, (_, i) => ({
+      total: 8,
+      questions: Array.from({ length: 8 }, (_, i) => ({
         id: i + 1,
+        globalId: globalId++,
         text: `English Question ${i + 1}`,
-        options: ["Option A", "Option B", "Option C", "Option D"],
+        options: ["A", "B", "C", "D"],
       })),
     },
     {
       name: "Reasoning",
-      total: 25,
-      questions: Array.from({ length: 25 }, (_, i) => ({
+      total: 7,
+      questions: Array.from({ length: 7 }, (_, i) => ({
         id: i + 1,
+        globalId: globalId++,
         text: `Reasoning Question ${i + 1}`,
-        options: ["Option A", "Option B", "Option C", "Option D"],
-      })),
-    },
-    {
-      name: "General Awareness",
-      total: 30,
-      questions: Array.from({ length: 30 }, (_, i) => ({
-        id: i + 1,
-        text: `General Awareness Question ${i + 1}`,
-        options: ["Option A", "Option B", "Option C", "Option D"],
+        options: ["A", "B", "C", "D"],
       })),
     },
   ];
 
-  const [currentSection, setCurrentSection] = useState<Section>(sections[0]);
-  const [currentQuestion, setCurrentQuestion] = useState(1);
-  const [timeLeft, setTimeLeft] = useState(3 * 60 * 60); // 3 hours
-  const [score, setScore] = useState(0);
-  const [showDialog, setShowDialog] = useState(false);
+  const totalQuestions = sections.reduce((s, cur) => s + cur.total, 0);
+
+  // Local state for the exam interface
+  const [activeSectionIndex, setActiveSectionIndex] = useState(0);
+  const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<number, string | null>>({});
+  const [marked, setMarked] = useState<Record<number, boolean>>({});
+  const [timeLeft, setTimeLeft] = useState(60 * 60); // default 60 minutes for demo
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const candidate = { name: "Rajesh Kumar", studentId: "24MCAR0111" };
 
-  // Timer effect with auto-submit
+  // Timer
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          submitExam();
-          return 0;
-        }
-        return prev - 1;
-      });
+    const t = setInterval(() => {
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
-    return () => clearInterval(timer);
+    return () => clearInterval(t);
   }, []);
 
-  const formatTime = (seconds: number) => {
-    const h = Math.floor(seconds / 3600)
+  const formatTime = (sec: number) => {
+    const h = Math.floor(sec / 3600)
       .toString()
       .padStart(2, "0");
-    const m = Math.floor((seconds % 3600) / 60)
+    const m = Math.floor((sec % 3600) / 60)
       .toString()
       .padStart(2, "0");
-    const s = (seconds % 60).toString().padStart(2, "0");
+    const s = (sec % 60).toString().padStart(2, "0");
     return `${h}:${m}:${s}`;
   };
 
-  // Update answer for a question
-  const selectAnswer = (qid: number, option: string) => {
-    setCurrentSection((prev) => ({
-      ...prev,
-      questions: prev.questions.map((q) =>
-        q.id === qid ? { ...q, answer: option } : q
-      ),
-    }));
+  const activeSection = sections[activeSectionIndex];
+  const question = activeSection.questions[activeQuestionIndex];
+
+  // Answer handling
+  const pickAnswer = (qId: number, choice: string) => {
+    setAnswers((prev) => ({ ...prev, [qId]: choice }));
   };
 
-  // Toggle mark for review
-  const toggleReview = (qid: number) => {
-    setCurrentSection((prev) => ({
-      ...prev,
-      questions: prev.questions.map((q) =>
-        q.id === qid ? { ...q, markedForReview: !q.markedForReview } : q
-      ),
-    }));
+  const toggleMark = (qId: number) => {
+    setMarked((prev) => ({ ...prev, [qId]: !prev[qId] }));
   };
 
-  // Switch section
-  const switchSection = (sectionName: string) => {
-    const section = sections.find((s) => s.name === sectionName);
-    if (section) {
-      setCurrentSection(section);
-      setCurrentQuestion(1);
-    }
-  };
+  const goToQuestion = (index: number) => setActiveQuestionIndex(index);
 
-  // Summary for current section only
-  const getSectionSummary = (section: Section) => {
-    let answered = 0;
-    let marked = 0;
-    let notAnswered = 0;
-
-    section.questions.forEach((q) => {
-      if (q.answer) answered++;
-      else notAnswered++;
-      if (q.markedForReview) marked++;
-    });
-
-    return { answered, notAnswered, marked };
-  };
-
-  // Submit exam
+  // Submit
   const submitExam = () => {
-    const examData = {
+    // Build payload
+    const payload = {
       candidate,
       timeLeft,
-      submittedAt: new Date().toISOString(),
-      sections: sections.map((section) => ({
-        name: section.name,
-        totalQuestions: section.total,
-        questions: section.questions.map((q) => ({
-          id: q.id,
-          text: q.text,
-          selectedAnswer: q.answer || null,
-          markedForReview: q.markedForReview || false,
-        })),
-      })),
+      answers,
+      marked,
     };
-
-    console.log("✅ Exam Submitted:", examData);
-    alert("Exam Submitted Successfully!");
+    console.log("Submitting exam:", payload);
+    alert("Exam submitted — check console for payload (demo)");
   };
 
-  const handleSaveNextSection = () => {
-    setShowDialog(true);
-  };
-
-  const confirmSaveNextSection = () => {
-    setShowDialog(false);
-    const currentIndex = sections.findIndex(
-      (s) => s.name === currentSection.name
-    );
-    const nextSection = sections[currentIndex + 1];
-    if (nextSection) {
-      setCurrentSection(nextSection);
-      setCurrentQuestion(1);
-    } else {
-      submitExam();
-    }
-  };
-
-  const question = currentSection.questions[currentQuestion - 1];
+  // UI helpers
+  const answeredCount = Object.keys(answers).length;
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r p-4 flex flex-col overflow-y-auto">
-        {/* Logo */}
-        <div className="flex items-center justify-center mb-6">
-          <div className="w-12 h-12 rounded-full bg-blue-900 flex items-center justify-center text-white font-bold">
-            JGI
+    <div className="flex h-screen bg-slate-50">
+      {/* Left: Sections & palette */}
+      <aside className="w-72 border-r bg-white p-4 flex flex-col gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded bg-blue-800 flex items-center justify-center text-white font-semibold">
+            J
+          </div>
+          <div>
+            <div className="text-sm font-semibold">{candidate.name}</div>
+            <div className="text-xs text-muted-foreground">{candidate.studentId}</div>
           </div>
         </div>
 
-        <h2 className="font-semibold text-sm text-gray-600 mb-2">
-          Exam Section
-        </h2>
+        <div className="flex items-center justify-between">
+          <div className="text-sm">Time Left</div>
+          <div className="font-mono font-semibold">{formatTime(timeLeft)}</div>
+        </div>
 
-        <div className="flex flex-col gap-2">
-          {sections.map((sec) => (
-            <Button
-              key={sec.name}
-              onClick={() => switchSection(sec.name)}
-              variant={currentSection.name === sec.name ? "default" : "outline"}
-              className={`w-full ${
-                currentSection.name === sec.name ? "bg-blue-900 text-white" : ""
-              }`}
+        <div className="space-y-2">
+          {sections.map((s, idx) => (
+            <button
+              key={s.name}
+              onClick={() => {
+                setActiveSectionIndex(idx);
+                setActiveQuestionIndex(0);
+              }}
+              className={`w-full text-left px-3 py-2 rounded ${idx === activeSectionIndex ? "bg-blue-900 text-white" : "hover:bg-slate-100"}`}
             >
-              {sec.name} ({sec.total})
-            </Button>
+              <div className="flex justify-between">
+                <div className="font-medium">{s.name}</div>
+                <div className="text-sm text-muted-foreground">{s.total}</div>
+              </div>
+            </button>
           ))}
         </div>
 
-        <div className="grid grid-cols-4 gap-2 mt-6">
-          {currentSection.questions.map((q) => (
-            <Button
-              key={q.id}
-              onClick={() => setCurrentQuestion(q.id)}
-              variant="outline"
-              className={`w-12 h-12 text-sm
-                ${currentQuestion === q.id ? "bg-blue-900 text-white" : ""}
-                ${q.answer ? "bg-gray-800 text-white" : ""}
-                ${q.markedForReview ? "bg-yellow-400 text-black" : ""}
-              `}
-            >
-              {q.id}
-            </Button>
-          ))}
-        </div>
+        <div className="mt-auto">
+          <div className="text-xs text-muted-foreground mb-2">Question Palette</div>
+          <div className="grid grid-cols-6 gap-2">
+            {activeSection.questions.map((q, i) => {
+              const status = answers[q.globalId] ? "bg-green-600 text-white" : marked[q.globalId] ? "bg-yellow-400" : "bg-white";
+              return (
+                <button
+                  key={q.globalId}
+                  onClick={() => goToQuestion(i)}
+                  className={`w-10 h-10 rounded border ${status} flex items-center justify-center text-sm`}
+                >
+                  {q.globalId}
+                </button>
+              );
+            })}
+          </div>
 
-        <div className="mt-6 text-sm space-y-1">
-          <p>
-            <span className="inline-block w-4 h-4 bg-blue-900 mr-2"></span>
-            Current
-          </p>
-          <p>
-            <span className="inline-block w-4 h-4 bg-gray-800 mr-2"></span>
-            Answered
-          </p>
-          <p>
-            <span className="inline-block w-4 h-4 bg-yellow-400 mr-2"></span>
-            Marked
-          </p>
-          <p>
-            <span className="inline-block w-4 h-4 bg-gray-400 mr-2"></span>
-            Not answered
-          </p>
+          <div className="mt-4 flex items-center justify-between">
+            <div className="text-sm">Answered: <span className="font-semibold">{answeredCount}</span></div>
+            <div>
+              <button className="px-3 py-1 bg-red-600 text-white rounded" onClick={() => setConfirmOpen(true)}>
+                Submit
+              </button>
+            </div>
+          </div>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 p-6 flex flex-col">
-        <div className="flex justify-between items-center mb-6">
-          <div className="bg-blue-900 text-white px-4 py-2 rounded font-mono">
-            {formatTime(timeLeft)}
-          </div>
-          <div className="text-right">
-            <p className="font-semibold">Candidate Name: {candidate.name}</p>
-            <p className="text-sm text-gray-600">Student ID: {candidate.studentId}</p>
-          </div>
-        </div>
-
-        <Card className="flex-1">
-          <CardContent className="p-6 flex flex-col h-full">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">
-                {currentSection.name} - Question {currentQuestion} of {currentSection.total}
-              </h2>
-              <span className="font-semibold">Score: {score}</span>
+      {/* Main area */}
+      <main className="flex-1 p-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white rounded shadow p-6">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h3 className="text-lg font-semibold">{activeSection.name}</h3>
+                <div className="text-sm text-muted-foreground">Question {question.globalId} of {totalQuestions}</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button className="text-sm px-3 py-1 border rounded" onClick={() => toggleMark(question.globalId)}>
+                  Mark for review
+                </button>
+                <div className="text-sm">{answers[question.globalId] ? <span className="text-green-600">Answered</span> : <span className="text-muted-foreground">Not answered</span>}</div>
+              </div>
             </div>
 
-            <Separator className="mb-4" />
-
-            <p className="mb-6">{question.text}</p>
+            <div className="mb-6">
+              <p className="text-base">{question.text}</p>
+            </div>
 
             <div className="space-y-3">
-              {question.options.map((opt, idx) => (
-                <Button
-                  key={idx}
-                  onClick={() => selectAnswer(question.id, opt)}
-                  variant="outline"
-                  className={`w-full justify-start text-left ${
-                    question.answer === opt ? "bg-blue-900 text-white" : ""
-                  }`}
-                >
-                  {String.fromCharCode(65 + idx)}. {opt}
-                </Button>
-              ))}
-            </div>
-
-            <div className="mt-auto flex justify-between pt-6">
-              <Button
-                className="bg-blue-900 text-white"
-                onClick={() =>
-                  setCurrentQuestion((prev) => Math.max(1, prev - 1))
-                }
-                disabled={currentQuestion === 1}
-              >
-                Previous
-              </Button>
-
-              {/* Save & Next Section with confirmation */}
-              <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    className="bg-green-600 text-white"
-                    onClick={handleSaveNextSection}
+              {question.options.map((opt, i) => {
+                const picked = answers[question.globalId] === opt;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => pickAnswer(question.globalId, opt)}
+                    className={`w-full text-left p-3 rounded border ${picked ? "bg-blue-900 text-white" : "bg-white"}`}
                   >
-                    {currentSection.name === "General Awareness"
-                      ? "Finish Exam"
-                      : "Save & Next Section"}
-                  </Button>
-                </AlertDialogTrigger>
-
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      {currentSection.name === "General Awareness"
-                        ? "Confirm Exam Submission"
-                        : "Confirm Next Section"}
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Please review your section summary before proceeding.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-
-                  {/* Section Summary */}
-                  {(() => {
-                    const { answered, notAnswered, marked } = getSectionSummary(currentSection);
-                    return (
-                      <div className="space-y-2 mt-4">
-                        <p><strong>Answered:</strong> {answered}</p>
-                        <p><strong>Not Answered:</strong> {notAnswered}</p>
-                        <p><strong>Marked for Review:</strong> {marked}</p>
-                      </div>
-                    );
-                  })()}
-
-                  <AlertDialogFooter className="mt-6">
-                    <AlertDialogCancel>Go Back</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={confirmSaveNextSection}
-                      className="bg-green-600 text-white hover:bg-green-700"
-                    >
-                      Confirm
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-
-              <Button
-                className="bg-orange-500 text-white"
-                onClick={() => toggleReview(question.id)}
-              >
-                Mark for Review
-              </Button>
-
-              <Button
-                className="bg-blue-900 text-white"
-                onClick={() =>
-                  setCurrentQuestion((prev) =>
-                    Math.min(currentSection.total, prev + 1)
-                  )
-                }
-              >
-                Next
-              </Button>
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 rounded-full border flex items-center justify-center">{String.fromCharCode(65 + i)}</div>
+                      <div>{opt}</div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
-          </CardContent>
-        </Card>
+
+            <div className="mt-6 flex justify-between">
+              <div className="flex gap-2">
+                <button
+                  className="px-4 py-2 border rounded"
+                  onClick={() => setActiveQuestionIndex((p) => Math.max(0, p - 1))}
+                >
+                  Previous
+                </button>
+                <button
+                  className="px-4 py-2 bg-blue-900 text-white rounded"
+                  onClick={() => setActiveQuestionIndex((p) => Math.min(activeSection.questions.length - 1, p + 1))}
+                >
+                  Next
+                </button>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button className="px-3 py-2 border rounded" onClick={() => { /* Save local draft - placeholder */ alert('Saved draft (demo)') }}>Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
+
+      {/* Submit confirmation (simple modal) */}
+      {confirmOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded p-6 w-[420px]">
+            <h3 className="text-lg font-semibold mb-2">Submit Exam</h3>
+            <p className="text-sm text-muted-foreground mb-4">Are you sure you want to submit? You won't be able to change answers after submission.</p>
+            <div className="flex justify-end gap-2">
+              <button className="px-3 py-1 border rounded" onClick={() => setConfirmOpen(false)}>Cancel</button>
+              <button className="px-3 py-1 bg-green-600 text-white rounded" onClick={() => { submitExam(); setConfirmOpen(false); }}>Confirm</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

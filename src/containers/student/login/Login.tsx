@@ -1,20 +1,38 @@
 'use client';
 
-import React, { useState } from "react";
-// import { otpSchema, OtpSchema } from "./otp-schema";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { OTPInput } from "input-otp";
-import { loginSchema, LoginSchema, OtpSchema } from "@/lib/zod/login";
 import LoginForm from "@/components/auth/LoginForm";
 import OTPForm from "@/components/auth/OTPForm";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useProctor } from "@/contexts/ProctorContext";
+import { LoginSchema, OtpSchema } from "@/lib/zod/login";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 function Login() {
     const [isFormValidated, setIsFormValidated] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const { login } = useProctor();
+    const router = useRouter();
 
-    const handleLogin = (values: LoginSchema) => {
-        setIsFormValidated(true);
-        console.log(values)
+    const handleLogin = async (values: LoginSchema) => {
+        setIsLoading(true);
+        try {
+            const result = await login(values.email, values.password);
+
+            if (result.success) {
+                toast.success("Login successful!");
+                // For now, redirect to dashboard. Later we can add OTP verification
+                router.push('/student/dashboard');
+            } else {
+                toast.error(result.error || "Login failed");
+            }
+        } catch (error) {
+            toast.error("An unexpected error occurred");
+            console.error("Login error:", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleOtpSubmit = (e: OtpSchema) => {

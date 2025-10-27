@@ -5,7 +5,7 @@ import Link from 'next/link'
 
 function Topbar() {
   return (
-    <nav className="mb-2 w-full h-16 flex items-center justify-between px-6 border-b shadow-lg">
+    <nav className="fixed top-0 left-0 right-0 w-full h-16 flex items-center justify-between px-6 border-b shadow-lg bg-background z-50">
       <div className="flex items-center gap-2">
         {/* <Image src="/logo.svg" alt="Logo" width={32} height={32} /> */}
         <span className="font-bold text-lg">Proctor</span>
@@ -19,8 +19,12 @@ function Topbar() {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/faculty/profile">Profile</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/faculty/settings">Settings</Link>
+            </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link href="/student/login" className="text-destructive">Logout</Link>
             </DropdownMenuItem>

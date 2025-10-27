@@ -1,191 +1,139 @@
-// "use client";
-
-// import React, { useState } from "react";
-// import { Calendar } from "lucide-react";
-
-// const TestResults = () => {
-//   const [activeTab, setActiveTab] = useState<"upcoming" | "past">("past");
-
-//   const results = [
-//     {
-//       date: "07 Feb, 2025",
-//       time: "05:00 PM",
-//       title: "Superset Diagnostics Test",
-//       totalScore: 62,
-//       maxScore: 100,
-//       type: "past", // 👈 tag for filtering
-//       sections: [
-//         { name: "Verbal Ability", score: 15, max: 20, color: "bg-cyan-400" },
-//         { name: "Logical Reasoning", score: 17, max: 30, color: "bg-yellow-300" },
-//         { name: "Quantitative Aptitude", score: 16, max: 30, color: "bg-yellow-300" },
-//         { name: "General Awareness", score: 14, max: 20, color: "bg-cyan-400" },
-//       ],
-//     },
-//     {
-//       date: "04 Feb, 2025",
-//       time: "06:00 PM",
-//       title: "Superset Diagnostics Test",
-//       totalScore: 57,
-//       maxScore: 100,
-//       type: "past",
-//       sections: [],
-//     },
-//     {
-//       date: "10 Oct, 2025",
-//       time: "04:00 PM",
-//       title: "Mock Aptitude Test",
-//       totalScore: null, // no score yet
-//       maxScore: 100,
-//       type: "upcoming", // 👈 upcoming exam
-//       sections: [],
-//     },
-//   ];
-
-//   // Filter results by tab
-//   const filteredResults = results.filter((r) => r.type === activeTab);
-
-//   return (
-//     <div className="min-h-screen bg-gray-50 p-8">
-//       <div className="max-w-6xl mx-auto">
-//         {/* Header */}
-//         <div className="flex justify-between items-center mb-8">
-//           <h1 className="text-3xl font-semibold text-gray-700">My Results</h1>
-//           <div className="flex gap-2 bg-white rounded-full p-1 shadow-sm">
-//             <button
-//               onClick={() => setActiveTab("upcoming")}
-//               className={`px-8 py-3 rounded-full text-sm font-medium transition-colors ${
-//                 activeTab === "upcoming"
-//                   ? "bg-indigo-500 text-white"
-//                   : "text-gray-500 hover:text-gray-700"
-//               }`}
-//             >
-//               Upcoming
-//             </button>
-//             <button
-//               onClick={() => setActiveTab("past")}
-//               className={`px-8 py-3 rounded-full text-sm font-medium transition-colors ${
-//                 activeTab === "past"
-//                   ? "bg-indigo-500 text-white"
-//                   : "text-gray-500 hover:text-gray-700"
-//               }`}
-//             >
-//               Past
-//             </button>
-//           </div>
-//         </div>
-
-//         {/* Results List */}
-//         <div className="space-y-8">
-//           {filteredResults.length > 0 ? (
-//             filteredResults.map((result, idx) => (
-//               <div key={idx} className="bg-white rounded-lg shadow-sm p-8">
-//                 {/* Date and Score Header */}
-//                 <div className="flex justify-between items-start mb-6">
-//                   <div>
-//                     <div className="flex items-center gap-2 text-gray-400 mb-2">
-//                       <Calendar className="w-5 h-5" />
-//                       <span className="text-lg">
-//                         {result.date} {result.time}
-//                       </span>
-//                     </div>
-//                     <h2 className="text-xl font-semibold text-gray-700">
-//                       {result.title}
-//                     </h2>
-//                   </div>
-//                   <div className="text-right">
-//                     {result.type === "past" ? (
-//                       <>
-//                         <span className="text-3xl font-semibold text-cyan-400">
-//                           {result.totalScore}
-//                         </span>
-//                         <span className="text-2xl text-gray-400">
-//                           {" "}
-//                           / {result.maxScore}
-//                         </span>
-//                       </>
-//                     ) : (
-//                       <span className="text-gray-400 text-lg">
-//                         Upcoming Exam
-//                       </span>
-//                     )}
-//                   </div>
-//                 </div>
-
-//                 {/* Section Scores (only for past exams) */}
-//                 {result.type === "past" && result.sections.length > 0 && (
-//                   <div className="space-y-6 mt-8">
-//                     {result.sections.map((section, sIdx) => (
-//                       <div key={sIdx} className="flex items-center gap-6">
-//                         <div className="w-56 text-gray-400 text-base">
-//                           {section.name}
-//                         </div>
-//                         <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-//                           <div
-//                             className={`${section.color} h-full rounded-full transition-all duration-500`}
-//                             style={{
-//                               width: `${(section.score / section.max) * 100}%`,
-//                             }}
-//                           />
-//                         </div>
-//                         <div className="w-20 text-right">
-//                           <span className="text-lg font-medium text-gray-600">
-//                             {section.score}
-//                           </span>
-//                           <span className="text-gray-400">
-//                             {" "}
-//                             / {section.max}
-//                           </span>
-//                         </div>
-//                       </div>
-//                     ))}
-//                   </div>
-//                 )}
-//               </div>
-//             ))
-//           ) : (
-//             <p className="text-gray-500">No results to display.</p>
-//           )}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default TestResults;
-
-
-
 "use client";
-import React from "react";
 import { useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { TrendingUp, Calendar, Award, ArrowLeft } from "lucide-react";
 
 export default function ResultsPage() {
   const router = useRouter();
+  
   const tests = [
-    { id: "test1", title: "Superset Diagnostics Test", score: 62, max: 100, date: "07 Feb, 2025" },
-    { id: "test2", title: "Superset Diagnostics Test", score: 57, max: 100, date: "04 Feb, 2025" }
+    { id: "test1", title: "Mathematics Advanced", score: 62, max: 100, date: "07 Feb, 2025", trend: "up" },
+    { id: "test2", title: "Physics Fundamentals", score: 57, max: 100, date: "04 Feb, 2025", trend: "same" },
+    { id: "test3", title: "Chemistry Basics", score: 85, max: 100, date: "01 Feb, 2025", trend: "up" }
   ];
 
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return "text-green-600";
+    if (score >= 60) return "text-blue-600";
+    return "text-red-600";
+  };
+
+  const getScoreBadge = (score: number) => {
+    if (score >= 80) return "bg-green-100 text-green-800";
+    if (score >= 60) return "bg-blue-100 text-blue-800";
+    return "bg-red-100 text-red-800";
+  };
+
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-6">My Results</h1>
-      <div className="space-y-4">
-        {tests.map(test => (
-          <div 
-            key={test.id} 
-            className="p-6 bg-white rounded-lg shadow cursor-pointer hover:bg-gray-50"
-            onClick={() => router.push(`/student/results/${test.id}/submission`)}
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-4xl mx-auto">
+        {/* Header with Back Button */}
+        <div className="flex items-center justify-between mb-8">
+          <Button 
+            variant="outline" 
+            onClick={() => router.push('/student/dashboard')}
+            className="flex items-center gap-2"
           >
-            <div className="flex justify-between">
-              <span className="font-semibold">{test.title}</span>
-              <span className="text-cyan-600">{test.score}/{test.max}</span>
-            </div>
-            <div className="text-gray-500 text-sm">{test.date}</div>
+            <ArrowLeft className="w-4 h-4" />
+            Back to Dashboard
+          </Button>
+          <div className="text-center flex-1">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-2">
+              My Results
+            </h1>
+            <p className="text-muted-foreground">Track your academic progress and performance</p>
           </div>
-        ))}
+          <div className="w-32"></div> {/* Spacer for balance */}
+        </div>
+
+        <div className="space-y-4">
+          {tests.map((test) => (
+            <Card 
+              key={test.id}
+              className="cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.02] border-2 hover:border-primary/50"
+              onClick={() => router.push(`/student/results/${test.id}/submission`)}
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <Award className="w-5 h-5 text-primary" />
+                      <h3 className="text-lg font-semibold text-foreground">{test.title}</h3>
+                      <Badge variant="secondary" className={getScoreBadge(test.score)}>
+                        {test.score}%
+                      </Badge>
+                    </div>
+                    
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        {test.date}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <TrendingUp className={`w-4 h-4 ${
+                          test.trend === "up" ? "text-green-600" : "text-muted-foreground"
+                        }`} />
+                        <span className={test.trend === "up" ? "text-green-600 font-medium" : "text-muted-foreground"}>
+                          {test.trend === "up" ? "Improving" : "Stable"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <div className={`text-2xl font-bold ${getScoreColor(test.score)}`}>
+                      {test.score}/{test.max}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Score</div>
+                  </div>
+                </div>
+
+                {/* Progress bar */}
+                <div className="mt-4">
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full transition-all duration-500 ${
+                        test.score >= 80 ? "bg-green-500" :
+                        test.score >= 60 ? "bg-blue-500" : "bg-red-500"
+                      }`}
+                      style={{ width: `${test.score}%` }}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Stats Summary */}
+        <Card className="mt-8 bg-card/80 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="text-lg">Performance Summary</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <div className="text-2xl font-bold text-primary">{tests.length}</div>
+                <div className="text-sm text-muted-foreground">Tests Taken</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-green-600">
+                  {Math.round(tests.reduce((acc, test) => acc + test.score, 0) / tests.length)}%
+                </div>
+                <div className="text-sm text-muted-foreground">Average Score</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-cyan-600">
+                  {tests.filter(t => t.trend === "up").length}
+                </div>
+                <div className="text-sm text-muted-foreground">Improving</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
 }
-
-

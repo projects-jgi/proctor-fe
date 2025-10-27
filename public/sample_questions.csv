@@ -1,0 +1,5 @@
+title,type,content,option1,option2,option3,option4,correctAnswer,marks,explanation,difficulty,subject,category,specialization
+Sample Multiple Choice Question,multiple-choice,What is the capital of France?,Paris,London,Berlin,Madrid,0,5,Paris is the capital and most populous city of France.,easy,Geography,General Knowledge,Computer Science
+True/False Question,true-false,Is the Earth round?,true,, , ,true,3,Scientific evidence confirms the Earth is an oblate spheroid.,medium,Science,General Knowledge,Computer Science
+Short Answer Question,short-answer,What is 2 + 2?,4,, , ,,4,2,Basic arithmetic operation.,easy,Mathematics,General Knowledge,Computer Science
+Essay Question,essay,Explain the concept of recursion in programming.,,, , ,, ,10,Recursion is a programming technique where a function calls itself.,hard,Programming,Technical,Computer Science

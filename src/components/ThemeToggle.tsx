@@ -62,6 +62,7 @@ export function ThemeToggle() {
             {
                 themes.map(({name, Icon, value}) => (
                     <DropdownMenuItem
+                        key={value}
                         onClick={() => setTheme(value)}
                         className={
                             cn("cursor-pointer", theme == value && "bg-accent text-accent-foreground")
