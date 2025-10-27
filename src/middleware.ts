@@ -13,6 +13,10 @@ export async function middleware(request: NextRequest){
 
     // TODO: login and redirect are currently only works for student routes
 
+    if(pathname == "/student"){
+        return NextResponse.redirect(new URL("/student/dashboard", request.url))
+    }
+
     // redirect authorized users away from login routes
     if(is_authorized && login_routes.includes(pathname)){
         return NextResponse.redirect(new URL("/student/dashboard", request.url))

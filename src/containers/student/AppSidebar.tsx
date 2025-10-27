@@ -1,5 +1,8 @@
+'use client';
+
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation';
 import React from 'react'
 
 const data = {
@@ -28,16 +31,16 @@ const data = {
       items: [
         {
           title: "Upcoming exams",
-          url: "#",
+          url: "/student/exams/status/upcoming",
         },
         {
           title: "Ongoing exams",
-          url: "#",
+          url: "/student/exams/status/ongoing",
           isActive: true,
         },
         {
           title: "Completed exams",
-          url: "#",
+          url: "/student/exams/status/completed",
         },
       ],
     },
@@ -64,10 +67,12 @@ const data = {
 
 
 function AppSidebar() {
+    const pathname = usePathname();
+
     return (
-        <Sidebar>
+        <Sidebar variant='inset'>
             <SidebarHeader className='h-16 inline-flex items-center justify-center'>
-                <Link href={"#"} className=''>
+                <Link href={"/student"} className=''>
                     Proctor
                 </Link>
             </SidebarHeader>
@@ -82,7 +87,7 @@ function AppSidebar() {
                             {
                                 item.items.map((item) => (
                                     <SidebarMenuItem>
-                                        <SidebarMenuButton asChild isActive={item.isActive}>
+                                        <SidebarMenuButton asChild isActive={item.url == pathname.toLocaleLowerCase()}>
                                             <Link href={item.url}>{item.title}</Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
