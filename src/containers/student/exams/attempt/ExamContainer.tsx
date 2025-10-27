@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import QuestionCard from './QuestionCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentQuestion, setQuestionCounter, setQuestionsLength } from '@/lib/redux/state/ExamAttempt';
+import { SidebarInset } from '@/components/ui/sidebar';
 
 function ExamContainer({ exam_id, exam_questions }: { exam_id: number, exam_questions: any }) {
     const questionCounter = useSelector(state => state.exam_attempt.questionCounter);
@@ -37,9 +38,8 @@ function ExamContainer({ exam_id, exam_questions }: { exam_id: number, exam_ques
 
     return (
         <>
-            <aside>
-                <ExamSidebar questions={exam_questions["questions"]} />
-            </aside>
+            <ExamSidebar questions={exam_questions["questions"]} />
+            <SidebarInset>
                 <main className='w-full'>
                     <Topbar startTime={exam_questions.attempt.started_at} duration={exam_questions.attempt.exam.duration_in_minutes} />
                     <div className="m-8">
@@ -65,6 +65,7 @@ function ExamContainer({ exam_id, exam_questions }: { exam_id: number, exam_ques
                         </section>
                     </div>
                 </main>
+            </SidebarInset>
         </>
     )
 }

@@ -62,53 +62,38 @@ export function ExamSidebar({ questions }: { questions: ExamTypeQuestion }) {
     dispatch(setQuestionCounter(parseInt(questionCounter)))
   }
   return (
-    <Sidebar>
-        <SidebarHeader>
-            <span className="text-lg inline-block text-center font-bold p-4">LOGO</span>
-        </SidebarHeader>
+    <Sidebar variant="inset">
+      <SidebarHeader className='h-16 inline-flex items-center justify-center'>
+        Proctor
+      </SidebarHeader>
       <SidebarContent className="gap-0">
         {Object.keys(questions).map((exam_type: string, index) => (
-          <Collapsible
-            key={exam_type}
-            title={exam_type}
-            defaultOpen
-            className="group/collapsible"
-          >
-            <SidebarGroup>
-              <SidebarGroupLabel
-                asChild
-                className="group/label text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-md font-bold mb-2"
-              >
-                <CollapsibleTrigger>
-                  {exam_type}{" "}
-                  <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
-                </CollapsibleTrigger>
-              </SidebarGroupLabel>
-              <CollapsibleContent>
-                <SidebarGroupContent>
-                  <SidebarMenu className="grid grid-cols-4 gap-3">
-                    {Object.values(questions[exam_type]).map((question: ExamQuestion, index) => (
-                        <SidebarMenuItem
-                          key={index}
-                          className={cn(
-                            "w-full aspect-square bg-secondary text-secondary-foreground ring-2 ring-border",
-                            selectedAnswers[question.id] != null && selectedAnswers[question.id].length > 0 && "ring-success",
-                            (questionCounter == question_counter) && 'bg-primary'
-                          )}
-                          onClick={handleItemClick}
-                          data-question-counter={question_counter}
-                          data-question-id={question.id}
-                        >
-                            <SidebarMenuButton isActive={false} className="inline-flex w-full h-full items-center justify-center">
-                                {question_counter++}
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </CollapsibleContent>
-            </SidebarGroup>
-          </Collapsible>
+          <SidebarGroup key={exam_type}>
+            <SidebarGroupLabel className="text-sm p-0">
+              {exam_type}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+                <SidebarMenu className="grid grid-cols-4 gap-3">
+                  {Object.values(questions[exam_type]).map((question: ExamQuestion, index) => (
+                      <SidebarMenuItem
+                        key={index}
+                        className={cn(
+                          "w-full aspect-square bg-secondary/30 text-secondary-foreground ring-1 ring-border",
+                          selectedAnswers[question.id] != null && selectedAnswers[question.id].length > 0 && "ring-success",
+                          (questionCounter == question_counter) && 'bg-primary text-primary-foreground'
+                        )}
+                        onClick={handleItemClick}
+                        data-question-counter={question_counter}
+                        data-question-id={question.id}
+                      >
+                          <SidebarMenuButton isActive={false} className="inline-flex w-full h-full items-center justify-center">
+                              {question_counter++}
+                          </SidebarMenuButton>
+                      </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+          </SidebarGroup>
         ))}
       </SidebarContent>
       <SidebarFooter>

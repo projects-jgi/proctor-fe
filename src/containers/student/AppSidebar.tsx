@@ -20,7 +20,7 @@ const data = {
           url: "#",
         },
         {
-          title: "View All",
+          title: "... view All",
           url: "#",
         },
       ],
@@ -86,7 +86,7 @@ function AppSidebar() {
                         <SidebarMenu>
                             {
                                 item.items.map((item) => (
-                                    <SidebarMenuItem>
+                                    <SidebarMenuItem key={item.title}>
                                         <SidebarMenuButton asChild isActive={item.url == pathname.toLocaleLowerCase()}>
                                             <Link href={item.url}>{item.title}</Link>
                                         </SidebarMenuButton>

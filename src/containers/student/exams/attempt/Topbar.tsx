@@ -1,6 +1,6 @@
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Button } from '@/components/ui/button'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Countdown } from './Countdown'
 import { save_student_exam_attempt } from '@/lib/server_api/student'
 import { useMutation } from '@tanstack/react-query'
@@ -8,9 +8,12 @@ import { useRouter } from 'next/navigation'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import { AlertDialogDescription } from '@radix-ui/react-alert-dialog'
 import { toast } from 'sonner'
+import { SidebarTrigger } from '@/components/ui/sidebar'
+import { Separator } from '@/components/ui/separator'
 
 function Topbar({ startTime, duration }: { startTime: string, duration: number }) {
     const router = useRouter()
+    const [isFullyLoaded, onFullyLoaded] = useState(false)
     
     function onFinish(){
         const local_storage = localStorage.getItem("user_answers");
@@ -34,10 +37,17 @@ function Topbar({ startTime, duration }: { startTime: string, duration: number }
         }
     })
 
+    useEffect(() => {
+        onFullyLoaded(true)
+    }, [])
+
     return (
-        <nav className="mb-2 w-full h-16 flex items-center justify-between px-6 border-b shadow-lg">
+        <header className="flex h-16 shrink-0 justify-between items-center gap-2 border-b px-4">
+            <div className="flex gap-2 h-16 items-center">
+                <SidebarTrigger className="-ml-1" />
+            </div>
             <div className='text-destructive'>
-                {/* <Countdown startTime={new Date(startTime)} duration={duration * 60} /> */}
+                {isFullyLoaded && <Countdown startTime={new Date(startTime)} duration={duration * 60} />}
             </div>
             <div className="flex items-center gap-4">
                 <ThemeToggle />
@@ -61,7 +71,7 @@ function Topbar({ startTime, duration }: { startTime: string, duration: number }
                     </AlertDialogContent>
                 </AlertDialog>
             </div>
-        </nav>
+        </header>
     )
 }
 
