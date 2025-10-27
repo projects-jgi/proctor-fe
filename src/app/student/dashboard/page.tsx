@@ -4,17 +4,15 @@ import CompletedExams from '@/containers/student/dashboard/CompletedExams'
 import HeroBanner from '@/containers/student/dashboard/HeroBanner'
 import OngoingExams from '@/containers/student/dashboard/OnGoingExams'
 import UpcomingExams from '@/containers/student/dashboard/UpcomingExams'
-import Topbar from '@/containers/student/Topbar'
 import { AlarmClock, AlarmClockCheck, ArrowRight, Award, CalendarDays, Hourglass, Siren, Tally1 } from 'lucide-react'
 import React from 'react'
 
 function page() {
     return (
         <>
-            <Topbar />
             <main className=''>
                 <HeroBanner />
-                <div className="container mx-auto">
+                <div className="xl:px-12 container mx-auto">
                     <div className="my-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <Card className='w-full'>
                             <CardHeader>

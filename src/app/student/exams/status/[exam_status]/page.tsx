@@ -20,33 +20,8 @@ async function page({ params }: { params: any }) {
 
   return (
     <>
-      <Topbar />
       <main>
-        <div className="w-full bg-primary">
-          <Card className="text-primary-foreground bg-transparent border-0 shadow-none container mx-auto">
-            <CardHeader>
-              <CardDescription className="text-primary-foreground">
-                <Breadcrumb>
-                    <BreadcrumbList className="text-primary-foreground">
-                        <BreadcrumbItem>
-                            <BreadcrumbLink asChild>
-                                <Link href="/student/dashboard">Dashboard</Link>
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
-                            <BreadcrumbPage className="text-primary-foreground font-bold"><span className="capitalize">{exam_status}</span> Exams</BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                    </Breadcrumb>
-              </CardDescription>
-              <CardTitle className="text-2xl">
-                <span className="capitalize">{exam_status}</span> Exams
-              </CardTitle>
-            </CardHeader>
-          </Card>
-        </div>
-        <section className="container">
+        <section className="container xl:px-12">
           {
             exam_status == ExamStatus.COMPLETED ? 
             <ExamCompletedList /> :

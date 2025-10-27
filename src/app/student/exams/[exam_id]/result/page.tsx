@@ -14,7 +14,6 @@ async function page({ params }: {params: PageParams}) {
 
     return (
         <>
-        <Topbar />  
         <ResultList result={result.data} />
         </>
     )
