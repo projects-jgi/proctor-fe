@@ -7,6 +7,9 @@ import { useQuery } from "@tanstack/react-query";
 import { get_student_exams } from "@/lib/server_api/student";
 import ExamCard from "@/components/exam/ExamCard";
 import { ExamStatus } from "@/types/exam";
+import { useDispatch } from "react-redux";
+import { setCompletedExams } from "@/lib/redux/state/ExamList";
+import { useEffect } from "react";
 
 const card_count = 2;
 
@@ -16,13 +19,22 @@ function CompletedExams() {
         queryFn: async ({ queryKey }) =>
         await get_student_exams({ status: queryKey[1].status }),
     });
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if(completed_exams.data){
+            dispatch(setCompletedExams(completed_exams.data))
+        }
+    }, [completed_exams.isSuccess])
+
     if (
         completed_exams.isLoading ||
         completed_exams.isError ||
         completed_exams.data.length == 0
     ) {
         return <></>;
-    }
+    }    
 
     return (
         <section className="mt-8">

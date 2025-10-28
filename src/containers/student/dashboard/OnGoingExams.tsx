@@ -5,6 +5,9 @@ import { useQuery } from "@tanstack/react-query";
 import { get_student_exams } from "@/lib/server_api/student";
 import ExamCard from "@/components/exam/ExamCard";
 import { ExamStatus } from "@/types/exam";
+import { useEffect } from "react";
+import { setOngoingExams } from "@/lib/redux/state/ExamList";
+import { useDispatch } from "react-redux";
 
 const card_count = 2;
 
@@ -14,6 +17,14 @@ function OngoingExams() {
         queryFn: async ({ queryKey }) =>
         await get_student_exams({ status: queryKey[1].status }),
     });
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if(ongoing_exams.data){
+            dispatch(setOngoingExams(ongoing_exams.data))
+        }
+    }, [ongoing_exams.isSuccess])
 
     if (
         ongoing_exams.isLoading ||
