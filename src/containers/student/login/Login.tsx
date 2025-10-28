@@ -25,8 +25,10 @@ function Login() {
             setLoginError("")
         }catch(err){
             let err_message = "Unable to login. Please try again!"
-            if(err.message){
-                err_message = err.message
+            if(err instanceof Error){
+                if(err.message){
+                    err_message = err.message
+                }
             }
             setLoginError(err_message)
         }finally{

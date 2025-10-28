@@ -16,8 +16,10 @@ const card_count = 2;
 function OngoingExams() {
     const ongoing_exams = useQuery({
         queryKey: ["exams", { status: ExamStatus.ONGOING }],
-        queryFn: async ({ queryKey }) =>
-        await get_student_exams({ status: queryKey[1].status }),
+        queryFn: async ({ queryKey }) =>{
+            const [, { status }] = queryKey as [string, { status: string }]
+            return await get_student_exams({ status })
+        }
     });
 
     const dispatch = useDispatch();
@@ -40,7 +42,7 @@ function OngoingExams() {
         <section className="">
             <h2 className="text-xl font-bold">Ongoing Exams</h2>
             <div className="grid grid-cols-1 gap-4 mt-4">
-                {ongoing_exams.data.slice(0, card_count).map((exam, index) => (
+                {ongoing_exams.data.slice(0, card_count).map((exam: any, index: number) => (
                 <ExamCard key={index} {...exam} action={
                     <Button variant={"default"}>
                         <Link href={`/student/exams/${exam.id}/attempt/`}>Enter Exam</Link>

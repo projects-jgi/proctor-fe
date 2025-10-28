@@ -13,8 +13,8 @@ export async function login({ email, password }: {email: string, password: strin
         const response = await Request({url: process.env.BACKEND_HOST + "/api/auth/student/login", method: 'POST', body: body})
         await loginSession(response.data)
         return {}
-    }catch(error){
-        if(error.response){
+    }catch(error: any){
+        if("response" in error){
             return Promise.reject(error.response.data.message)
         }
         return Promise.reject("Unknown error occured")

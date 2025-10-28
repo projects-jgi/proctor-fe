@@ -16,7 +16,10 @@ const card_count = 2;
 function UpcomingExams() {
   const upcoming_exams = useQuery({
     queryKey: ["exams", {status: ExamStatus.UPCOMING}],
-    queryFn: async ({ queryKey }) => await get_student_exams({ status: queryKey[1].status })
+    queryFn: async ({ queryKey }) => {
+      const [, { status }] = queryKey as [string, {status: string}]
+      return await get_student_exams({ status })
+    }
   })
 
   const dispatch = useDispatch();
@@ -46,7 +49,7 @@ function UpcomingExams() {
       </div>
       <div className="grid grid-cols-1 gap-4 mt-4">
         {
-          upcoming_exams.data!.slice(0, card_count).map((exam, index) => (
+          upcoming_exams.data!.slice(0, card_count).map((exam: any, index: number) => (
             <ExamCard key={index} {...exam} action={<Button>View Details</Button>}  />
           ))          
         }

@@ -5,24 +5,25 @@ import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader,
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { setQuestionCounter, setSelectedAnswers } from "@/lib/redux/state/ExamAttempt";
+import { RootState } from "@/lib/redux/store";
 import { ChevronLeft, ChevronRight, TriangleAlert } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 function QuestionCard() {
-    const question = useSelector(state => state.exam_attempt.currentQuestion);
-    const totalQuestions = useSelector(state => state.exam_attempt.questionsLength);
-    const questionCounter = useSelector(state => state.exam_attempt.questionCounter);
+    const question = useSelector((state: RootState) => state.exam_attempt.currentQuestion);
+    const totalQuestions = useSelector((state: RootState) => state.exam_attempt.questionsLength);
+    const questionCounter = useSelector((state: RootState) => state.exam_attempt.questionCounter);
     const dispatch = useDispatch();
     
     const options: {
         [option: string]: string | undefined
     } = {
-        option_1: question.option_1,
-        option_2: question.option_2,
-        option_3: question.option_3,
-        option_4: question.option_4,
-        option_5: question.option_5,
+        option_1: question?.option_1,
+        option_2: question?.option_2,
+        option_3: question?.option_3,
+        option_4: question?.option_4,
+        option_5: question?.option_5,
     }
 
     // stored all the selected answers in memory
@@ -33,7 +34,7 @@ function QuestionCard() {
         const local_storage: string | null = localStorage.getItem("user_answers")
         if(local_storage != null){
             const user_answers = JSON.parse(local_storage);
-            setSelectedOptions(user_answers[question.id])
+            setSelectedOptions(user_answers[question!.id])
         }
 
     }, [question])
@@ -48,7 +49,7 @@ function QuestionCard() {
             }
             let new_values = {
                 ...prev_user_answers,
-                [question.id]: selectedOptions
+                [question!.id]: selectedOptions
             }
             dispatch(setSelectedAnswers(new_values));
             localStorage.setItem("user_answers", JSON.stringify(new_values))
@@ -71,23 +72,23 @@ function QuestionCard() {
     }
 
     function incrementCounter(){
-        dispatch(setQuestionCounter(questionCounter + 1))
+        dispatch(setQuestionCounter(questionCounter ? questionCounter + 1 : 0))
     }
 
     function decrementCounter(){
-        dispatch(setQuestionCounter(questionCounter - 1))
+        dispatch(setQuestionCounter(questionCounter ? questionCounter - 1 : 0))
     }
 
     return (
-        <Card className="card__question" data-question-id={question.id}>
+        <Card className="card__question" data-question-id={question?.id}>
             <CardHeader>
                 <CardDescription className="text-sm mb-2">
                 Question {questionCounter} of {totalQuestions}
                 </CardDescription>
                 <CardTitle>
-                {question.question_text}
+                {question?.question_text}
                 </CardTitle>
-                <CardAction className="text-sm font-bold">Score: { question.score }</CardAction>
+                <CardAction className="text-sm font-bold">Score: { question?.score }</CardAction>
             </CardHeader>
             <CardContent>
                 <div className="flex flex-col gap-4">
@@ -95,14 +96,14 @@ function QuestionCard() {
                         if(options[option]){
                             return (
                                 <Label
-                                    key={`toggle-${question.id}-${option}`}
+                                    key={`toggle-${question?.id}-${option}`}
                                     className="hover:bg-accent/50 flex items-start gap-3 rounded-lg border p-3 has-[[aria-checked=true]]:border-blue-600 has-[[aria-checked=true]]:bg-blue-50 dark:has-[[aria-checked=true]]:border-accent/50 dark:has-[[aria-checked=true]]:bg-accent/30"
                                 >
                                     <Checkbox
-                                        id={`toggle-${question.id}-${option}`}
+                                        id={`toggle-${question?.id}-${option}`}
                                         className="data-[state=checked]:border-blue-600 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white dark:data-[state=checked]:border-accent/50 dark:data-[state=checked]:bg-accent"
                                         data-option-name={option}
-                                        data-question-id={question.id}
+                                        data-question-id={question?.id}
                                         onCheckedChange={() => onOptionClicked(option)}
                                         checked={selectedOptions != null && selectedOptions.includes(option)}
                                     />

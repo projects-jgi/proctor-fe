@@ -9,10 +9,13 @@ import React from 'react'
 
 function ExamUpcomingList({ count = undefined }: { count?: number | undefined }) {
     const exams = useQuery({
-        queryKey: ["exams", { status: ExamStatus.UPCOMING }],
-        queryFn: async ({ queryKey }) =>
-        await get_student_exams({ status: queryKey[1].status }),
-    });
+        queryKey: ["exams", {status: ExamStatus.UPCOMING}],
+        queryFn: async ({ queryKey }) => {
+        const [, { status }] = queryKey as [string, {status: string}]
+        return await get_student_exams({ status })
+        }
+    })
+
     if (
         exams.isLoading ||
         exams.isError ||
@@ -24,7 +27,7 @@ function ExamUpcomingList({ count = undefined }: { count?: number | undefined })
     return (
         <div className="grid grid-cols-1 gap-4 mt-4">
             {exams.data.slice(0, count)
-            .map((exam, index) => (
+            .map((exam: any, index: number) => (
                 <ExamCard key={index} {...exam} action={<Button>View Details</Button>}  />
             ))}
         </div>

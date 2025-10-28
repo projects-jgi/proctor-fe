@@ -1,13 +1,6 @@
 'use client';
 
 import * as React from "react"
-import { ChevronRight } from "lucide-react"
-
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
 import {
   Sidebar,
   SidebarContent,
@@ -25,6 +18,7 @@ import { ExamQuestion, ExamTypeQuestion } from "@/types/exam";
 import { cn } from "@/lib/utils";
 import { useDispatch, useSelector } from "react-redux";
 import { setQuestionCounter } from "@/lib/redux/state/ExamAttempt";
+import { RootState } from "@/lib/redux/store";
 
 // This is sample data.
 const data = {
@@ -49,8 +43,8 @@ const data = {
 }
 
 export function ExamSidebar({ questions }: { questions: ExamTypeQuestion }) {
-  const questionCounter = useSelector(state => state.exam_attempt.questionCounter);
-  const selectedAnswers = useSelector(state => state.exam_attempt.selectedAnswers);
+  const questionCounter = useSelector((state: RootState) => state.exam_attempt.questionCounter);
+  const selectedAnswers = useSelector((state: RootState) => state.exam_attempt.selectedAnswers);
   const dispatch = useDispatch();
 
   let question_counter = 1;
@@ -79,7 +73,7 @@ export function ExamSidebar({ questions }: { questions: ExamTypeQuestion }) {
                         key={index}
                         className={cn(
                           "w-full aspect-square bg-secondary/30 text-secondary-foreground ring-1 ring-border",
-                          selectedAnswers[question.id] != null && selectedAnswers[question.id].length > 0 && "ring-success",
+                          selectedAnswers != undefined && selectedAnswers[question.id] != null && selectedAnswers[question.id].length > 0 && "ring-success",
                           (questionCounter == question_counter) && 'bg-primary text-primary-foreground'
                         )}
                         onClick={handleItemClick}

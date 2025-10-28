@@ -10,13 +10,14 @@ import useAudioPermission from '@/hooks/browser_permissions/useAudioPermission';
 import useVideoPermission from '@/hooks/browser_permissions/useVideoPermission';
 import { useOnlineStatus } from '@/hooks/browser_permissions/useOnlineStatus';
 import { useFullscreenStatus } from '@/hooks/browser_permissions/useFullscreenStatus';
+import { RootState } from '@/lib/redux/store';
 
 function ExamWrapper({ exam_id, exam_questions }: { exam_id: number, exam_questions: any}) {
     const audio_permission = useAudioPermission();
     const video_permission = useVideoPermission();
     const online_status = useOnlineStatus();
     const full_screen = useFullscreenStatus();
-    const isEligible = useSelector(state => state.exam_eligibility_test.is_eligible);
+    const isEligible = useSelector((state: RootState) => state.exam_eligibility_test.is_eligible);
     
     const dispatch = useDispatch();
 

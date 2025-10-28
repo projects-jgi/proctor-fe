@@ -12,12 +12,13 @@ import { SidebarInset } from '@/components/ui/sidebar';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import useTabActive from '@/hooks/useTabActive';
+import { RootState } from '@/lib/redux/store';
 
 function ExamContainer({ exam_id, exam_questions }: { exam_id: number, exam_questions: any }) {
     const [isActiveTab, setIsActiveTab] = useTabActive();
-    const questionCounter = useSelector(state => state.exam_attempt.questionCounter);
-    const totalQuestions = useSelector(state => state.exam_attempt.questionsLength);
-    const currentQuestion = useSelector(state => state.exam_attempt.currentQuestion);
+    const questionCounter = useSelector((state: RootState) => state.exam_attempt.questionCounter);
+    const totalQuestions = useSelector((state: RootState) => state.exam_attempt.questionsLength);
+    const currentQuestion = useSelector((state: RootState) => state.exam_attempt.currentQuestion);
 
     const dispatch = useDispatch();
     

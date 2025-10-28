@@ -16,8 +16,10 @@ const card_count = 2;
 function CompletedExams() {
     const completed_exams = useQuery({
         queryKey: ["exams", { status: ExamStatus.COMPLETED }],
-        queryFn: async ({ queryKey }) =>
-        await get_student_exams({ status: queryKey[1].status }),
+        queryFn: async ({ queryKey }) =>{
+            const [, { status }] = queryKey as [string, { status: string }]
+            return await get_student_exams({ status })
+        },
     });
 
     const dispatch = useDispatch();
@@ -50,7 +52,7 @@ function CompletedExams() {
                 </Link>
             </div>
             <div className="grid grid-cols-1 gap-4 mt-4">
-                {completed_exams.data.slice(0, card_count).map((exam, index) => (
+                {completed_exams.data.slice(0, card_count).map((exam: any, index: number) => (
                 <ExamCard
                     key={index}
                     {...exam}

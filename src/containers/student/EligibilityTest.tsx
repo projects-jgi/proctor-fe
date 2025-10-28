@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { setAudioAccess, setFullScreen, setOnlineStatus, setVideoAccess } from "@/lib/redux/state/ExamEligibilityTest";
+import { RootState } from "@/lib/redux/store";
 import { LoaderCircle, Lock, MoveRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -55,10 +56,10 @@ function EligibilityTest({ setStartExam }: {setStartExam: () => void}) {
     const [internetInfo, setInternetInfo] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
     const [isEligible, setIsEligible] = useState<boolean>(false);
 
-    const audioAccess: string = useSelector(state => state.exam_eligibility_test.audio_access);
-    const videoAccess: string = useSelector(state => state.exam_eligibility_test.video_access); 
-    const onlineStatus: string = useSelector(state => state.exam_eligibility_test.online_status); 
-    const fullscreenAccess: string = useSelector(state => state.exam_eligibility_test.full_screen);
+    const audioAccess = useSelector((state:RootState) => state.exam_eligibility_test.audio_access);
+    const videoAccess = useSelector((state: RootState) => state.exam_eligibility_test.video_access); 
+    const onlineStatus = useSelector((state: RootState) => state.exam_eligibility_test.online_status); 
+    const fullscreenAccess = useSelector((state: RootState) => state.exam_eligibility_test.full_screen);
 
     const status_permission_mapping: {
         [key: string]: string,
@@ -69,10 +70,10 @@ function EligibilityTest({ setStartExam }: {setStartExam: () => void}) {
     }
 
     useEffect(() => {
-        setAudioInfo(status_permission_mapping[audioAccess] as PermissionStatus)
-        setVideoInfo(status_permission_mapping[videoAccess] as PermissionStatus)
-        setInternetInfo(status_permission_mapping[onlineStatus] as PermissionStatus)
-        setFullscreenInfo(status_permission_mapping[fullscreenAccess] as PermissionStatus)
+        setAudioInfo(status_permission_mapping[String(audioAccess)] as PermissionStatus)
+        setVideoInfo(status_permission_mapping[String(videoAccess)] as PermissionStatus)
+        setInternetInfo(status_permission_mapping[String(onlineStatus)] as PermissionStatus)
+        setFullscreenInfo(status_permission_mapping[String(fullscreenAccess)] as PermissionStatus)
 
         if(audioAccess && videoAccess && onlineStatus){
             setIsEligible(true)

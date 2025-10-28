@@ -1,14 +1,15 @@
 'use client';
 
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { RootState } from "@/lib/redux/store";
 import { AlarmClock, AlarmClockCheck, Award, Siren } from "lucide-react";
 import React from "react";
 import { useSelector } from "react-redux";
 
 function Stats() {
-    const completed_exams_length = useSelector(state => state.exam_list.completed_exams.length);
-    const ongoing_exams_length = useSelector(state => state.exam_list.ongoing_exams.length);
-    const upcoming_exams_length = useSelector(state => state.exam_list.upcoming_exams.length);
+    const completed_exams_length = useSelector((state: RootState) => state.exam_list.completed_exams.length);
+    const ongoing_exams_length = useSelector((state: RootState) => state.exam_list.ongoing_exams.length);
+    const upcoming_exams_length = useSelector((state: RootState) => state.exam_list.upcoming_exams.length);
 
     return (
         <div className="my-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
