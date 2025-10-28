@@ -13,9 +13,11 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { setAudioAccess, setFullScreen, setOnlineStatus, setVideoAccess } from "@/lib/redux/state/ExamEligibilityTest";
 import { LoaderCircle, Lock, MoveRight } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { Dispatch, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 enum PermissionStatus {
     NOT_CHECKED = "Not Checked",
@@ -48,65 +50,97 @@ function StatusMessage({status}: {status: PermissionStatus}) {
     )
 }
 
-function EligibilityTest({ exam_url }: { exam_url: string }) {
-    const [audioStatus, setAudioStatus] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
-    const [videoStatus, setVideoStatus] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
-    const [fullscreenStatus, setFullscreenStatus] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
-    const [internetStatus, setInternetStatus] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
+function EligibilityTest({ setStartExam }: {setStartExam: () => void}) {
+    console.log("Eligibility test rendered")
+    const [audioInfo, setAudioInfo] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
+    const [videoInfo, setVideoInfo] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
+    const [fullscreenInfo, setFullscreenInfo] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
+    const [internetInfo, setInternetInfo] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
     const [isEligible, setIsEligible] = useState<boolean>(false);
 
+    const audioAccess: string = useSelector(state => state.exam_eligibility_test.audio_access);
+    const videoAccess: string = useSelector(state => state.exam_eligibility_test.video_access); 
+    const onlineStatus: string = useSelector(state => state.exam_eligibility_test.online_status); 
+    const fullscreenAccess: string = useSelector(state => state.exam_eligibility_test.full_screen);
+
+    const status_permission_mapping: {
+        [key: string]: string,
+    }= {
+        true: PermissionStatus.GRANTED,
+        false: PermissionStatus.DENIED,
+        null: PermissionStatus.NOT_CHECKED
+    }
+
+    useEffect(() => {
+        setAudioInfo(status_permission_mapping[audioAccess] as PermissionStatus)
+        setVideoInfo(status_permission_mapping[videoAccess] as PermissionStatus)
+        setInternetInfo(status_permission_mapping[onlineStatus] as PermissionStatus)
+        setFullscreenInfo(status_permission_mapping[fullscreenAccess] as PermissionStatus)
+    }, [audioAccess, videoAccess, onlineStatus])
+
+    const dispatch = useDispatch();
+
     async function audioPrompt(){
-        setAudioStatus(PermissionStatus.CHECKING);
+        setAudioInfo(PermissionStatus.CHECKING);
         try{
             await navigator.mediaDevices.getUserMedia({audio: true})
-            setAudioStatus(PermissionStatus.GRANTED);
+            setAudioInfo(PermissionStatus.GRANTED);
+            dispatch(setAudioAccess(true))
             return Promise.resolve('granted')
         }catch(err){
-            setAudioStatus(PermissionStatus.DENIED);
+            setAudioInfo(PermissionStatus.DENIED);
+            dispatch(setAudioAccess(false))
             return Promise.reject('denied')
         }
     }
 
     async function videoPrompt(){
-        setVideoStatus(PermissionStatus.CHECKING);
+        setVideoInfo(PermissionStatus.CHECKING);
 
         try{
             await navigator.mediaDevices.getUserMedia({video: true})
-            setVideoStatus(PermissionStatus.GRANTED);
+            setVideoInfo(PermissionStatus.GRANTED);
+            dispatch(setVideoAccess(true))
             return Promise.resolve('granted')
         }catch(err){
-            setVideoStatus(PermissionStatus.DENIED);
+            setVideoInfo(PermissionStatus.DENIED);
+            dispatch(setVideoAccess(false))
             return Promise.reject('denied')
         }
     }
 
     async function fullscreenPrompt(){
-        setFullscreenStatus(PermissionStatus.CHECKING);
+        setFullscreenInfo(PermissionStatus.CHECKING);
         try{
             const elem = document.documentElement;
             if (elem.requestFullscreen) {
                 await elem.requestFullscreen();
             }
-            setFullscreenStatus(PermissionStatus.GRANTED);
+            setFullscreenInfo(PermissionStatus.GRANTED);
+            dispatch(setFullScreen(true))
             return Promise.resolve('granted')
         }catch(err){
-            setFullscreenStatus(PermissionStatus.DENIED);
+            setFullscreenInfo(PermissionStatus.DENIED);
+            dispatch(setFullScreen(false))
             return Promise.reject('denied')
         }
     }
 
     async function internetCheck(){
-        setInternetStatus(PermissionStatus.CHECKING);
+        setInternetInfo(PermissionStatus.CHECKING);
         try{
             if(navigator.onLine){
-                setInternetStatus(PermissionStatus.GRANTED);
+                setInternetInfo(PermissionStatus.GRANTED);
+                dispatch(setOnlineStatus(true));
                 return Promise.resolve('online')
             }else{
-                setInternetStatus(PermissionStatus.DENIED);
+                setInternetInfo(PermissionStatus.DENIED);
+                dispatch(setOnlineStatus(false));
                 return Promise.reject('offline')
             }
         }catch(err){
-            setInternetStatus(PermissionStatus.DENIED);
+            setInternetInfo(PermissionStatus.DENIED);
+            dispatch(setOnlineStatus(false));
             return Promise.reject('error')
         }
     }
@@ -121,10 +155,7 @@ function EligibilityTest({ exam_url }: { exam_url: string }) {
     }
 
     return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button>Enter Exam</Button>
-            </DialogTrigger>
+        <Dialog open={true}>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>Exam Eligibility Check</DialogTitle>
@@ -146,10 +177,10 @@ function EligibilityTest({ exam_url }: { exam_url: string }) {
                 <div>
                     <h3 className="text-lg font-semibold">System Check</h3>
                     <ul className="text-sm flex flex-col gap-1">
-                        <li>Audio System: <StatusMessage status={audioStatus} /></li>
-                        <li>Video System: <StatusMessage status={videoStatus} /></li>
-                        <li>Fullscreen Mode: <StatusMessage status={fullscreenStatus} /></li>
-                        <li>Internet Connection: <StatusMessage status={internetStatus} /></li>
+                        <li>Audio System: <StatusMessage status={audioInfo} /></li>
+                        <li>Video System: <StatusMessage status={videoInfo} /></li>
+                        <li>Fullscreen Mode: <StatusMessage status={fullscreenInfo} /></li>
+                        <li>Internet Connection: <StatusMessage status={internetInfo} /></li>
                     </ul>
                     <p className="text-xs text-muted-foreground mt-2">NOTE: Click the <Lock className="inline" size={10} /> lock icon in the address bar <MoveRight size={10} className="inline" /> Site settings <MoveRight size={10} className="inline" /> Allow Camera and Microphone access.</p>
                 </div>
@@ -158,19 +189,16 @@ function EligibilityTest({ exam_url }: { exam_url: string }) {
                     <Label htmlFor="terms">Accept terms and conditions</Label>
                 </div>
                 <DialogFooter>
-                    <DialogClose asChild>
-                        <Button variant="secondary">Cancel</Button>
-                    </DialogClose>
-
                     <div>
                         {
                             !isEligible ?
                             <Button onClick={eligibilityCheck}>Check Eligibility</Button>
                             :
-                            fullscreenStatus === PermissionStatus.GRANTED ? 
-                            <Button variant="default" asChild>
-                                <Link href={exam_url}>Enter Exam</Link>
-                            </Button>
+                            fullscreenInfo === PermissionStatus.GRANTED ? 
+                            <DialogClose asChild>
+                                <Button onClick={setStartExam}>Enter Exam</Button>
+                            </DialogClose>
+
                             : 
                             <Button variant="default" onClick={fullscreenPrompt}>Enter Fullscreen Mode</Button>
                         }

@@ -1,10 +1,6 @@
 import React from 'react'
-import { signal } from '@preact/signals-react';
-import { Button } from '@/components/ui/button';
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { useQuery } from '@tanstack/react-query';
 import { make_student_exam_attempt } from '@/lib/server_api/student';
-import ExamContainer from '@/containers/student/exams/attempt/ExamContainer';
+import ExamWrapper from '@/containers/student/exams/attempt/ExamWrapper';
 
 interface PageParams {
     exam_id: number
@@ -30,11 +26,7 @@ async function page({ params }: { params: PageParams}) {
     console.log(exam_questions)
 
     return (
-        <>
-            <SidebarProvider>
-                <ExamContainer exam_id={exam_id} exam_questions={exam_questions} />
-            </SidebarProvider>
-        </>
+        <ExamWrapper exam_id={exam_id} exam_questions={exam_questions} />
     )
 }
 

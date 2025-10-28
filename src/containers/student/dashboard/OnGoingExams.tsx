@@ -8,6 +8,8 @@ import { ExamStatus } from "@/types/exam";
 import { useEffect } from "react";
 import { setOngoingExams } from "@/lib/redux/state/ExamList";
 import { useDispatch } from "react-redux";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const card_count = 2;
 
@@ -39,7 +41,11 @@ function OngoingExams() {
             <h2 className="text-xl font-bold">Ongoing Exams</h2>
             <div className="grid grid-cols-1 gap-4 mt-4">
                 {ongoing_exams.data.slice(0, card_count).map((exam, index) => (
-                <ExamCard key={index} {...exam} action={<EligibilityTest exam_url={`/student/exams/${exam.id}/attempt/`} />} />
+                <ExamCard key={index} {...exam} action={
+                    <Button variant={"default"}>
+                        <Link href={`/student/exams/${exam.id}/attempt/`}>Enter Exam</Link>
+                    </Button>
+                } />
                 ))}
             </div>
         </section>
