@@ -9,8 +9,12 @@ import QuestionCard from './QuestionCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentQuestion, setQuestionCounter, setQuestionsLength } from '@/lib/redux/state/ExamAttempt';
 import { SidebarInset } from '@/components/ui/sidebar';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import useTabActive from '@/hooks/useTabActive';
 
 function ExamContainer({ exam_id, exam_questions }: { exam_id: number, exam_questions: any }) {
+    const [isActiveTab, setIsActiveTab] = useTabActive();
     const questionCounter = useSelector(state => state.exam_attempt.questionCounter);
     const totalQuestions = useSelector(state => state.exam_attempt.questionsLength);
     const currentQuestion = useSelector(state => state.exam_attempt.currentQuestion);
@@ -36,8 +40,26 @@ function ExamContainer({ exam_id, exam_questions }: { exam_id: number, exam_ques
         }
     }, [questionCounter])
 
+    useEffect(() => {
+        console.log("Active tab changed: ", isActiveTab === false)        
+    }, [isActiveTab])
+    
+
     return (
         <>
+            <Dialog open={isActiveTab === false}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Violation Alert</DialogTitle>
+                        <DialogDescription>Tab Switch Detected</DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button onClick={() => setIsActiveTab(true)}>Continue</Button>
+                        </DialogClose>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
             <ExamSidebar questions={exam_questions["questions"]} />
             <SidebarInset>
                 <main className='w-full'>

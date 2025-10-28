@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -15,8 +14,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { setAudioAccess, setFullScreen, setOnlineStatus, setVideoAccess } from "@/lib/redux/state/ExamEligibilityTest";
 import { LoaderCircle, Lock, MoveRight } from "lucide-react";
-import Link from "next/link";
-import { Dispatch, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 enum PermissionStatus {
@@ -51,7 +49,6 @@ function StatusMessage({status}: {status: PermissionStatus}) {
 }
 
 function EligibilityTest({ setStartExam }: {setStartExam: () => void}) {
-    console.log("Eligibility test rendered")
     const [audioInfo, setAudioInfo] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
     const [videoInfo, setVideoInfo] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
     const [fullscreenInfo, setFullscreenInfo] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
@@ -76,7 +73,11 @@ function EligibilityTest({ setStartExam }: {setStartExam: () => void}) {
         setVideoInfo(status_permission_mapping[videoAccess] as PermissionStatus)
         setInternetInfo(status_permission_mapping[onlineStatus] as PermissionStatus)
         setFullscreenInfo(status_permission_mapping[fullscreenAccess] as PermissionStatus)
-    }, [audioAccess, videoAccess, onlineStatus])
+
+        if(audioAccess && videoAccess && onlineStatus){
+            setIsEligible(true)
+        }
+    }, [audioAccess, videoAccess, onlineStatus, fullscreenAccess])
 
     const dispatch = useDispatch();
 
@@ -84,11 +85,9 @@ function EligibilityTest({ setStartExam }: {setStartExam: () => void}) {
         setAudioInfo(PermissionStatus.CHECKING);
         try{
             await navigator.mediaDevices.getUserMedia({audio: true})
-            setAudioInfo(PermissionStatus.GRANTED);
             dispatch(setAudioAccess(true))
             return Promise.resolve('granted')
         }catch(err){
-            setAudioInfo(PermissionStatus.DENIED);
             dispatch(setAudioAccess(false))
             return Promise.reject('denied')
         }
@@ -99,11 +98,9 @@ function EligibilityTest({ setStartExam }: {setStartExam: () => void}) {
 
         try{
             await navigator.mediaDevices.getUserMedia({video: true})
-            setVideoInfo(PermissionStatus.GRANTED);
             dispatch(setVideoAccess(true))
             return Promise.resolve('granted')
         }catch(err){
-            setVideoInfo(PermissionStatus.DENIED);
             dispatch(setVideoAccess(false))
             return Promise.reject('denied')
         }
@@ -116,11 +113,9 @@ function EligibilityTest({ setStartExam }: {setStartExam: () => void}) {
             if (elem.requestFullscreen) {
                 await elem.requestFullscreen();
             }
-            setFullscreenInfo(PermissionStatus.GRANTED);
             dispatch(setFullScreen(true))
             return Promise.resolve('granted')
         }catch(err){
-            setFullscreenInfo(PermissionStatus.DENIED);
             dispatch(setFullScreen(false))
             return Promise.reject('denied')
         }
@@ -130,16 +125,13 @@ function EligibilityTest({ setStartExam }: {setStartExam: () => void}) {
         setInternetInfo(PermissionStatus.CHECKING);
         try{
             if(navigator.onLine){
-                setInternetInfo(PermissionStatus.GRANTED);
                 dispatch(setOnlineStatus(true));
                 return Promise.resolve('online')
             }else{
-                setInternetInfo(PermissionStatus.DENIED);
                 dispatch(setOnlineStatus(false));
                 return Promise.reject('offline')
             }
         }catch(err){
-            setInternetInfo(PermissionStatus.DENIED);
             dispatch(setOnlineStatus(false));
             return Promise.reject('error')
         }
