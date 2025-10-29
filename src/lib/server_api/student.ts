@@ -48,9 +48,24 @@ export async function save_student_exam_attempt({ exam_id, answers }: {exam_id: 
     })
 }
 
-export async function get_student_attempt_result({ exam_id }: { exam_id: number }){
+export async function get_student_attempt_answers({ exam_id }: { exam_id: number }){
     return Request({
         url: process.env.BACKEND_HOST + `/api/students/exams/${exam_id}/attempts/1/answers`,
+        isAuthorized: true,
+        method: "GET"
+    }).then(function(response){
+        return response.data
+    }).catch(function(error){
+        if(error.response){
+            return Promise.reject(error.response.data.message)
+        }
+        return Promise.reject("Unable to load exam results")
+    })
+}
+
+export async function get_student_attempt_result({ exam_id }: {exam_id: number}){
+    return Request({
+        url: process.env.BACKEND_HOST + `/api/students/exams/${exam_id}/attempts/1/result`,
         isAuthorized: true,
         method: "GET"
     }).then(function(response){

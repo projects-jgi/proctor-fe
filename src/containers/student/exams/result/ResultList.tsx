@@ -51,31 +51,32 @@ function ResultList({ result }: {result: any}) {
                                 options.map((option, option_index) => {
                                     if(item.exam_question[option]){
                                         return (
-                                        <>
-                                        <Label
-                                            className={cn(
-                                                'flex items-start gap-3 rounded-lg border p-3',
-                                                item.exam_question[option_answer_map[option]] == 1 && 'has-[[aria-checked=true]]:border-green-600 has-[[aria-checked=true]]:bg-green-50 dark:has-[[aria-checked=true]]:border-green-900 dark:has-[[aria-checked=true]]:bg-green-950',
-                                                item.exam_question[option_answer_map[option]] == 0 && 'has-[[aria-checked=true]]:border-red-600 has-[[aria-checked=true]]:bg-red-50 dark:has-[[aria-checked=true]]:border-red-900 dark:has-[[aria-checked=true]]:bg-red-950',
-                                            )}
-                                            key={option_index}
-                                        >
-                                            <Checkbox
-                                                className=""
-                                                checked={item.exam_question[option_explanation_map[option]] ? true : false}
-                                            />
-                                            <div className="grid gap-1.5 font-normal">
-                                            <p className="text-sm leading-none font-medium">{item.exam_question[option]}</p>
+                                        <div key={option_index}>
+                                            <Label
+                                                className={cn(
+                                                    'flex items-start gap-3 rounded-lg border p-3 mb-2',
+                                                    item.exam_question[option_answer_map[option]] == 1 && 'has-[[aria-checked=true]]:border-green-600 has-[[aria-checked=true]]:bg-green-50 dark:has-[[aria-checked=true]]:border-green-900 dark:has-[[aria-checked=true]]:bg-green-950',
+                                                    item.exam_question[option_answer_map[option]] == 0 && 'has-[[aria-checked=true]]:border-red-600 has-[[aria-checked=true]]:bg-red-50 dark:has-[[aria-checked=true]]:border-red-900 dark:has-[[aria-checked=true]]:bg-red-950',
+                                                )}
+                                            >
+                                                <Checkbox
+                                                    className=""
+                                                    checked={item.exam_question[option_explanation_map[option]] ? true : false}
+                                                />
+                                                <div className="grid gap-1.5 font-normal">
+                                                <p className="text-sm leading-none font-medium">{item.exam_question[option]}</p>
+                                                <p className={
+                                                        cn(
+                                                            'text-sm',
+                                                            item.exam_question[option_answer_map[option]] == 1 ? 'text-green-700 dark:text-green-300' : '',
+                                                            item.exam_question[option_answer_map[option]] == 0 ? 'text-red-700 dark:text-red-300' : '',
+                                                        )
+                                                    }>
+                                                    {item.exam_question[option_explanation_map[option]]}
+                                                </p>
+                                                </div>
+                                            </Label>
                                             </div>
-                                        </Label>
-                                        <p className={
-                                            cn(
-                                                'ms-4 mb-2 text-sm',
-                                                item.exam_question[option_answer_map[option]] == 1 ? 'text-green-700 dark:text-green-300' : '',
-                                                item.exam_question[option_answer_map[option]] == 0 ? 'text-red-700 dark:text-red-300' : '',
-                                            )
-                                        }>{item.exam_question[option_explanation_map[option]]}</p>
-                                        </>
                                         )
                                     }
                                 })
