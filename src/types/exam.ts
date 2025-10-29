@@ -26,6 +26,21 @@ export interface ExamQuestion {
     score: number
 }
 
+export interface Exam{
+    id: number,
+    description?: string,
+    department_id: number,
+    name: string,
+    start_time?: string,
+    end_time?: string,
+    duration_in_minutes: number,
+    passing_percentage: number,
+    max_attempts?: number,
+    status?: number,
+    show_answers?: number,
+    completion_status: number
+}
+
 export interface ExamTypeQuestion{
     [exam_type: string] : {
         [exam_id: number]: ExamQuestion
