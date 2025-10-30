@@ -36,9 +36,12 @@ function ResultList({ result }: {result: any}) {
     }
 
     return (
-        <main className='container mx-auto'>
+        <main className='container mx-auto mb-8'>
             <div className="space-y-6">
-                {result.map((item: any, index: number) => (
+                {result.map((item: any, index: number) => {
+                    let submitted_answers = item.submitted_answer.split(",");
+
+                    return (
                     <Card className="hover:shadow-md transition" key={index}>
                         <CardHeader>
                             <CardTitle className="text-base font-semibold flex items-center gap-2">
@@ -55,25 +58,30 @@ function ResultList({ result }: {result: any}) {
                                             <Label
                                                 className={cn(
                                                     'flex items-start gap-3 rounded-lg border p-3 mb-2',
-                                                    item.exam_question[option_answer_map[option]] == 1 && 'has-[[aria-checked=true]]:border-green-600 has-[[aria-checked=true]]:bg-green-50 dark:has-[[aria-checked=true]]:border-green-900 dark:has-[[aria-checked=true]]:bg-green-950',
-                                                    item.exam_question[option_answer_map[option]] == 0 && 'has-[[aria-checked=true]]:border-red-600 has-[[aria-checked=true]]:bg-red-50 dark:has-[[aria-checked=true]]:border-red-900 dark:has-[[aria-checked=true]]:bg-red-950',
+                                                    item.exam_question[option_answer_map[option]] == 1 && 'has-[[aria-checked=true]]:border-success has-[[aria-checked=true]]:bg-success/20 dark:has-[[aria-checked=true]]:border-success/80 dark:has-[[aria-checked=true]]:bg-success/20',
+                                                    item.exam_question[option_answer_map[option]] == 0 && 'has-[[aria-checked=true]]:border-destructive has-[[aria-checked=true]]:bg-destructive/10 dark:has-[[aria-checked=true]]:border-destructive/80 dark:has-[[aria-checked=true]]:bg-destructive/10',
                                                 )}
                                             >
                                                 <Checkbox
                                                     className=""
-                                                    checked={item.exam_question[option_explanation_map[option]] ? true : false}
+                                                    checked={item.exam_question[option_explanation_map[option]] && submitted_answers.includes(option) ? true : false}
                                                 />
-                                                <div className="grid gap-1.5 font-normal">
-                                                <p className="text-sm leading-none font-medium">{item.exam_question[option]}</p>
-                                                <p className={
-                                                        cn(
-                                                            'text-sm',
-                                                            item.exam_question[option_answer_map[option]] == 1 ? 'text-green-700 dark:text-green-300' : '',
-                                                            item.exam_question[option_answer_map[option]] == 0 ? 'text-red-700 dark:text-red-300' : '',
-                                                        )
-                                                    }>
-                                                    {item.exam_question[option_explanation_map[option]]}
-                                                </p>
+                                                <div className="grid gap-1.5 font-normal flex-1">
+                                                    <div className="flex justify-between items-center">
+                                                        <p className="text-sm leading-none font-medium">{item.exam_question[option]}</p>
+                                                        {item.exam_question[option_answer_map[option]] == 1 && <p className="text-sm leading-none font-medium">
+                                                            <Badge className='bg-success text-success-foreground'>Correct</Badge>
+                                                        </p>}
+                                                    </div>
+                                                    <p className={
+                                                            cn(
+                                                                'text-sm',
+                                                                item.exam_question[option_answer_map[option]] == 1 ? 'text-green-800 dark:text-success' : '',
+                                                                item.exam_question[option_answer_map[option]] == 0 ? 'text-destructive' : '',
+                                                            )
+                                                        }>
+                                                        {item.exam_question[option_explanation_map[option]]}
+                                                    </p>
                                                 </div>
                                             </Label>
                                             </div>
@@ -83,7 +91,8 @@ function ResultList({ result }: {result: any}) {
                             }
                         </CardContent>
                     </Card>
-                ))}
+                )
+                })}
             </div>
         </main>
     )
