@@ -7,6 +7,7 @@ import { ExamStatus } from '@/types/exam';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react'
 import ExamCompletedCard from '../../../components/exam/ExamCompletedCard';
+import ExamNotFound from '@/components/exam/ExamNotFound';
 
 function ExamCompletedList({ count = undefined }: { count?: number | undefined }) {
     const exams = useQuery({
@@ -22,7 +23,7 @@ function ExamCompletedList({ count = undefined }: { count?: number | undefined }
         exams.isError ||
         exams.data.length == 0
     ) {
-        return <></>;
+        return <ExamNotFound/>;
     }
 
     return (

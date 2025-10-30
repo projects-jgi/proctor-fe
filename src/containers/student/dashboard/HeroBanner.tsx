@@ -9,15 +9,13 @@ function HeroBanner() {
                 <CardHeader>
                     <CardTitle className="text-2xl">Welcome back, username! </CardTitle>
                     <CardDescription className="text-primary-foreground">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore,
-                        esse soluta similique voluptatem blanditiis nihil vero ut illo
-                        dolore maiores.
+                        We're glad to see you again.
                     </CardDescription>
-                    <CardAction>
+                    {/* <CardAction>
                         <Button variant={"secondary"} className="text-md">
                         Get started
                         </Button>
-                    </CardAction>
+                    </CardAction> */}
                 </CardHeader>
             </Card>
         </div>
