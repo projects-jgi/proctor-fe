@@ -8,7 +8,7 @@ import { DepartmentLayout } from '../../../components/DepartmentLayout';
 import { useProctor } from '../../../contexts/ProctorContext';
 
 function page() {
-    const { exams, addExam, updateExam, deleteExam, departments, specializations } = useProctor();
+    const { exams, addExam, updateExam, deleteExam, departments } = useProctor();
 
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -19,7 +19,7 @@ function page() {
         name: exam.title,
         description: exam.description,
         department: departments.find(d => d.id === exam.departmentId)?.name || 'Unknown',
-        course: specializations.find(s => s.id === exam.specializationId)?.name || 'Unknown',
+        course: 'General',
         startDate: exam.startTime,
         endDate: exam.endTime,
         duration: `${exam.duration} min`,
@@ -41,7 +41,6 @@ function page() {
             title: exam.name,
             description: exam.description,
             type: 'public' as const,
-            specializationId: '', // Would need to be set based on course
             departmentId: '', // Would need to be set based on department
             facultyId: '', // Would need to be set
             questions: [],

@@ -42,22 +42,10 @@ export interface Department {
   createdAt: string;
 }
 
-export interface Specialization {
-  id: string;
-  name: string;
-  code: string;
-  departmentId: string;
-  description: string;
-  duration: number; // in semesters
-  isActive: boolean;
-  createdAt: string;
-}
-
 export interface Student {
   id: string;
   userId: string;
   rollNumber: string;
-  specializationId: string;
   departmentId: string;
   schoolId: string;
   semester: number;
@@ -73,7 +61,6 @@ export interface Faculty {
   userId: string;
   employeeId: string;
   departmentId: string;
-  specializationId?: string;
   designation: string;
   qualification: string;
   experience: number;
@@ -116,7 +103,6 @@ export interface Question {
   explanation?: string;
   difficulty: 'easy' | 'medium' | 'hard';
   subject: string;
-  specializationId: string;
   facultyId: string;
   isActive: boolean;
   createdAt: string;
@@ -127,7 +113,6 @@ export interface Exam {
   title: string;
   description: string;
   type: ExamType;
-  specializationId: string;
   departmentId: string;
   facultyId: string;
   questions: string[]; // Question IDs
@@ -248,7 +233,6 @@ export interface CreateExamForm {
   title: string;
   description: string;
   type: ExamType;
-  specializationId: string;
   questions: string[];
   duration: number;
   startTime: string;
@@ -267,5 +251,4 @@ export interface CreateQuestionForm {
   explanation?: string;
   difficulty: 'easy' | 'medium' | 'hard';
   subject: string;
-  specializationId: string;
 }

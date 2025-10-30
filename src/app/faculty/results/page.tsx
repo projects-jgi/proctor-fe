@@ -8,7 +8,6 @@ export default function FacultyResultsPage() {
   const {
     currentUser,
     faculties,
-    specializations,
     exams,
     results,
     students,
@@ -24,7 +23,6 @@ export default function FacultyResultsPage() {
     .map(result => {
       const exam = exams.find(e => e.id === result.examId);
       const student = students.find(s => s.id === result.studentId);
-      const specialization = specializations.find(s => s.id === exam?.specializationId);
       return {
         id: result.id,
         examName: exam?.title || 'Unknown Exam',
@@ -38,7 +36,7 @@ export default function FacultyResultsPage() {
         feedback: result.feedback,
         submittedAt: result.generatedAt,
         examDate: exam?.startTime || result.generatedAt,
-        specialization: specialization?.name || 'N/A'
+        specialization: 'General'
       };
     }) : [];
 

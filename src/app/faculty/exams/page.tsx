@@ -35,13 +35,11 @@ export default function FacultyExamsPage() {
   const {
     currentUser,
     faculties,
-    specializations,
     exams,
     addExam,
     updateExam,
     publishExam,
     unpublishExam,
-    getQuestionsForSpecialization,
     getExamsForFaculty
   } = useProctor();
 
@@ -60,7 +58,6 @@ export default function FacultyExamsPage() {
     title: '',
     description: '',
     type: 'private' as 'private' | 'public' | 'practice' | 'timed',
-    specializationId: '',
     questions: [] as string[],
     duration: 90,
     startTime: '',
@@ -84,7 +81,6 @@ export default function FacultyExamsPage() {
       title: '',
       description: '',
       type: 'private',
-      specializationId: '',
       questions: [],
       duration: 90,
       startTime: '',
@@ -110,7 +106,6 @@ export default function FacultyExamsPage() {
       title: exam.title,
       description: exam.description,
       type: exam.type,
-      specializationId: exam.specializationId,
       questions: exam.questions,
       duration: exam.duration,
       startTime: exam.startTime,
@@ -124,8 +119,8 @@ export default function FacultyExamsPage() {
 
   const handleCreateExam = () => {
     // Add validation
-    if (!examForm.title.trim() || !examForm.description.trim() || !examForm.specializationId || !examForm.startTime || !examForm.endTime) {
-      alert('Please fill in all required fields: title, description, specialization, start time, and end time.');
+    if (!examForm.title.trim() || !examForm.description.trim() || !examForm.startTime || !examForm.endTime) {
+      alert('Please fill in all required fields: title, description, start time, and end time.');
       return;
     }
     if (new Date(examForm.startTime) >= new Date(examForm.endTime)) {
@@ -140,8 +135,8 @@ export default function FacultyExamsPage() {
     if (currentFaculty) {
       let examQuestions = examForm.questions;
       if (!editingExam) {
-        const selectedQuestions = getQuestionsForSpecialization(examForm.specializationId);
-        examQuestions = selectedQuestions.slice(0, 10).map(q => q.id); // Take first 10 questions
+        // For new exams, start with empty questions - faculty can add them later
+        examQuestions = [];
       }
 
       // Configure settings based on exam type
@@ -434,25 +429,6 @@ export default function FacultyExamsPage() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="exam-specialization" className="text-sm font-medium">Specialization *</Label>
-                    <Select 
-                      value={examForm.specializationId} 
-                      onValueChange={(value: string) => setExamForm({...examForm, specializationId: value})}
-                    >
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder="Select specialization" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {specializations.map((spec) => (
-                          <SelectItem key={spec.id} value={spec.id}>
-                            {spec.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
                     <Label htmlFor="exam-duration" className="text-sm font-medium">Duration (minutes) *</Label>
                     <Input
                       id="exam-duration"
@@ -616,8 +592,6 @@ export default function FacultyExamsPage() {
 
       <div className="grid gap-4">
         {facultyExams.map((exam) => {
-          const specialization = specializations.find(s => s.id === exam.specializationId);
-          
           // Get exam type icon and color
           const getExamTypeInfo = (type: string) => {
             switch (type) {
@@ -646,16 +620,14 @@ export default function FacultyExamsPage() {
                       <div className={`p-2 rounded-lg ${examTypeInfo.bgColor}`}>
                         <ExamTypeIcon className={`h-5 w-5 ${examTypeInfo.color}`} />
                       </div>
-                      <div>
-                        <CardTitle className="text-lg">{exam.title}</CardTitle>
-                        <div className="flex items-center space-x-2">
-                          <Badge variant="outline" className={`${examTypeInfo.bgColor} ${examTypeInfo.color} border-current`}>
-                            {examTypeInfo.label}
-                          </Badge>
-                          <span className="text-sm text-muted-foreground">•</span>
-                          <span className="text-sm text-muted-foreground">{specialization?.name}</span>
+                        <div>
+                          <CardTitle className="text-lg">{exam.title}</CardTitle>
+                          <div className="flex items-center space-x-2">
+                            <Badge variant="outline" className={`${examTypeInfo.bgColor} ${examTypeInfo.color} border-current`}>
+                              {examTypeInfo.label}
+                            </Badge>
+                          </div>
                         </div>
-                      </div>
                     </div>
                     <CardDescription className="text-sm">
                       {exam.questions.length} questions • {exam.totalMarks} marks • {exam.duration} min

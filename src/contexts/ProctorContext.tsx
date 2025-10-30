@@ -14,7 +14,9 @@ interface ProctorContextType {
   updateExam: (id: string, updates: any) => void;
   deleteExam: (id: string) => void;
   departments: any[];
-  specializations: any[];
+  addDepartment: (department: any) => void;
+  updateDepartment: (id: string, updates: any) => void;
+  deleteDepartment: (id: string) => void;
   categories: any[];
   addCategory: (category: any) => void;
   updateCategory: (id: string, updates: any) => void;
@@ -33,12 +35,8 @@ interface ProctorContextType {
   addFaculty: (faculty: any) => void;
   updateFaculty: (id: string, updates: any) => void;
   deleteFaculty: (id: string) => void;
-  addSpecialization: (specialization: any) => void;
-  updateSpecialization: (id: string, updates: any) => void;
-  deleteSpecialization: (id: string) => void;
   publishExam: (id: string) => void;
   unpublishExam: (id: string) => void;
-  getQuestionsForSpecialization: (specializationId: string) => any[];
   getExamsForFaculty: (facultyId: string) => any[];
   recordViolation: (attemptId?: string, violation?: any) => void;
   createEligibilityTest: (examId: string, userId: string) => string;
@@ -66,7 +64,6 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
       title: 'Data Structures Final Exam',
       description: 'Comprehensive exam covering all data structures topics',
       type: 'private',
-      specializationId: 'bca',
       departmentId: 'computer-science-it',
       facultyId: 'faculty-1',
       questions: ['q1', 'q2', 'q3'],
@@ -89,24 +86,32 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
   ]);
   const [departments, setDepartments] = useState<any[]>([
     {
-      id: 'computer-science-it',
-      name: 'Computer Science & IT',
-      code: 'CSIT',
-      schoolId: 'school-1',
-      headOfDepartment: 'Dr. Smith',
-      description: 'Department of Computer Science and Information Technology',
+      id: 'mca-dept',
+      name: 'Department of Master of Computer Applications',
+      code: 'MCA',
+      schoolId: 'school-of-csit',
+      headOfDepartment: 'Dr. Rajesh Kumar',
+      description: 'Advanced computing and software development programs',
       isActive: true,
       createdAt: new Date().toISOString(),
-    }
-  ]);
-  const [specializations, setSpecializations] = useState<any[]>([
+    },
     {
-      id: 'bca',
-      name: 'Bachelor of Computer Applications',
+      id: 'msc-dept',
+      name: 'Department of Master of Science (CS & IT)',
+      code: 'MSC',
+      schoolId: 'school-of-csit',
+      headOfDepartment: 'Dr. Priya Sharma',
+      description: 'Research-oriented computer science and IT programs',
+      isActive: true,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'bca-dept',
+      name: 'Department of Bachelor of Computer Applications',
       code: 'BCA',
-      departmentId: 'computer-science-it',
-      description: 'Undergraduate program in computer applications',
-      duration: 6,
+      schoolId: 'school-of-csit',
+      headOfDepartment: 'Prof. Amit Singh',
+      description: 'Foundation programs in computer applications and programming',
       isActive: true,
       createdAt: new Date().toISOString(),
     }
@@ -197,7 +202,6 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
       id: 'student-1',
       userId: 'user-student-1',
       rollNumber: 'BCA001',
-      specializationId: 'bca',
       departmentId: 'computer-science-it',
       schoolId: 'school-1',
       semester: 4,
@@ -211,7 +215,6 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
       id: 'student-2',
       userId: 'user-student-2',
       rollNumber: 'BCA002',
-      specializationId: 'bca',
       departmentId: 'computer-science-it',
       schoolId: 'school-1',
       semester: 4,
@@ -225,7 +228,6 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
       id: 'student-3',
       userId: 'user-student-3',
       rollNumber: 'BCA003',
-      specializationId: 'bca',
       departmentId: 'computer-science-it',
       schoolId: 'school-1',
       semester: 4,
@@ -239,7 +241,6 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
       id: 'student-4',
       userId: 'user-student-4',
       rollNumber: 'BCA004',
-      specializationId: 'bca',
       departmentId: 'computer-science-it',
       schoolId: 'school-1',
       semester: 4,
@@ -252,14 +253,94 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
   ]);
   const [users, setUsers] = useState<any[]>([]);
   const [faculties, setFaculties] = useState<any[]>([
+    // MCA Department Faculty
     {
-      id: 'faculty-1',
-      userId: 'user-faculty',
-      employeeId: 'FAC001',
-      departmentId: 'computer-science-it',
-      designation: 'Assistant Professor',
+      id: 'fac-mca-1',
+      userId: 'user-fac-mca-1',
+      employeeId: 'MCA001',
+      departmentId: 'mca-dept',
+      designation: 'Professor & Head',
       qualification: 'PhD in Computer Science',
+      experience: 15,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'fac-mca-2',
+      userId: 'user-fac-mca-2',
+      employeeId: 'MCA002',
+      departmentId: 'mca-dept',
+      designation: 'Associate Professor',
+      qualification: 'MTech in Cyber Security',
+      experience: 10,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'fac-mca-3',
+      userId: 'user-fac-mca-3',
+      employeeId: 'MCA003',
+      departmentId: 'mca-dept',
+      designation: 'Assistant Professor',
+      qualification: 'MCA, MTech',
+      experience: 6,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+    },
+    // MSC Department Faculty
+    {
+      id: 'fac-msc-1',
+      userId: 'user-fac-msc-1',
+      employeeId: 'MSC001',
+      departmentId: 'msc-dept',
+      designation: 'Professor & Head',
+      qualification: 'PhD in Computer Science',
+      experience: 18,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'fac-msc-2',
+      userId: 'user-fac-msc-2',
+      employeeId: 'MSC002',
+      departmentId: 'msc-dept',
+      designation: 'Associate Professor',
+      qualification: 'PhD in Data Science',
+      experience: 12,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+    },
+    // BCA Department Faculty
+    {
+      id: 'fac-bca-1',
+      userId: 'user-fac-bca-1',
+      employeeId: 'BCA001',
+      departmentId: 'bca-dept',
+      designation: 'Professor & Head',
+      qualification: 'PhD in Computer Applications',
+      experience: 14,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'fac-bca-2',
+      userId: 'user-fac-bca-2',
+      employeeId: 'BCA002',
+      departmentId: 'bca-dept',
+      designation: 'Assistant Professor',
+      qualification: 'MTech in AI & ML',
       experience: 8,
+      isActive: true,
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'fac-bca-3',
+      userId: 'user-fac-bca-3',
+      employeeId: 'BCA003',
+      departmentId: 'bca-dept',
+      designation: 'Lecturer',
+      qualification: 'MCA',
+      experience: 4,
       isActive: true,
       createdAt: new Date().toISOString(),
     }
@@ -277,7 +358,6 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
       difficulty: 'easy',
       subject: 'Data Structures',
       categoryId: '',
-      specializationId: 'bca',
       facultyId: 'faculty-1',
       isActive: true,
       createdAt: new Date().toISOString(),
@@ -293,7 +373,6 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
       difficulty: 'medium',
       subject: 'Algorithms',
       categoryId: '',
-      specializationId: 'bca',
       facultyId: 'faculty-1',
       isActive: true,
       createdAt: new Date().toISOString(),
@@ -467,6 +546,18 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
       createdAt: new Date().toISOString(),
     };
     setFaculties(prev => [...prev, newFaculty]);
+
+    // If a user object is provided, add it to users array
+    if (faculty.userData) {
+      const newUser = {
+        ...faculty.userData,
+        id: faculty.userId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      setUsers(prev => [...prev, newUser]);
+    }
+
     console.log('Mock add faculty:', newFaculty);
   };
 
@@ -482,31 +573,6 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
     // Mock delete faculty - remove from state
     setFaculties(prev => prev.filter(faculty => faculty.id !== id));
     console.log('Mock delete faculty:', id);
-  };
-
-  const addSpecialization = (specialization: any) => {
-    // Mock add specialization - add to state
-    const newSpecialization = {
-      ...specialization,
-      id: `specialization_${Date.now()}`,
-      createdAt: new Date().toISOString(),
-    };
-    setSpecializations(prev => [...prev, newSpecialization]);
-    console.log('Mock add specialization:', newSpecialization);
-  };
-
-  const updateSpecialization = (id: string, updates: any) => {
-    // Mock update specialization - update in state
-    setSpecializations(prev => prev.map(specialization =>
-      specialization.id === id ? { ...specialization, ...updates } : specialization
-    ));
-    console.log('Mock update specialization:', id, updates);
-  };
-
-  const deleteSpecialization = (id: string) => {
-    // Mock delete specialization - remove from state
-    setSpecializations(prev => prev.filter(specialization => specialization.id !== id));
-    console.log('Mock delete specialization:', id);
   };
 
   const addCategory = (category: any) => {
@@ -534,6 +600,31 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
     console.log('Mock delete category:', id);
   };
 
+  const addDepartment = (department: any) => {
+    // Mock add department - add to state
+    const newDepartment = {
+      ...department,
+      id: `department_${Date.now()}`,
+      createdAt: new Date().toISOString(),
+    };
+    setDepartments(prev => [...prev, newDepartment]);
+    console.log('Mock add department:', newDepartment);
+  };
+
+  const updateDepartment = (id: string, updates: any) => {
+    // Mock update department - update in state
+    setDepartments(prev => prev.map(department =>
+      department.id === id ? { ...department, ...updates } : department
+    ));
+    console.log('Mock update department:', id, updates);
+  };
+
+  const deleteDepartment = (id: string) => {
+    // Mock delete department - remove from state
+    setDepartments(prev => prev.filter(department => department.id !== id));
+    console.log('Mock delete department:', id);
+  };
+
   const publishExam = (id: string) => {
     // Mock publish exam
     console.log('Mock publish exam:', id);
@@ -542,11 +633,6 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
   const unpublishExam = (id: string) => {
     // Mock unpublish exam
     console.log('Mock unpublish exam:', id);
-  };
-
-  const getQuestionsForSpecialization = (specializationId: string) => {
-    // Mock get questions for specialization
-    return questions.filter(q => q.specializationId === specializationId);
   };
 
   const getExamsForFaculty = (facultyId: string) => {
@@ -592,7 +678,9 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
     updateExam,
     deleteExam,
     departments,
-    specializations,
+    addDepartment,
+    updateDepartment,
+    deleteDepartment,
     categories,
     addCategory,
     updateCategory,
@@ -611,12 +699,8 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
     addFaculty,
     updateFaculty,
     deleteFaculty,
-    addSpecialization,
-    updateSpecialization,
-    deleteSpecialization,
     publishExam,
     unpublishExam,
-    getQuestionsForSpecialization,
     getExamsForFaculty,
     recordViolation,
     createEligibilityTest,

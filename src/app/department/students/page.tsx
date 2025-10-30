@@ -10,35 +10,27 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import DepartmentStudents from '../../../containers/department/dashboard/DepartmentStudents';
 import { DepartmentLayout } from '../../../components/DepartmentLayout';
 import { useProctor } from '../../../contexts/ProctorContext';
-import { getAllDepartments, getCoursesForDepartment, getSpecializationsForCourse } from '../../../lib/departments';
+import { getAllDepartments, getCoursesForDepartment } from '../../../lib/departments';
 
 function page() {
-    const { students, users, specializations, addStudent, updateStudent, deleteStudent } = useProctor();
+    const { students, users, addStudent, updateStudent, deleteStudent } = useProctor();
 
     const [searchTerm, setSearchTerm] = useState('');
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [selectedDepartment, setSelectedDepartment] = useState('all');
     const [selectedCourse, setSelectedCourse] = useState('all');
-    const [selectedSpecialization, setSelectedSpecialization] = useState('all');
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         phone: '',
         department: '',
         course: '',
-        specialization: '',
         semester: '1'
     });
 
     const departments = getAllDepartments();
 
-    // Helper function to get specializations for a course
-    const getSpecializationsForCourseLocal = (courseId: string) => {
-        return getSpecializationsForCourse(courseId);
-    };
-
     const availableCourses = selectedDepartment !== 'all' ? getCoursesForDepartment(selectedDepartment) : [];
-    const availableSpecializations = selectedCourse !== 'all' ? getSpecializationsForCourseLocal(selectedCourse) : [];
 
     const resetForm = () => {
         setFormData({
@@ -47,7 +39,6 @@ function page() {
             phone: '',
             department: '',
             course: '',
-            specialization: 'all',
             semester: '1'
         });
         setIsAddModalOpen(false);
@@ -61,7 +52,6 @@ function page() {
             phone: formData.phone,
             department: formData.department,
             course: formData.course,
-            specialization: formData.specialization,
             rollNumber: `STU${Date.now()}`,
             examsTaken: 0,
             averageScore: 0
@@ -77,15 +67,9 @@ function page() {
             if (selectedDepartment !== 'all' && student.departmentId !== selectedDepartment) {
                 return false;
             }
-            // Filter by selected course (specialization)
-            if (selectedCourse !== 'all' && student.specializationId !== selectedCourse) {
+            // Filter by selected course
+            if (selectedCourse !== 'all' && student.departmentId !== selectedCourse) {
                 return false;
-            }
-            // Filter by selected specialization (if applicable)
-            if (selectedSpecialization !== 'all') {
-                // For now, we'll assume specialization filtering is not implemented in the data model
-                // This would need to be added to the student/specialization relationship
-                return true;
             }
             return true;
         })
@@ -94,8 +78,8 @@ function page() {
             name: users.find(u => u.id === student.userId)?.name || 'Unknown',
             email: users.find(u => u.id === student.userId)?.email || 'Unknown',
             phone: users.find(u => u.id === student.userId)?.phone || 'Unknown',
-            department: specializations.find(s => s.id === student.specializationId)?.name || 'Unknown',
-            course: specializations.find(s => s.id === student.specializationId)?.name || 'Unknown',
+            department: getAllDepartments().find(d => d.id === student.departmentId)?.name || 'Unknown',
+            course: getCoursesForDepartment(student.departmentId).find(c => c.id === student.specializationId)?.name || 'Unknown',
             semester: student.semester.toString(),
             examsTaken: student.examsTaken,
             averageScore: student.averageScore
@@ -143,13 +127,12 @@ function page() {
             subtitle="Manage student enrollments and progress"
         >
             {/* Hierarchical Filters */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div>
                     <label className="text-sm font-medium mb-2 block">Department</label>
                     <Select value={selectedDepartment} onValueChange={(value) => {
                         setSelectedDepartment(value);
                         setSelectedCourse('all');
-                        setSelectedSpecialization('all');
                     }}>
                         <SelectTrigger>
                             <SelectValue placeholder="All Departments" />
@@ -171,7 +154,6 @@ function page() {
                         value={selectedCourse}
                         onValueChange={(value) => {
                             setSelectedCourse(value);
-                            setSelectedSpecialization('all');
                         }}
                         disabled={selectedDepartment === 'all'}
                     >
@@ -189,34 +171,12 @@ function page() {
                     </Select>
                 </div>
 
-                <div>
-                    <label className="text-sm font-medium mb-2 block">Specialization</label>
-                    <Select
-                        value={selectedSpecialization}
-                        onValueChange={setSelectedSpecialization}
-                        disabled={selectedCourse === 'all'}
-                    >
-                        <SelectTrigger>
-                            <SelectValue placeholder="All Specializations" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Specializations</SelectItem>
-                            {availableSpecializations.map((spec: any) => (
-                                <SelectItem key={spec.id} value={spec.id}>
-                                    {spec.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-
                 <div className="flex items-end">
                     <Button
                         variant="outline"
                         onClick={() => {
                             setSelectedDepartment('all');
                             setSelectedCourse('all');
-                            setSelectedSpecialization('all');
                         }}
                         className="w-full"
                     >
@@ -302,7 +262,7 @@ function page() {
                                 </Label>
                                 <Select
                                     value={formData.department}
-                                    onValueChange={(value: string) => setFormData({ ...formData, department: value, course: '', specialization: '' })}
+                                    onValueChange={(value: string) => setFormData({ ...formData, department: value, course: '' })}
                                 >
                                     <SelectTrigger className="col-span-3">
                                         <SelectValue placeholder="Select department" />
@@ -322,7 +282,7 @@ function page() {
                                 </Label>
                                 <Select
                                     value={formData.course}
-                                    onValueChange={(value: string) => setFormData({ ...formData, course: value, specialization: '' })}
+                                    onValueChange={(value: string) => setFormData({ ...formData, course: value })}
                                     disabled={!formData.department}
                                 >
                                     <SelectTrigger className="col-span-3">
@@ -332,28 +292,6 @@ function page() {
                                         {getCoursesForDepartment(formData.department).map((course: any) => (
                                             <SelectItem key={course.id} value={course.id}>
                                                 {course.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="specialization" className="text-right">
-                                    Specialization
-                                </Label>
-                                <Select
-                                    value={formData.specialization}
-                                    onValueChange={(value: string) => setFormData({ ...formData, specialization: value })}
-                                    disabled={!formData.course}
-                                >
-                                    <SelectTrigger className="col-span-3">
-                                        <SelectValue placeholder="Select specialization (optional)" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">No specialization</SelectItem>
-                                        {getSpecializationsForCourseLocal(formData.course).map((spec: any) => (
-                                            <SelectItem key={spec.id} value={spec.id}>
-                                                {spec.name}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>

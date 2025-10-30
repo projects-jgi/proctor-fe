@@ -1,9 +1,42 @@
+"use client";
+
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { User } from 'lucide-react'
 import Link from 'next/link'
+import { useProctor } from '@/contexts/ProctorContext'
 
 function Topbar() {
+  const { currentUser, logout } = useProctor()
+
+  const getProfileLinks = () => {
+    switch (currentUser?.role) {
+      case 'faculty':
+        return [
+          { href: '/faculty/profile', label: 'Profile' },
+          { href: '/faculty/settings', label: 'Settings' },
+        ]
+      case 'department':
+        return [
+          { href: '/department/dashboard', label: 'Dashboard' },
+        ]
+      case 'campus':
+        return [
+          { href: '/school/dashboard', label: 'Dashboard' },
+        ]
+      case 'student':
+        return [
+          { href: '/student/dashboard', label: 'Dashboard' },
+        ]
+      default:
+        return []
+    }
+  }
+
+  const handleLogout = () => {
+    logout()
+  }
+
   return (
     <nav className="fixed top-0 left-0 right-0 w-full h-16 flex items-center justify-between px-6 border-b shadow-lg bg-background z-50">
       <div className="flex items-center gap-2">
@@ -19,14 +52,13 @@ function Topbar() {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem asChild>
-              <Link href="/faculty/profile">Profile</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/faculty/settings">Settings</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/student/login" className="text-destructive">Logout</Link>
+            {getProfileLinks().map((link) => (
+              <DropdownMenuItem key={link.href} asChild>
+                <Link href={link.href}>{link.label}</Link>
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+              Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

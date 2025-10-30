@@ -101,26 +101,42 @@ function ExamHall() {
 
   // Save exam state to localStorage
   useEffect(() => {
-    const savedState = localStorage.getItem('examState');
-    if (savedState) {
-      try {
+    // Only run on client side
+    if (typeof window === 'undefined') return;
+
+    try {
+      const savedState = localStorage.getItem('examState');
+      if (savedState && savedState.trim()) {
         const parsedState = JSON.parse(savedState);
         setExamState({
           ...parsedState,
-          markedForReview: new Set(parsedState.markedForReview),
+          markedForReview: new Set(parsedState.markedForReview || []),
         });
-      } catch (error) {
-        console.error('Failed to load saved exam state:', error);
+      }
+    } catch (error) {
+      console.error('Failed to load saved exam state:', error);
+      // Clear corrupted data
+      try {
+        localStorage.removeItem('examState');
+      } catch (storageError) {
+        console.error('Failed to clear corrupted localStorage:', storageError);
       }
     }
   }, []);
 
   useEffect(() => {
-    const stateToSave = {
-      ...examState,
-      markedForReview: Array.from(examState.markedForReview),
-    };
-    localStorage.setItem('examState', JSON.stringify(stateToSave));
+    // Only run on client side
+    if (typeof window === 'undefined') return;
+
+    try {
+      const stateToSave = {
+        ...examState,
+        markedForReview: Array.from(examState.markedForReview),
+      };
+      localStorage.setItem('examState', JSON.stringify(stateToSave));
+    } catch (error) {
+      console.error('Failed to save exam state:', error);
+    }
   }, [examState]);
 
   // Format time helper
@@ -197,13 +213,25 @@ function ExamHall() {
   // Submit handlers
   const handleAutoSubmit = useCallback(() => {
     console.log('Auto-submitted answers:', examState.answers);
-    localStorage.removeItem('examState');
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('examState');
+      } catch (error) {
+        console.error('Failed to clear exam state:', error);
+      }
+    }
     setIsSuccessDialogOpen(true);
   }, [examState.answers]);
 
   const handleSubmit = useCallback(() => {
     console.log('Submitted answers:', examState.answers);
-    localStorage.removeItem('examState');
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.removeItem('examState');
+      } catch (error) {
+        console.error('Failed to clear exam state:', error);
+      }
+    }
     setIsSubmitDialogOpen(false);
     setShowResults(true);
   }, [examState.answers]);

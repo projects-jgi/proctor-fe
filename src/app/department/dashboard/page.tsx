@@ -33,16 +33,6 @@ interface Department {
   isActive: boolean;
 }
 
-interface Specialization {
-  id: string;
-  name: string;
-  code: string;
-  departmentId: string;
-  description: string;
-  duration: number;
-  isActive: boolean;
-}
-
 interface Student {
   id: string;
   rollNumber: string;
@@ -50,7 +40,6 @@ interface Student {
   enrollmentYear: number;
   userId: string;
   departmentId: string;
-  specializationId: string;
   schoolId: string;
   phone: string;
   examsTaken: number;
@@ -63,7 +52,6 @@ interface Faculty {
   id: string;
   employeeId: string;
   departmentId: string;
-  specializationId?: string;
   designation: string;
   qualification: string;
   experience: number;
@@ -78,7 +66,6 @@ interface Exam {
   description: string;
   type: string;
   departmentId: string;
-  specializationId: string;
   facultyId: string;
   questions: string[];
   duration: number;
@@ -94,7 +81,7 @@ interface Exam {
 }
 
 function DepartmentDashboard() {
-  const { currentUser, apiCall, departments, specializations, students, faculties, exams } = useProctor();
+  const { currentUser, apiCall, departments, students, faculties, exams } = useProctor();
   const [loading, setLoading] = useState(true);
   const [department, setDepartment] = useState<Department | null>(null);
 
@@ -122,13 +109,11 @@ function DepartmentDashboard() {
   // Filter data for current department
   const deptStudents = students.filter(s => s.departmentId === department?.id);
   const deptFaculties = faculties.filter(f => f.departmentId === department?.id);
-  const deptSpecializations = specializations.filter(s => s.departmentId === department?.id);
   const deptExams = exams.filter(e => e.departmentId === department?.id);
 
   const stats = {
     students: deptStudents.length,
     faculties: deptFaculties.length,
-    specializations: deptSpecializations.length,
     exams: deptExams.length,
     activeExams: deptExams.filter(e => e.status === 'active' || e.status === 'published').length
   };
@@ -174,26 +159,6 @@ function DepartmentDashboard() {
             <div className="mt-2">
               <Progress
                 value={(deptFaculties.filter(f => f.isActive).length / Math.max(stats.faculties, 1)) * 100}
-                className="h-1"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-warning/10 rounded-bl-3xl" />
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Specializations</CardTitle>
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.specializations}</div>
-            <p className="text-xs text-muted-foreground">
-              {deptSpecializations.filter(s => s.isActive).length} active programs
-            </p>
-            <div className="mt-2">
-              <Progress
-                value={(deptSpecializations.filter(s => s.isActive).length / Math.max(stats.specializations, 1)) * 100}
                 className="h-1"
               />
             </div>
@@ -311,7 +276,7 @@ function DepartmentDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
               <Target className="h-5 w-5 mr-2" />
@@ -349,7 +314,7 @@ function DepartmentDashboard() {
               <Progress value={85} className="h-2" />
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       {/* Quick Actions & Recent Activity */}
@@ -366,7 +331,6 @@ function DepartmentDashboard() {
           <CardContent>
             <div className="space-y-4">
               {deptExams.slice(0, 3).map((exam) => {
-                const specialization = specializations.find(s => s.id === exam.specializationId);
                 const faculty = faculties.find(f => f.id === exam.facultyId);
                 return (
                   <div key={exam.id} className="flex items-start space-x-3 p-3 rounded-lg bg-muted/50">
@@ -378,7 +342,7 @@ function DepartmentDashboard() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">{exam.title}</p>
                       <p className="text-xs text-muted-foreground">
-                        {specialization?.name} • {faculty?.employeeId} • {new Date(exam.createdAt).toLocaleDateString()}
+                        {faculty?.employeeId} • {new Date(exam.createdAt).toLocaleDateString()}
                       </p>
                       <Badge variant="outline" className="mt-1 text-xs">
                         {exam.status}

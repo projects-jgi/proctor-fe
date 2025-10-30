@@ -41,14 +41,12 @@ interface QuestionFormData {
   difficulty: 'easy' | 'medium' | 'hard';
   subject: string;
   categoryId: string;
-  specializationId: string;
 }
 
 export default function FacultyQuestionBank() {
   const {
     currentUser,
     faculties,
-    specializations,
     categories,
     addCategory,
     updateCategory,
@@ -70,7 +68,6 @@ export default function FacultyQuestionBank() {
   const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<any>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedSpecialization, setSelectedSpecialization] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   // Question form state
@@ -84,8 +81,7 @@ export default function FacultyQuestionBank() {
     explanation: '',
     difficulty: 'medium',
     subject: '',
-    categoryId: '',
-    specializationId: ''
+    categoryId: ''
   });
 
   // Category form state
@@ -111,8 +107,7 @@ export default function FacultyQuestionBank() {
       explanation: '',
       difficulty: 'medium',
       subject: '',
-      categoryId: 'none',
-      specializationId: ''
+      categoryId: 'none'
     });
     setEditingQuestion(null);
   };
@@ -129,8 +124,7 @@ export default function FacultyQuestionBank() {
       explanation: question.explanation || '',
       difficulty: question.difficulty,
       subject: question.subject,
-      categoryId: question.categoryId || 'none',
-      specializationId: question.specializationId
+      categoryId: question.categoryId || 'none'
     });
     setEditingQuestion(question);
     setIsCreateQuestionOpen(true);
@@ -139,8 +133,8 @@ export default function FacultyQuestionBank() {
   // Handle question creation/update
   const handleQuestionSubmit = () => {
     // Validation
-    if (!questionForm.title.trim() || !questionForm.content.trim() || !questionForm.specializationId) {
-      alert('Please fill in all required fields: title, content, and specialization.');
+    if (!questionForm.title.trim() || !questionForm.content.trim()) {
+      alert('Please fill in all required fields: title and content.');
       return;
     }
 
@@ -246,10 +240,10 @@ export default function FacultyQuestionBank() {
     }
 
     const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-    const expectedHeaders = ['title', 'type', 'content', 'option1', 'option2', 'option3', 'option4', 'correctanswer', 'marks', 'explanation', 'difficulty', 'subject', 'category', 'specialization'];
+    const expectedHeaders = ['title', 'type', 'content', 'option1', 'option2', 'option3', 'option4', 'correctanswer', 'marks', 'explanation', 'difficulty', 'subject', 'category'];
 
     // Check if required headers are present
-    const requiredHeaders = ['title', 'type', 'content', 'correctanswer', 'marks', 'difficulty', 'subject', 'specialization'];
+    const requiredHeaders = ['title', 'type', 'content', 'correctanswer', 'marks', 'difficulty', 'subject'];
     for (const required of requiredHeaders) {
       if (!headers.includes(required)) {
         throw new Error(`Missing required column: ${required}`);
@@ -307,19 +301,11 @@ export default function FacultyQuestionBank() {
             const category = categories.find(c => c.name.toLowerCase() === value.toLowerCase());
             questionData.categoryId = category ? category.id : '';
             break;
-          case 'specialization':
-            // Find specialization by name
-            const specialization = specializations.find(s => s.name.toLowerCase() === value.toLowerCase());
-            if (!specialization) {
-              throw new Error(`Specialization "${value}" not found`);
-            }
-            questionData.specializationId = specialization.id;
-            break;
         }
       });
 
       // Validate required fields
-      if (!questionData.title || !questionData.content || !questionData.specializationId) {
+      if (!questionData.title || !questionData.content) {
         console.warn(`Skipping invalid question at row ${i + 1}`);
         continue;
       }
@@ -345,16 +331,15 @@ export default function FacultyQuestionBank() {
     // questions.forEach(q => addQuestion(q));
   };
 
-  // Filter questions based on category, specialization and search
+  // Filter questions based on category and search
   const filteredQuestions = facultyQuestions.filter(question => {
     const matchesCategory = selectedCategory === 'all' || question.categoryId === selectedCategory || (!question.categoryId && selectedCategory === 'all');
-    const matchesSpecialization = selectedSpecialization === 'all' || question.specializationId === selectedSpecialization;
     const matchesSearch = searchQuery === '' ||
       question.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       question.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
       question.subject.toLowerCase().includes(searchQuery.toLowerCase());
 
-    return matchesCategory && matchesSpecialization && matchesSearch;
+    return matchesCategory && matchesSearch;
   });
 
   return (
@@ -416,11 +401,11 @@ export default function FacultyQuestionBank() {
                     </Button>
                   </div>
                   <ul className="text-sm text-accent-foreground space-y-1">
-                    <li>• Columns: title, type, content, option1, option2, option3, option4, correctAnswer, marks, explanation, difficulty, subject, category, specialization</li>
+                    <li>• Columns: title, type, content, option1, option2, option3, option4, correctAnswer, marks, explanation, difficulty, subject, category</li>
                     <li>• Type values: multiple-choice, true-false, short-answer, essay</li>
                     <li>• Difficulty values: easy, medium, hard</li>
                     <li>• For multiple-choice: provide 4 options and correctAnswer as 0-3</li>
-                    <li>• Category and specialization should match existing names</li>
+                    <li>• Category should match existing category names</li>
                   </ul>
                 </div>
 
@@ -647,22 +632,6 @@ export default function FacultyQuestionBank() {
                 </div>
 
                 <div>
-                  <Label htmlFor="q-specialization">Specialization *</Label>
-                  <Select value={questionForm.specializationId} onValueChange={(value: string) => setQuestionForm({...questionForm, specializationId: value})}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select specialization" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {specializations.map((spec) => (
-                        <SelectItem key={spec.id} value={spec.id}>
-                          {spec.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
                   <Label htmlFor="q-explanation">Explanation (Optional)</Label>
                   <Textarea
                     id="q-explanation"
@@ -769,22 +738,6 @@ export default function FacultyQuestionBank() {
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label htmlFor="specialization-filter">Specialization</Label>
-              <Select value={selectedSpecialization} onValueChange={setSelectedSpecialization}>
-                <SelectTrigger className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Specializations</SelectItem>
-                  {specializations.map((spec) => (
-                    <SelectItem key={spec.id} value={spec.id}>
-                      {spec.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
           </div>
         </CardContent>
       </Card>
@@ -820,7 +773,6 @@ export default function FacultyQuestionBank() {
           ) : (
             <div className="grid gap-4">
               {filteredQuestions.map((question) => {
-                const specialization = specializations.find(s => s.id === question.specializationId);
                 return (
                   <Card key={question.id}>
                     <CardHeader>
@@ -840,7 +792,7 @@ export default function FacultyQuestionBank() {
                               {categories.find(c => c.id === question.categoryId)?.name || 'Unknown'}
                             </Badge>
                             <span className="text-sm text-muted-foreground">
-                              {specialization?.name} • {question.marks} marks
+                              {question.marks} marks
                             </span>
                           </div>
                         </div>
@@ -915,7 +867,6 @@ export default function FacultyQuestionBank() {
           <TabsContent key={category.id} value={category.id} className="space-y-4">
             <div className="grid gap-4">
               {filteredQuestions.filter(q => q.categoryId === category.id).map((question) => {
-                const specialization = specializations.find(s => s.id === question.specializationId);
                 return (
                   <Card key={question.id}>
                     <CardHeader>
@@ -935,7 +886,7 @@ export default function FacultyQuestionBank() {
                               {category.name}
                             </Badge>
                             <span className="text-sm text-muted-foreground">
-                              {specialization?.name} • {question.marks} marks
+                              {question.marks} marks
                             </span>
                           </div>
                         </div>

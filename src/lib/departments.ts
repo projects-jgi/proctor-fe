@@ -4,74 +4,31 @@ export const DEPARTMENTS = {
     name: "School of CS & IT",
     courses: {
       // Bachelor programs
-      "bca": "BCA",
-      "bsc": "BSc",
+      "bca": "Bachelors of Computer Applications",
+      "bsc": "Bachelors of Science",
 
       // Master programs
-      "mca": "MCA",
-      "msc": "MSc",
+      "mca": "Masters of Computer Applications",
+      "msc": "Masters of Science",
 
       // Post Graduate Diploma
-      "pgd-it": "PGD IT"
+      "pgd-it": "Post Graduate Diploma in IT"
     }
   },
   "design-media-arts": {
     name: "School of Design",
     courses: {
       // Bachelor programs
-      "bdes": "B.Des",
-      "ba": "BA",
-      "bfa": "BFA",
+      "bdes": "Bachelors of Design",
+      "ba": "Bachelors of Arts",
+      "bfa": "Bachelors of Fine Arts",
 
       // Master programs
-      "mdes": "M.Des",
-      "ma": "MA",
-      "mfa": "MFA",
-      "msc-interior": "MSc Interior Design"
+      "mdes": "Masters of Design",
+      "ma": "Masters of Arts",
+      "mfa": "Masters of Fine Arts",
+      "msc-interior": "Masters of Interior Design"
     }
-  }
-};
-
-// Course Specializations
-export const COURSE_SPECIALIZATIONS = {
-  // BCA Specializations
-  "bca": {
-    "ai": "AI",
-    "isms": "ISMS",
-    "sct": "SCT",
-    "cyber-security": "CS",
-    "data-analytics": "DA",
-    "mobile-app-dev": "MAD",
-    "cloud-computing": "CC",
-    "iot": "IoT",
-    "blockchain": "BC",
-    "machine-learning": "ML"
-  },
-  // BSc Specializations
-  "bsc": {
-    "data-science": "DS",
-    "ai-ml": "AIML",
-    "cyber-security": "CS",
-    "cloud-computing": "CC",
-    "iot": "IoT",
-    "blockchain": "BC"
-  },
-  // MCA Specializations
-  "mca": {
-    "ai": "AI",
-    "cyber-security": "CS",
-    "cloud-computing": "CC",
-    "data-analytics": "DA",
-    "mobile-app-dev": "MAD",
-    "blockchain": "BC"
-  },
-  // MSc Specializations
-  "msc": {
-    "computer-science": "CS",
-    "data-science": "DS",
-    "ai-ml": "AIML",
-    "cyber-security": "CS",
-    "cloud-computing": "CC"
   }
 };
 
@@ -106,19 +63,6 @@ export const getCoursesForDepartment = (departmentId: string) => {
   if (!department) return [];
 
   return Object.entries(department.courses).map(([id, name]) => ({
-    id,
-    name
-  }));
-};
-
-export const getSpecializationsForCourse = (courseId: string) => {
-  // Extract the base course type (bca, bsc, mca, msc, etc.)
-  const baseCourse = courseId.split('-')[0]; // Gets 'bca' from 'bca-ai', 'bsc' from 'bsc-data-science', etc.
-
-  const specializations = COURSE_SPECIALIZATIONS[baseCourse as keyof typeof COURSE_SPECIALIZATIONS];
-  if (!specializations) return [];
-
-  return Object.entries(specializations).map(([id, name]) => ({
     id,
     name
   }));

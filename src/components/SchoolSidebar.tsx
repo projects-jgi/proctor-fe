@@ -3,52 +3,52 @@
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
+  Building2,
+  Users,
   FileText,
-  HelpCircle,
-  TrendingUp,
   Shield
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-interface FacultySidebarProps {
+interface SchoolSidebarProps {
   className?: string;
 }
 
 const navigationItems = [
   {
     title: "Dashboard",
-    href: "/faculty/dashboard",
+    href: "/school/dashboard",
     icon: LayoutDashboard,
-    description: "Overview and quick actions"
+    description: "School administration overview"
   },
   {
-    title: "Question Bank",
-    href: "/faculty/questions",
-    icon: HelpCircle,
-    description: "Manage your question library"
+    title: "Departments",
+    href: "/school/departments",
+    icon: Building2,
+    description: "Manage academic departments"
+  },
+  {
+    title: "Faculty",
+    href: "/school/faculty",
+    icon: Users,
+    description: "View and manage faculty"
   },
   {
     title: "Exams",
-    href: "/faculty/exams",
+    href: "/school/exams",
     icon: FileText,
-    description: "Create and manage exams"
+    description: "Monitor school exams"
   },
   {
     title: "Proctoring",
-    href: "/faculty/proctoring",
+    href: "/school/proctoring",
     icon: Shield,
     description: "Monitor ongoing exam sessions"
-  },
-  {
-    title: "Results",
-    href: "/faculty/results",
-    icon: TrendingUp,
-    description: "View student results"
   }
 ];
 
-export function FacultySidebar({ className }: FacultySidebarProps) {
+export function SchoolSidebar({ className }: SchoolSidebarProps) {
   const pathname = usePathname();
 
   return (
