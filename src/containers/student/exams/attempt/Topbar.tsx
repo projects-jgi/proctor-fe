@@ -27,7 +27,13 @@ function Topbar({ startTime, duration }: { startTime: string, duration: number }
 
     const onFinishMutation = useMutation({
         mutationFn: save_student_exam_attempt,
-        onSuccess: (data) => {
+        onSuccess: async (data) => {
+            localStorage.removeItem("user_answers")
+
+            if (document.fullscreenElement) {
+                await document.exitFullscreen();
+            }
+            
             router.push("/student/dashboard")
         },
         onError: (error) => {

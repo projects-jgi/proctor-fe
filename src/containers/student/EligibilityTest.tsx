@@ -77,6 +77,8 @@ function EligibilityTest({ setStartExam }: {setStartExam: () => void}) {
 
         if(audioAccess && videoAccess && onlineStatus){
             setIsEligible(true)
+        }else{
+            setIsEligible(false)
         }
     }, [audioAccess, videoAccess, onlineStatus, fullscreenAccess])
 

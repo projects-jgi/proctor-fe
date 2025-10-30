@@ -4,6 +4,7 @@ import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader,
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import { Exam } from '@/types/exam'
+import { CalendarDays, Hourglass } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
@@ -11,7 +12,17 @@ function ExamCompletedCard({ exam }: { exam: Exam }) {
     return (
         <Card className="w-full">
             <CardHeader className="grid">
-                <CardTitle className="text-lg">{exam.name}</CardTitle>
+                <CardTitle className="text-lg">
+                <div className="mb-1">
+                    <Badge variant={"default"} className={
+                        cn(
+                            exam.completion_status == 0 && 'bg-destructive text-destructive-foreground',
+                            exam.completion_status == 1 && 'bg-success text-success-foreground',
+                        )
+                    }>{exam.completion_status ? "Completed" : "Missed"}</Badge>
+                </div>
+                    {exam.name}
+                </CardTitle>
                 {exam.description && <CardDescription>{exam.description}</CardDescription>}
                 <CardAction>
                     <span className="hidden sm:block">
@@ -30,27 +41,28 @@ function ExamCompletedCard({ exam }: { exam: Exam }) {
                 </CardAction>
             </CardHeader>
             <CardContent className="text-sm">
-                <div className="mb-2">
-                    <Badge variant={"default"} className={
-                        cn(
-                            exam.completion_status == 0 && 'bg-destructive text-destructive-foreground',
-                            exam.completion_status == 1 && 'bg-success text-success-foreground',
-                        )
-                    }>{exam.completion_status ? "Completed" : "Missed"}</Badge>
-                </div>
-                <div className="flex flex-col gap-2 flex-wrap">
-                    {exam.start_time && <p className="inline">Start Date & Time: {new Date(exam.start_time).toLocaleString()}</p>}
-                    {exam.end_time && <p className="inline">End Date & Time: {new Date(exam.end_time).toLocaleString()}</p>}
-                    <Separator
-                        orientation="vertical"
-                        className="hidden data-[orientation=vertical]:h-4"
-                    />
-                    <p className='inline'>Duration: {exam.duration_in_minutes} Minutes</p>
-                    <Separator
-                        orientation="vertical"
-                        className="hidden data-[orientation=vertical]:h-4"
-                    />
-                    <p className='inline'>Passing: {exam.passing_percentage}</p>
+                <div className="flex flex-wrap gap-8 items-center">
+                    <div>
+                        <p className='font-bold inline-flex gap-1 items-center'>
+                            <CalendarDays size={14} />
+                            <span>Start Time</span>
+                        </p>
+                        <p>{exam.start_time && new Date(exam.start_time).toLocaleString()}</p>
+                    </div>
+                    <div>
+                        <p className='font-bold inline-flex gap-1 items-center'>
+                            <CalendarDays size={14} />
+                            <span>End Time</span>
+                        </p>
+                        <p>{exam.end_time && new Date(exam.end_time).toLocaleString()}</p>
+                    </div>
+                    <div>
+                        <p className='font-bold inline-flex gap-1 items-center'>
+                            <Hourglass size={14} />
+                            <span>Duration</span>
+                        </p>
+                        <p>{exam.duration_in_minutes} Minutes</p>
+                    </div>
                 </div>
             </CardContent>
             <CardFooter className="sm:hidden">

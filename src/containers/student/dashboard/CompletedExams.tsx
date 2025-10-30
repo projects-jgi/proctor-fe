@@ -10,7 +10,7 @@ import { ExamStatus } from "@/types/exam";
 import { useDispatch } from "react-redux";
 import { setCompletedExams } from "@/lib/redux/state/ExamList";
 import { useEffect } from "react";
-import ExamCompletedCard from "../exams/ExamCompletedCard";
+import ExamCompletedCard from "../../../components/exam/ExamCompletedCard";
 
 const card_count = 2;
 
@@ -54,7 +54,7 @@ function CompletedExams() {
             </div>
             <div className="grid grid-cols-1 gap-4 mt-4">
                 {completed_exams.data.slice(0, card_count).map((exam: any, index: number) => (
-                    <ExamCompletedCard exam={exam} />
+                    <ExamCompletedCard exam={exam} key={index} />
                 ))}
             </div>
         </section>

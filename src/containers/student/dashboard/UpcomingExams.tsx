@@ -10,6 +10,7 @@ import ExamCard from "@/components/exam/ExamCard";
 import { ExamStatus } from "@/types/exam";
 import { setUpcomingExams } from "@/lib/redux/state/ExamList";
 import { useDispatch } from "react-redux";
+import ExamUpcomingCard from "../../../components/exam/ExamUpcomingCard";
 
 const card_count = 2;
 
@@ -50,7 +51,7 @@ function UpcomingExams() {
       <div className="grid grid-cols-1 gap-4 mt-4">
         {
           upcoming_exams.data!.slice(0, card_count).map((exam: any, index: number) => (
-            <ExamCard key={index} {...exam} action={<Button>View Details</Button>}  />
+            <ExamUpcomingCard exam={exam} key={index} />
           ))          
         }
       </div>

@@ -8,22 +8,14 @@ import React from 'react'
 const data = {
   navMain: [
     {
-      title: "Cohorts",
+      title: "Home",
       url: "#",
       items: [
         {
-          title: "Python Programming III",
-          url: "#",
-        },
-        {
-          title: "IoT III",
-          url: "#",
-        },
-        {
-          title: "... view All",
-          url: "#",
-        },
-      ],
+          title: "Dashboard",
+          url: "/student/dashboard"
+        }
+      ]
     },
     {
       title: "Exams",
@@ -36,29 +28,10 @@ const data = {
         {
           title: "Ongoing exams",
           url: "/student/exams/status/ongoing",
-          isActive: true,
         },
         {
           title: "Completed exams",
           url: "/student/exams/status/completed",
-        },
-      ],
-    },
-    {
-      title: "Practice",
-      url: "#",
-      items: [
-        {
-          title: "Logical",
-          url: "#",
-        },
-        {
-          title: "Verbal",
-          url: "#",
-        },
-        {
-          title: "Aptitude",
-          url: "#",
         },
       ],
     },

@@ -6,6 +6,7 @@ import { get_student_exams } from '@/lib/server_api/student';
 import { ExamStatus } from '@/types/exam';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react'
+import ExamOngoingCard from '../../../components/exam/ExamOngoingCard';
 
 function ExamOngoingList({ count = undefined }: { count?: number | undefined }) {
     const exams = useQuery({
@@ -28,7 +29,7 @@ function ExamOngoingList({ count = undefined }: { count?: number | undefined }) 
         <div className="grid grid-cols-1 gap-4 mt-4">
             {exams.data.slice(0, count)
             .map((exam: any, index: number) => (
-                <ExamCard key={index} {...exam} action={<Button>View Details</Button>}  />
+                <ExamOngoingCard exam={exam} key={index} />
             ))}
         </div>
     )
