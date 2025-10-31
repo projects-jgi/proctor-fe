@@ -1,6 +1,5 @@
 'use client';
 
-import ExamCard from '@/components/exam/ExamCard';
 import { Button } from '@/components/ui/button';
 import { get_student_exams } from '@/lib/server_api/student';
 import { ExamStatus } from '@/types/exam';

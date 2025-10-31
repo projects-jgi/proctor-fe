@@ -55,6 +55,8 @@ function EligibilityTest({ setStartExam }: {setStartExam: () => void}) {
     const [fullscreenInfo, setFullscreenInfo] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
     const [internetInfo, setInternetInfo] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
     const [isEligible, setIsEligible] = useState<boolean>(false);
+    const [isTermsChecked, setIsTermsChecked] = useState<boolean>(false);
+    const [termsError, setTermsError] = useState<boolean>(false);
 
     const audioAccess = useSelector((state:RootState) => state.exam_eligibility_test.audio_access);
     const videoAccess = useSelector((state: RootState) => state.exam_eligibility_test.video_access); 
@@ -81,6 +83,14 @@ function EligibilityTest({ setStartExam }: {setStartExam: () => void}) {
             setIsEligible(false)
         }
     }, [audioAccess, videoAccess, onlineStatus, fullscreenAccess])
+
+    useEffect(() => {
+        if(isTermsChecked == false){
+            setTermsError(true)
+        }else{
+            setTermsError(false)
+        }
+    }, [isTermsChecked])
 
     const dispatch = useDispatch();
 
@@ -149,6 +159,14 @@ function EligibilityTest({ setStartExam }: {setStartExam: () => void}) {
         })
     }
 
+    function handleEnterExam(){
+        if(isTermsChecked){
+            setStartExam()
+        }else{
+            setTermsError(true)
+        }
+    }
+
     return (
         <Dialog open={true}>
             <DialogContent>
@@ -180,8 +198,11 @@ function EligibilityTest({ setStartExam }: {setStartExam: () => void}) {
                     <p className="text-xs text-muted-foreground mt-2">NOTE: Click the <Lock className="inline" size={10} /> lock icon in the address bar <MoveRight size={10} className="inline" /> Site settings <MoveRight size={10} className="inline" /> Allow Camera and Microphone access.</p>
                 </div>
                 <div className="flex items-center gap-3">
-                    <Checkbox id="terms" />
-                    <Label htmlFor="terms">Accept terms and conditions</Label>
+                    <Checkbox id="terms" checked={isTermsChecked} onClick={() => setIsTermsChecked(prev => !prev)} />
+                    <Label htmlFor="terms" className="block">
+                        <p>Accept terms and conditions</p>
+                        {termsError && <p className="text-destructive block text-xs mt-1">*Required</p>}
+                    </Label>
                 </div>
                 <DialogFooter>
                     <div>
@@ -191,7 +212,7 @@ function EligibilityTest({ setStartExam }: {setStartExam: () => void}) {
                             :
                             fullscreenInfo === PermissionStatus.GRANTED ? 
                             <DialogClose asChild>
-                                <Button onClick={setStartExam}>Enter Exam</Button>
+                                <Button onClick={handleEnterExam}>Enter Exam</Button>
                             </DialogClose>
 
                             : 
