@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { setAudioAccess, setFullScreen, setOnlineStatus, setVideoAccess } from "@/lib/redux/state/ExamEligibilityTest";
 import { RootState } from "@/lib/redux/store";
 import { LoaderCircle, Lock, MoveRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -50,6 +51,8 @@ function StatusMessage({status}: {status: PermissionStatus}) {
 }
 
 function EligibilityTest({ setStartExam }: {setStartExam: () => void}) {
+    const router = useRouter();
+
     const [audioInfo, setAudioInfo] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
     const [videoInfo, setVideoInfo] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
     const [fullscreenInfo, setFullscreenInfo] = useState<PermissionStatus>(PermissionStatus.NOT_CHECKED);
@@ -206,6 +209,9 @@ function EligibilityTest({ setStartExam }: {setStartExam: () => void}) {
                 </div>
                 <DialogFooter>
                     <div>
+                        <DialogClose asChild>
+                            <Button variant="outline" className="mr-2" onClick={() => router.back()}>Back</Button>
+                        </DialogClose>
                         {
                             !isEligible ?
                             <Button onClick={eligibilityCheck}>Check Eligibility</Button>
