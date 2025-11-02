@@ -24,7 +24,7 @@ export const slicer = createSlice({
         setAttempt(state, action: PayloadAction<any>){
             state.attempt = action.payload;
         },
-        setViolations(state, action: PayloadAction<Violation[] | null>){
+        setViolations(state, action: PayloadAction<Violation[]>){
             state.violations = action.payload;
         },
         setQuestionCounter(state, action: PayloadAction<number | null>){

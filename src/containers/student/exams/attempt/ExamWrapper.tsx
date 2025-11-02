@@ -69,7 +69,7 @@ function ExamWrapper({ exam_id, exam_questions }: { exam_id: number, exam_questi
     return (
         <>
             <SidebarProvider>
-                <ExamContainer isEligible={isEligible} exam_id={exam_id} exam_questions={exam_questions} />
+                <ExamContainer exam_id={exam_id} exam_questions={exam_questions} />
             </SidebarProvider>
         </>
     )

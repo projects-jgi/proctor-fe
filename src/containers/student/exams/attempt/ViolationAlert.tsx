@@ -3,7 +3,7 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { setViolations } from '@/lib/redux/state/ExamAttempt'
 import { RootState } from '@/lib/redux/store'
 import { create_attempt_violation } from '@/lib/server_api/student'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { InvalidateQueryFilters, useMutation, useQueryClient } from '@tanstack/react-query'
 import { OctagonAlert } from 'lucide-react'
 import React, { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -21,7 +21,7 @@ function ViolationAlert({onClose, description}: {description: string, onClose: (
     const store_violation_mutation = useMutation({
         mutationFn: create_attempt_violation,
         onSuccess: (data, variables, context) => {
-            queryClient.invalidateQueries(["exams", variables.exam_id, "attempts", variables.attempt_id, "violations"])
+            queryClient.invalidateQueries({ queryKey: ["exams", variables.exam_id, "attempts", variables.attempt_id, "violations"]})
             dispatch(setViolations(data))
         }
     })
