@@ -12,6 +12,9 @@ import { useOnlineStatus } from '@/hooks/browser_permissions/useOnlineStatus';
 import { useFullscreenStatus } from '@/hooks/browser_permissions/useFullscreenStatus';
 import { RootState } from '@/lib/redux/store';
 import useCameraCapture from '@/hooks/useCameraCapture';
+import { useQuery } from '@tanstack/react-query';
+import { get_attempt_violation } from '@/lib/server_api/student';
+import { setAttempt, setViolations } from '@/lib/redux/state/ExamAttempt';
 
 function ExamWrapper({ exam_id, exam_questions }: { exam_id: number, exam_questions: any}) {
     const audio_permission = useAudioPermission();
@@ -19,10 +22,25 @@ function ExamWrapper({ exam_id, exam_questions }: { exam_id: number, exam_questi
     const online_status = useOnlineStatus();
     const full_screen = useFullscreenStatus();
     const isEligible = useSelector((state: RootState) => state.exam_eligibility_test.is_eligible);
-    
-    useCameraCapture(video_permission);
-    
+    const attempt_id = useSelector((state: RootState) => state.exam_attempt.attempt?.id)
     const dispatch = useDispatch();
+    useCameraCapture(video_permission);
+
+    const violationQuery = useQuery({
+        queryKey: ["exams", exam_id, "attempts", attempt_id, "violations"],
+        queryFn: async () => {
+            return await get_attempt_violation({ exam_id, attempt_id }) 
+        },
+        enabled: !!attempt_id
+    })
+
+    if(violationQuery.isSuccess){
+        dispatch(setViolations(violationQuery.data.data))
+    }    
+
+    useEffect(() => {
+        dispatch(setAttempt(exam_questions.attempt))
+    }, [exam_questions])
 
     useEffect(() => {
         console.log("Audio access changed: ", audio_permission)

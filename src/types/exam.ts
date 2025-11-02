@@ -46,3 +46,10 @@ export interface ExamTypeQuestion{
         [exam_id: number]: ExamQuestion
     }
 }
+
+export interface Violation{
+    id: number,
+    student_exam_attempt_id: number,
+    description: string,
+    reference_url?: string
+}

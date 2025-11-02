@@ -9,19 +9,61 @@ import QuestionCard from './QuestionCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentQuestion, setQuestionCounter, setQuestionsLength } from '@/lib/redux/state/ExamAttempt';
 import { SidebarInset } from '@/components/ui/sidebar';
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import useTabActive from '@/hooks/useTabActive';
 import { RootState } from '@/lib/redux/store';
+import ViolationAlert from './ViolationAlert';
+import { useMutation } from '@tanstack/react-query';
+import { save_student_exam_attempt } from '@/lib/server_api/student';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import SubmissionLoading from './SubmissionLoading';
 
 function ExamContainer({ exam_id, exam_questions }: { exam_id: number, exam_questions: any }) {
     const [isActiveTab, setIsActiveTab] = useTabActive();
     const questionCounter = useSelector((state: RootState) => state.exam_attempt.questionCounter);
     const totalQuestions = useSelector((state: RootState) => state.exam_attempt.questionsLength);
     const currentQuestion = useSelector((state: RootState) => state.exam_attempt.currentQuestion);
+    const violations = useSelector((state: RootState) => state.exam_attempt.violations);
+    const attempt = useSelector((state: RootState) => state.exam_attempt.attempt);
 
+    const router = useRouter()
     const dispatch = useDispatch();
-    
+
+    useEffect(() => {
+        if((violations != null ? violations?.length : 0) >= attempt.exam.max_violation_count){
+            onFinish();
+        }
+    }, [violations])
+
+        
+    function onFinish(){
+        const local_storage = localStorage.getItem("user_answers");
+        let data: object = {};
+        if(local_storage){
+            data = JSON.parse(local_storage)
+        }
+
+        onFinishMutation.mutate({ exam_id: 1, answers: data})
+    }
+
+    const onFinishMutation = useMutation({
+        mutationFn: save_student_exam_attempt,
+        onSuccess: async (data) => {
+            localStorage.removeItem("user_answers")
+
+            if (document.fullscreenElement) {
+                await document.exitFullscreen();
+            }
+            
+            router.push("/student/dashboard")
+        },
+        onError: (error) => {
+            toast.error("Unable to submit exam answers", {
+                description: error.message
+            })
+        }
+    })
+
     // set initial question counter as first question
     useEffect(() => {
         if(exam_questions && questionCounter == null){
@@ -44,27 +86,16 @@ function ExamContainer({ exam_id, exam_questions }: { exam_id: number, exam_ques
     useEffect(() => {
         console.log("Active tab changed: ", isActiveTab === false)        
     }, [isActiveTab])
-    
+
 
     return (
         <>
-            <Dialog open={isActiveTab === false}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Violation Alert</DialogTitle>
-                        <DialogDescription>Tab Switch Detected</DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button onClick={() => setIsActiveTab(true)}>Continue</Button>
-                        </DialogClose>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            {onFinishMutation.isPending && <SubmissionLoading />}
+            {!isActiveTab && <ViolationAlert description='Tab Switch Violation' onClose={() => setIsActiveTab(true)} />}
             <ExamSidebar questions={exam_questions["questions"]} />
             <SidebarInset>
                 <main className='w-full'>
-                    <Topbar startTime={exam_questions.attempt.started_at} duration={exam_questions.attempt.exam.duration_in_minutes} />
+                    <Topbar onFinish={onFinish} onFinishMutation={onFinishMutation} startTime={exam_questions.attempt.started_at} duration={exam_questions.attempt.exam.duration_in_minutes} />
                     <div className="m-8">
                         <div className="flex flex-wrap gap-12 items-center">
                             <div className='text-md font-bold'>

@@ -1,12 +1,16 @@
-import { ExamQuestion } from "@/types/exam";
+import { ExamQuestion, Violation } from "@/types/exam";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState: {
+    attempt: any,
+    violations: Violation[],
     questionCounter?: number | null,
     currentQuestion?: ExamQuestion | null,
     questionsLength: number,
     selectedAnswers?: {[key: number]: string[]}
 } = {
+    attempt: null,
+    violations: [],
     questionCounter: null,
     currentQuestion: null,
     questionsLength: 0,
@@ -17,6 +21,12 @@ export const slicer = createSlice({
     name: "exam_answers",
     initialState,
     reducers: {
+        setAttempt(state, action: PayloadAction<any>){
+            state.attempt = action.payload;
+        },
+        setViolations(state, action: PayloadAction<Violation[] | null>){
+            state.violations = action.payload;
+        },
         setQuestionCounter(state, action: PayloadAction<number | null>){
             state.questionCounter = action.payload;
         },
@@ -32,6 +42,6 @@ export const slicer = createSlice({
     }
 })
 
-export const { setQuestionCounter, setCurrentQuestion, setQuestionsLength, setSelectedAnswers } = slicer.actions;
+export const { setQuestionCounter, setViolations, setCurrentQuestion, setQuestionsLength, setSelectedAnswers, setAttempt } = slicer.actions;
 
 export default slicer.reducer;

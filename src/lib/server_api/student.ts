@@ -77,3 +77,39 @@ export async function get_student_attempt_result({ exam_id }: {exam_id: number})
         return Promise.reject("Unable to load exam results")
     })
 }
+
+export async function create_attempt_violation({ exam_id, attempt_id, description, reference_url }: { exam_id: number, attempt_id: number, description?: string, reference_url?: string }){
+    try {
+        const response = await Request({
+            url: `${process.env.BACKEND_HOST}/api/students/exams/${exam_id}/attempts/${attempt_id}/violations`,
+            isAuthorized: true,
+            method: "POST",
+            body: { description, reference_url },
+        });
+
+        return response.data;
+    } catch (error: any) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw new Error("Unable to create exam violation");
+    }
+}
+
+export async function get_attempt_violation({ exam_id, attempt_id }: { exam_id: number, attempt_id: number }){
+    try {
+        const response = await Request({
+            url: `${process.env.BACKEND_HOST}/api/students/exams/${exam_id}/attempts/${attempt_id}/violations`,
+            isAuthorized: true,
+            method: "GET",
+        });
+
+        return response.data;
+    } catch (error: any) {
+        if (error.response?.data?.message) {
+            throw new Error(error.response.data.message);
+        }
+        throw new Error("Unable to get exam violation");
+    }
+}
+

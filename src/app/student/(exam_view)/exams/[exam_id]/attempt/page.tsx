@@ -1,5 +1,5 @@
 import React from 'react'
-import { make_student_exam_attempt } from '@/lib/server_api/student';
+import { get_attempt_violation, make_student_exam_attempt } from '@/lib/server_api/student';
 import ExamWrapper from '@/containers/student/exams/attempt/ExamWrapper';
 
 interface PageParams {
