@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { setViolations } from '@/lib/redux/state/ExamAttempt'
 import { RootState } from '@/lib/redux/store'
 import { create_attempt_violation } from '@/lib/server_api/student'
 import { InvalidateQueryFilters, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -14,15 +13,15 @@ function ViolationAlert({onClose, description}: {description: string, onClose: (
     const exam_id = useSelector((state: RootState) => state.exam_attempt.attempt.exam_id)
     const attempt = useSelector((state: RootState) => state.exam_attempt.attempt);
     const violations = useSelector((state: RootState) => state.exam_attempt.violations);
-    const dispatch = useDispatch()
     const queryClient = useQueryClient();
     const violation_count = useRef(violations.length + 1)
 
     const store_violation_mutation = useMutation({
         mutationFn: create_attempt_violation,
         onSuccess: (data, variables, context) => {
-            queryClient.invalidateQueries({ queryKey: ["exams", variables.exam_id, "attempts", variables.attempt_id, "violations"]})
-            dispatch(setViolations(data))
+            queryClient.invalidateQueries({
+                queryKey: ["exams", variables.exam_id, "attempts", variables.attempt_id, "violations"],
+            })
         }
     })
 
@@ -52,9 +51,11 @@ function ViolationAlert({onClose, description}: {description: string, onClose: (
                             <span>Violation Alert</span>
                         </h2>
                     </DialogTitle>
-                    <DialogDescription>
-                        <p className='mb-2'>{description}</p>
-                        <p className='text-destructive'><b>{Math.max(0, attempt.exam.max_violation_count - violation_count.current)}</b> out of <b>{attempt.exam.max_violation_count}</b> violations left</p>
+                    <DialogDescription asChild>
+                        <div>
+                            <p className='mb-2'>{description}</p>
+                            <p className='text-destructive'><b>{Math.max(0, attempt.exam.max_violation_count - violation_count.current)}</b> out of <b>{attempt.exam.max_violation_count}</b> violations left</p>
+                        </div>
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>

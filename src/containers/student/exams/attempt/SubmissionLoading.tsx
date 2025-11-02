@@ -6,10 +6,10 @@ export default function SubmissionLoading(){
         <AlertDialog open={true}>
         <AlertDialogContent>
             <AlertDialogHeader>
-            {/* <AlertDialogTitle>Submitting Exam <Loading /></AlertDialogTitle> */}
-            <AlertDialogDescription>
+            <AlertDialogTitle>Submitting Exam <Loading /></AlertDialogTitle>
+            <AlertDialogDescription asChild>
                 <div className="flex justify-between">
-                    <p>Submitting Exam</p>
+                    {/* <p>Submitting Exam</p> */}
                     <Loading />
                 </div>
             </AlertDialogDescription>

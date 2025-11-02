@@ -30,7 +30,7 @@ function ExamContainer({ exam_id, exam_questions }: { exam_id: number, exam_ques
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if((violations != null ? violations?.length : 0) >= attempt.exam.max_violation_count){
+        if(violations.length >= attempt.exam.max_violation_count){
             onFinish();
         }
     }, [violations])

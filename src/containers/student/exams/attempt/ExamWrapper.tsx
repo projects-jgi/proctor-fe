@@ -27,16 +27,17 @@ function ExamWrapper({ exam_id, exam_questions }: { exam_id: number, exam_questi
     useCameraCapture(video_permission);
 
     const violationQuery = useQuery({
-        queryKey: ["exams", exam_id, "attempts", attempt_id, "violations"],
+        queryKey: ["exams", parseInt(exam_id.toString()), "attempts", parseInt(attempt_id), "violations"],
         queryFn: async () => {
             return await get_attempt_violation({ exam_id, attempt_id }) 
         },
-        enabled: !!attempt_id
     })
 
-    if(violationQuery.isSuccess){
-        dispatch(setViolations(violationQuery.data.data))
-    }    
+    useEffect(() => {
+        if(violationQuery.isSuccess){
+            dispatch(setViolations(violationQuery.data.data))
+        }
+    }, [violationQuery])
 
     useEffect(() => {
         dispatch(setAttempt(exam_questions.attempt))
