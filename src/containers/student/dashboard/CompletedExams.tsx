@@ -5,7 +5,6 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { get_student_exams } from "@/lib/server_api/student";
-import ExamCard from "@/components/exam/ExamCard";
 import { ExamStatus } from "@/types/exam";
 import { useDispatch } from "react-redux";
 import { setCompletedExams } from "@/lib/redux/state/ExamList";

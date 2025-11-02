@@ -11,6 +11,7 @@ import useVideoPermission from '@/hooks/browser_permissions/useVideoPermission';
 import { useOnlineStatus } from '@/hooks/browser_permissions/useOnlineStatus';
 import { useFullscreenStatus } from '@/hooks/browser_permissions/useFullscreenStatus';
 import { RootState } from '@/lib/redux/store';
+import useCameraCapture from '@/hooks/useCameraCapture';
 
 function ExamWrapper({ exam_id, exam_questions }: { exam_id: number, exam_questions: any}) {
     const audio_permission = useAudioPermission();
@@ -18,6 +19,8 @@ function ExamWrapper({ exam_id, exam_questions }: { exam_id: number, exam_questi
     const online_status = useOnlineStatus();
     const full_screen = useFullscreenStatus();
     const isEligible = useSelector((state: RootState) => state.exam_eligibility_test.is_eligible);
+    
+    useCameraCapture(video_permission);
     
     const dispatch = useDispatch();
 
@@ -48,7 +51,7 @@ function ExamWrapper({ exam_id, exam_questions }: { exam_id: number, exam_questi
     return (
         <>
             <SidebarProvider>
-                <ExamContainer exam_id={exam_id} exam_questions={exam_questions} />
+                <ExamContainer isEligible={isEligible} exam_id={exam_id} exam_questions={exam_questions} />
             </SidebarProvider>
         </>
     )

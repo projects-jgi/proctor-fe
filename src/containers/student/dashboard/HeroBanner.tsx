@@ -7,7 +7,7 @@ function HeroBanner() {
         <div className="w-full bg-primary">
             <Card className="text-primary-foreground bg-transparent border-0 shadow-none container mx-auto">
                 <CardHeader>
-                    <CardTitle className="text-2xl">Welcome back, username! </CardTitle>
+                    <CardTitle className="text-2xl">Welcome back</CardTitle>
                     <CardDescription className="text-primary-foreground">
                         We're glad to see you again.
                     </CardDescription>

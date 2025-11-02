@@ -6,7 +6,6 @@ import React, { useEffect } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { get_student_exams } from "@/lib/server_api/student";
-import ExamCard from "@/components/exam/ExamCard";
 import { ExamStatus } from "@/types/exam";
 import { setUpcomingExams } from "@/lib/redux/state/ExamList";
 import { useDispatch } from "react-redux";

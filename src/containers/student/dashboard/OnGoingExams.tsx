@@ -3,7 +3,6 @@
 import EligibilityTest from "@/containers/student/EligibilityTest";
 import { useQuery } from "@tanstack/react-query";
 import { get_student_exams } from "@/lib/server_api/student";
-import ExamCard from "@/components/exam/ExamCard";
 import { ExamStatus } from "@/types/exam";
 import { useEffect } from "react";
 import { setOngoingExams } from "@/lib/redux/state/ExamList";
