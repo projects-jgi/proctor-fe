@@ -25,7 +25,7 @@ export default function SettingsPage() {
       case 'department':
         router.push('/department/settings');
         break;
-      case 'campus':
+      case 'school':
         router.push('/school/settings');
         break;
       case 'admin':

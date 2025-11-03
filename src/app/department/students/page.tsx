@@ -12,7 +12,7 @@ import DepartmentStudents from '../../../containers/department/dashboard/Departm
 import { useProctor } from '../../../contexts/ProctorContext';
 import { getAllDepartments } from '../../../lib/departments';
 
-function page() {
+function Page() {
     const { students, users, addStudent, updateStudent, deleteStudent } = useProctor();
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -39,21 +39,6 @@ function page() {
         setIsAddModalOpen(false);
     };
 
-        const handleAddSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        const newStudent = {
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            department: formData.department,
-            rollNumber: `STU${Date.now()}`,
-            examsTaken: 0,
-            averageScore: 0
-        };
-        handleAddStudent(newStudent);
-        resetForm();
-    };
-
     // Map students to include user information and filter by selections
     const mappedStudents = students
         .filter(student => {
@@ -68,7 +53,7 @@ function page() {
             name: users.find(u => u.id === student.userId)?.name || 'Unknown',
             email: users.find(u => u.id === student.userId)?.email || 'Unknown',
             phone: users.find(u => u.id === student.userId)?.phone || 'Unknown',
-            department: getAllDepartments().find(d => d.id === student.departmentId)?.name || 'Unknown',
+            department: getAllDepartments().find((d: any) => d.id === student.departmentId)?.name || 'Unknown',
             semester: student.semester.toString(),
             examsTaken: student.examsTaken,
             averageScore: student.averageScore
@@ -109,6 +94,21 @@ function page() {
         deleteStudent(id);
     };
 
+    const handleAddSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const newStudent = {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            department: formData.department,
+            rollNumber: `STU${Date.now()}`,
+            examsTaken: 0,
+            averageScore: 0
+        };
+        handleAddStudent(newStudent);
+        resetForm();
+    };
+
     return (
         <DepartmentLayout
             title="Student Management"
@@ -138,6 +138,7 @@ function page() {
                         variant="outline"
                         onClick={() => {
                             setSelectedDepartment('all');
+                            setSearchTerm('');
                         }}
                         className="w-full"
                     >
@@ -150,9 +151,9 @@ function page() {
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-                    <Input 
-                        placeholder="Search students..." 
-                        className="pl-10" 
+                    <Input
+                        placeholder="Search students..."
+                        className="pl-10"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -162,6 +163,7 @@ function page() {
                     Add Student
                 </Button>
             </div>
+
             <DepartmentStudents
                 students={filteredStudents}
                 onAdd={handleAddStudent}
@@ -271,4 +273,4 @@ function page() {
     )
 }
 
-export default page
+export default Page

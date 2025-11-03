@@ -12,16 +12,16 @@ import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  AlertTriangle,
-  Bell,
-  CheckCircle,
-  Eye,
-  EyeOff,
-  Lock,
-  Palette,
-  Save,
-  Settings,
-  Shield
+    AlertTriangle,
+    Bell,
+    CheckCircle,
+    Eye,
+    EyeOff,
+    Lock,
+    Palette,
+    Save,
+    Settings,
+    Shield
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -315,8 +315,8 @@ export default function FacultySettingsPage() {
                     <Label>Profile Visibility</Label>
                     <Select
                       value={settings.profileVisibility}
-                      onValueChange={(value: 'public' | 'department' | 'private') =>
-                        setSettings({...settings, profileVisibility: value})
+                      onValueChange={(value) =>
+                        setSettings({...settings, profileVisibility: value as 'public' | 'department' | 'private'})
                       }
                     >
                       <SelectTrigger>
@@ -545,8 +545,8 @@ export default function FacultySettingsPage() {
                     <Label>Theme</Label>
                     <Select
                       value={settings.theme}
-                      onValueChange={(value: 'light' | 'dark' | 'system') =>
-                        setSettings({...settings, theme: value})
+                      onValueChange={(value) =>
+                        setSettings({...settings, theme: value as 'light' | 'dark' | 'system'})
                       }
                     >
                       <SelectTrigger>

@@ -25,7 +25,7 @@ export default function ProfilePage() {
       case 'department':
         router.push('/department/profile');
         break;
-      case 'campus':
+      case 'school':
         router.push('/school/profile');
         break;
       case 'admin':

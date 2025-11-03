@@ -1,23 +1,15 @@
-<<<<<<< Updated upstream
-import { ThemeToggle } from '@/components/ThemeToggle'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { User } from 'lucide-react'
-import Link from 'next/link'
-
-function Topbar() {
-=======
 "use client";
 
-import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { User } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 function Topbar() {
   const pathname = usePathname();
@@ -41,7 +33,6 @@ function Topbar() {
     window.location.href = "/";
   };
 
->>>>>>> Stashed changes
   return (
     <nav className="mb-2 w-full h-16 flex items-center justify-between px-6 border-b shadow-lg">
       <div className="flex items-center gap-2">
@@ -59,12 +50,6 @@ function Topbar() {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-<<<<<<< Updated upstream
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/student/login" className="text-destructive">Logout</Link>
-=======
             <DropdownMenuItem asChild>
               <Link href={profileLink}>Profile</Link>
             </DropdownMenuItem>
@@ -76,7 +61,6 @@ function Topbar() {
               className="text-destructive cursor-pointer"
             >
               Logout
->>>>>>> Stashed changes
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

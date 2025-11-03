@@ -37,7 +37,7 @@ export default function StudentProfilePage() {
   const studentDepartment = departments.find(d => d.id === currentStudent?.departmentId);
 
   // Get student stats
-  const studentExams = exams.filter(e => e.enrolledStudents.includes(currentStudent?.id || ''));
+  const studentExams = exams.filter(e => e.enrolledStudents?.includes(currentStudent?.id || ''));
   const studentResults = results.filter(r => r.studentId === currentStudent?.id);
 
   // Profile stats
@@ -48,7 +48,7 @@ export default function StudentProfilePage() {
       ? Math.round(studentResults.reduce((sum, r) => sum + r.percentage, 0) / studentResults.length)
       : 0,
     passRate: studentResults.length > 0
-      ? Math.round((studentResults.filter(r => r.status === 'passed').length / studentResults.length) * 100)
+      ? Math.round((studentResults.filter(r => r.percentage >= 50).length / studentResults.length) * 100)
       : 0,
     upcomingExams: studentExams.filter(e => new Date(e.startTime) > new Date()).length,
     semester: currentStudent?.semester || 1,
@@ -88,7 +88,7 @@ export default function StudentProfilePage() {
                   <Avatar className="w-20 h-20">
                     <AvatarImage src={undefined} alt={currentUser?.name} />
                     <AvatarFallback className="text-lg">
-                      {currentUser?.name?.split(' ').map(n => n[0]).join('') || 'ST'}
+                      {currentUser?.name?.split(' ').map((n: string) => n[0]).join('') || 'ST'}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
@@ -355,11 +355,11 @@ export default function StudentProfilePage() {
                       <div key={result.id} className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="flex items-center space-x-4">
                           <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                            result.status === 'passed' ? 'bg-green-100' : 'bg-red-100'
+                            result.percentage >= 50 ? 'bg-green-100' : 'bg-red-100'
                           }`}>
-                            {result.status === 'passed' ? (
+                            {result.percentage >= 50 ? (
                               <CheckCircle className={`w-6 h-6 ${
-                                result.status === 'passed' ? 'text-green-600' : 'text-red-600'
+                                result.percentage >= 50 ? 'text-green-600' : 'text-red-600'
                               }`} />
                             ) : (
                               <FileText className="w-6 h-6 text-red-600" />
@@ -368,14 +368,14 @@ export default function StudentProfilePage() {
                           <div>
                             <p className="font-medium">{exam?.title}</p>
                             <p className="text-sm text-muted-foreground">
-                              {new Date(result.generatedAt).toLocaleDateString()}
+                              {new Date(result.submittedAt || result.startedAt || new Date()).toLocaleDateString()}
                             </p>
                           </div>
                         </div>
                         <div className="text-right">
                           <p className="font-medium">{result.percentage}%</p>
-                          <Badge variant={result.status === 'passed' ? 'default' : 'destructive'}>
-                            {result.grade}
+                          <Badge variant={result.percentage >= 50 ? 'default' : 'destructive'}>
+                            {result.percentage >= 50 ? 'Passed' : 'Failed'}
                           </Badge>
                         </div>
                       </div>
@@ -419,7 +419,7 @@ export default function StudentProfilePage() {
                       <div className="text-right">
                         <p className="font-medium">{exam.duration} min</p>
                         <Badge variant="outline">
-                          {exam.type}
+                          {exam.status}
                         </Badge>
                       </div>
                     </div>

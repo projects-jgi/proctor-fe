@@ -1,24 +1,10 @@
+"use client";
+
 import EligibilityTest from "@/containers/student/EligibilityTest";
+import { useProctor } from "@/contexts/ProctorContext";
+import { useEffect, useState } from "react";
 import ExamCard from "./ExamCard";
 
-<<<<<<< Updated upstream
-const exams = [
-    {
-        name: "MATHEMATICS FINAL EXAM",
-        description: "Master of Computer Applications",
-        startDate: "01/01/2025",
-        endDate: "03/01/2025",
-        duration: "90"
-    },
-    {
-        name: "PHYSICS FINAL EXAM",
-        description: "Bachelor of Science",
-        startDate: "05/01/2025",
-        endDate: "07/01/2025",
-        duration: "120"
-    }
-]
-=======
 interface Exam {
   id: string;
   title: string;
@@ -30,7 +16,7 @@ interface Exam {
   status: string;
 }
 
-const OngoingExams = () => {
+function OngoingExams() {
   const { currentUser, apiCall } = useProctor();
   const [ongoingExams, setOngoingExams] = useState<Exam[]>([]);
   const [loading, setLoading] = useState(true);
@@ -78,17 +64,28 @@ const OngoingExams = () => {
       </section>
     );
   }
->>>>>>> Stashed changes
 
-function OngoingExams() {
   return (
     <section className="">
       <h2 className="text-xl font-bold">Ongoing Exams</h2>
       <div className="grid grid-cols-1 gap-4 mt-4">
-        {exams
-          .map((exam, index) => (
-            <ExamCard key={index} {...exam} action={<EligibilityTest />}  />
-          ))}
+        {ongoingExams.length > 0 ? (
+          ongoingExams.map((exam) => (
+            <ExamCard
+              key={exam.id}
+              name={exam.title}
+              description={exam.description}
+              startDate={new Date(exam.startTime).toLocaleDateString()}
+              endDate={new Date(exam.endTime).toLocaleDateString()}
+              duration={exam.duration.toString()}
+              action={<EligibilityTest />}
+            />
+          ))
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            No ongoing exams found.
+          </div>
+        )}
       </div>
     </section>
   );

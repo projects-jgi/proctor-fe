@@ -354,8 +354,8 @@ export default function CreateQuestionPage() {
                 <Label htmlFor="difficulty">Difficulty Level</Label>
                 <Select
                   value={questionForm.difficulty}
-                  onValueChange={(value: 'easy' | 'medium' | 'hard') =>
-                    setQuestionForm({...questionForm, difficulty: value})
+                  onValueChange={(value) =>
+                    setQuestionForm({...questionForm, difficulty: value as 'easy' | 'medium' | 'hard'})
                   }
                 >
                   <SelectTrigger>

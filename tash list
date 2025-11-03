@@ -1,0 +1,74 @@
+* [33mabc47a3[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mrohit[m[33m)[m Profile, Settings and minor dept and school changes
+[31m|[m *   [33m31c6ced[m[33m ([m[1;35mrefs/stash[m[33m)[m WIP on master: 319d95c Faculty and School changes with proctoring interface
+[31m|[m [32m|[m[33m\[m  
+[31m|[m [32m|[m * [33m6885a4d[m index on master: 319d95c Faculty and School changes with proctoring interface
+[31m|[m [32m|[m[32m/[m  
+[31m|[m * [33m319d95c[m[33m ([m[1;31morigin/keerthi[m[33m, [m[1;32mmaster[m[33m, [m[1;32mkeerthi[m[33m)[m Faculty and School changes with proctoring interface
+[31m|[m * [33m3ab9a7f[m Faculty and department changes
+[31m|[m [33m|[m * [33m1ecc3c7[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m Fixed violation refetch issue
+[31m|[m [33m|[m * [33m316413a[m[33m ([m[1;31morigin/sudharshan[m[33m)[m Removed unused pages
+[31m|[m [33m|[m * [33mc1acf3f[m Fixed build errors
+[31m|[m [33m|[m * [33m5c46206[m Added back button on EligibilityTest
+[31m|[m [33m|[m * [33m8e75052[m Auto submit exam on violation count exceeded
+[31m|[m [33m|[m * [33m0311184[m Capture picture from camera stream
+[31m|[m [33m|[m * [33ma8dc875[m Fixed build errors
+[31m|[m [33m|[m * [33m423b4a0[m Added error for terms and conditions
+[31m|[m [33m|[m * [33md8693d1[m Added exam not found component
+[31m|[m [33m|[m * [33m86f725a[m Exam card for all status modified
+[31m|[m [33m|[m * [33md785be3[m Correct answer displayed on result list
+[31m|[m [33m|[m * [33ma0b7b98[m Added student result component
+[31m|[m [33m|[m * [33m226ce0e[m Modified completed exam card
+[31m|[m [33m|[m * [33m1d4a996[m[33m ([m[1;31morigin/sudharshan-api[m[33m)[m Fixed type issues
+[31m|[m [33m|[m * [33mba6370e[m Pushed tab switch test post eligibility test
+[31m|[m [33m|[m * [33m9b8d38f[m Implemented proctoring eligibility
+[31m|[m [33m|[m * [33mc61dced[m Integrated api for stats component
+[31m|[m [33m|[m * [33m21d98cb[m Created grouping for student routes for layout file
+[31m|[m [33m|[m * [33mabccbcf[m Redirect to student dashboard on /student request
+[31m|[m [33m|[m * [33m427ef5b[m Changed application colors
+[31m|[m [33m|[m * [33m1e072ec[m Added sidebar and sidebar inset for student user
+[31m|[m [33m|[m * [33mb0a931c[m Displayed exam attempt results
+[31m|[m [33m|[m * [33m9acd0ac[m Added redux and replaced states on exam attempt dashboard
+[31m|[m [33m|[m * [33mbb01c8b[m Moved exam attempt to server side component
+[31m|[m [33m|[m * [33mb81054c[m Changed exam status and attempt folder structure
+[31m|[m [33m|[m * [33m9b42f45[m Installed preact signals
+[31m|[m [33m|[m * [33m9265b72[m Stored exam answers via API
+[31m|[m [33m|[m * [33m51d9635[m Fixed a navigation issue
+[31m|[m [33m|[m * [33m7c4bfbd[m Stored and fetched user answers from localstorage
+[31m|[m [33m|[m * [33m5d4f9b3[m Set exam countdown from api
+[31m|[m [33m|[m * [33m7fd5c11[m Display questions dynamically on navigation buttons
+[31m|[m [33m|[m * [33m1c7cb8a[m Implemented api for exam questions
+[31m|[m [33m|[m * [33m08e0dfa[m Added .env.example file
+[31m|[m [33m|[m * [33mfff340f[m Api added for listing all exams
+[31m|[m [33m|[m * [33mf2d33d6[m Replaced requests from fetch to axios
+[31m|[m [33m|[m * [33mc0fdf21[m Added api for student dashboard exam sections
+[31m|[m [33m|[m * [33mb449b03[m Moved student login to /auth/student and implemented logout
+[31m|[m [33m|[m * [33m1601eb9[m Login api integrated
+[31m|[m [33m|[m * [33m562b945[m Installed and added tanstack query and ironsession wrappers
+[31m|[m [33m|[m * [33md13f8c8[m Added exam hall dashboard page
+[31m|[m [33m|[m[33m/[m  
+[31m|[m [33m|[m * [33ma711e05[m[33m ([m[1;31morigin/copilot/vscode1760599418151[m[33m)[m Checkpoint from VS Code for coding agent session
+[31m|[m [33m|[m[33m/[m  
+[31m|[m *   [33mdf54f11[m Merged keerthi branch
+[31m|[m [36m|[m[1;31m\[m  
+[31m|[m [36m|[m * [33mf7ad252[m exam dashboard and student results
+[31m|[m * [1;31m|[m [33mafbfa49[m Removed a duplicate Link import
+[31m|[m * [1;31m|[m   [33m9dfc309[m Merge branch 'rohit' of github.com:projects-jgi/proctor-fe into sudharshan
+[31m|[m [1;32m|[m[31m\[m [1;31m\[m  
+[31m|[m [1;32m|[m[31m/[m [1;31m/[m  
+[31m|[m[31m/[m[1;32m|[m [1;31m|[m   
+* [1;32m|[m [1;31m|[m [33mb75a94d[m[33m ([m[1;31morigin/rohit[m[33m)[m student exam page pending
+[1;31m|[m [1;32m|[m[1;31m/[m  
+[1;31m|[m[1;31m/[m[1;32m|[m   
+[1;31m|[m * [33m96c002d[m Added upcoming and completed exam pages
+[1;31m|[m[1;31m/[m  
+* [33md24d982[m Modified EligibilityTest component
+* [33m6383b57[m eligibility criteria added
+* [33m3a754a7[m Added container component class
+* [33m0d38902[m Divided exam sections to components
+* [33mc958f32[m Added student dashboard page
+* [33m35a4cbf[m Added navbar to student login page
+* [33md36c1cb[m Added student login form with validation
+* [33mb90e629[m Added themes
+* [33madd5fcb[m Installed shadcn
+* [33md0e0e23[m Added font sizes and colors
+* [33mec1d4ea[m Initial commit from Create Next App

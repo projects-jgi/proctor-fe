@@ -46,7 +46,8 @@ function FacultyResults({ results, exams, onViewDetails, onExport }: FacultyResu
                           result.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           result.studentRollNumber.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesExam = selectedExam === 'all' || result.examName === selectedExam;
-      const matchesGrade = selectedGrade === 'all' || result.grade === selectedGrade;
+      const matchesGrade = selectedGrade === 'all' || 
+                          (selectedGrade === 'F' ? result.status === 'failed' : result.grade.startsWith(selectedGrade));
       return matchesSearch && matchesExam && matchesGrade;
     })
     .sort((a, b) => {

@@ -1,0 +1,2894 @@
+[1mdiff --git a/public/sample_questions.csv b/public/sample_questions.csv[m
+[1mindex b0f2af4..d4b8f37 100644[m
+[1m--- a/public/sample_questions.csv[m
+[1m+++ b/public/sample_questions.csv[m
+[36m@@ -1,5 +1,5 @@[m
+[31m-title,type,content,option1,option2,option3,option4,correctAnswer,marks,explanation,difficulty,subject,category,specialization[m
+[31m-Sample Multiple Choice Question,multiple-choice,What is the capital of France?,Paris,London,Berlin,Madrid,0,5,Paris is the capital and most populous city of France.,easy,Geography,General Knowledge,Computer Science[m
+[31m-True/False Question,true-false,Is the Earth round?,true,, , ,true,3,Scientific evidence confirms the Earth is an oblate spheroid.,medium,Science,General Knowledge,Computer Science[m
+[31m-Short Answer Question,short-answer,What is 2 + 2?,4,, , ,,4,2,Basic arithmetic operation.,easy,Mathematics,General Knowledge,Computer Science[m
+[31m-Essay Question,essay,Explain the concept of recursion in programming.,,, , ,, ,10,Recursion is a programming technique where a function calls itself.,hard,Programming,Technical,Computer Science[m
+\ No newline at end of file[m
+[32m+[m[32mtitle,type,content,option1,option2,option3,option4,correctAnswer,marks,explanation,difficulty,subject,category[m
+[32m+[m[32mSample Multiple Choice Question,multiple-choice,What is the capital of France?,Paris,London,Berlin,Madrid,0,5,Paris is the capital and most populous city of France.,easy,Geography,General Knowledge[m
+[32m+[m[32mTrue/False Question,true-false,Is the Earth round?,true,, , ,true,3,Scientific evidence confirms the Earth is an oblate spheroid.,medium,Science,General Knowledge[m
+[32m+[m[32mShort Answer Question,short-answer,What is 2 + 2?,4,, , ,,4,2,Basic arithmetic operation.,easy,Mathematics,General Knowledge[m
+[32m+[m[32mEssay Question,essay,Explain the concept of recursion in programming.,,, , ,, ,10,Recursion is a programming technique where a function calls itself.,hard,Programming,Technical[m
+\ No newline at end of file[m
+[1mdiff --git a/src/app/department/faculty/page.tsx b/src/app/department/faculty/page.tsx[m
+[1mindex da33b57..3835471 100644[m
+[1m--- a/src/app/department/faculty/page.tsx[m
+[1m+++ b/src/app/department/faculty/page.tsx[m
+[36m@@ -1,18 +1,18 @@[m
+ "use client";[m
+ [m
+[31m-import { Search, UserPlus, Users, GraduationCap, Award, Clock, CheckCircle, Loader2 } from 'lucide-react';[m
+[32m+[m[32mimport { Award, CheckCircle, Clock, GraduationCap, Loader2, Search, UserPlus, Users } from 'lucide-react';[m
+ import { useState } from 'react';[m
+[32m+[m[32mimport { DepartmentLayout } from '../../../components/DepartmentLayout';[m
+[32m+[m[32mimport { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avatar';[m
+[32m+[m[32mimport { Badge } from '../../../components/ui/badge';[m
+ import { Button } from '../../../components/ui/button';[m
+[32m+[m[32mimport { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';[m
+[32m+[m[32mimport { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../components/ui/dialog';[m
+ import { Input } from '../../../components/ui/input';[m
+ import { Label } from '../../../components/ui/label';[m
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';[m
+[31m-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../components/ui/dialog';[m
+[31m-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';[m
+[31m-import { Badge } from '../../../components/ui/badge';[m
+[31m-import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avatar';[m
+[31m-import { DepartmentLayout } from '../../../components/DepartmentLayout';[m
+ import { useProctor } from '../../../contexts/ProctorContext';[m
+[31m-import { getAllDepartments, getCoursesForDepartment, getDepartmentName, getCourseName } from '../../../lib/departments';[m
+[32m+[m[32mimport { getAllDepartments, getCoursesForDepartment, getDepartmentName } from '../../../lib/departments';[m
+ [m
+ function FacultyPage() {[m
+     const { faculties, users, addFaculty, updateFaculty, deleteFaculty, exams, questions } = useProctor();[m
+[36m@@ -418,7 +418,7 @@[m [mfunction FacultyPage() {[m
+                                 <div className="flex items-start justify-between">[m
+                                     <div className="flex items-start space-x-4">[m
+                                         <Avatar className="h-12 w-12">[m
+[31m-                                            <AvatarImage src="" />[m
+[32m+[m[32m                                            <AvatarImage src={undefined} />[m
+                                             <AvatarFallback>[m
+                                                 {faculty.name.split(' ').map((n: string) => n[0]).join('').toUpperCase()}[m
+                                             </AvatarFallback>[m
+[1mdiff --git a/src/app/department/students/page.tsx b/src/app/department/students/page.tsx[m
+[1mindex c62921f..88f89bd 100644[m
+[1m--- a/src/app/department/students/page.tsx[m
+[1m+++ b/src/app/department/students/page.tsx[m
+[36m@@ -2,15 +2,15 @@[m
+ [m
+ import { Search, UserPlus } from 'lucide-react';[m
+ import { useState } from 'react';[m
+[32m+[m[32mimport { DepartmentLayout } from '../../../components/DepartmentLayout';[m
+ import { Button } from '../../../components/ui/button';[m
+[32m+[m[32mimport { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../components/ui/dialog';[m
+ import { Input } from '../../../components/ui/input';[m
+ import { Label } from '../../../components/ui/label';[m
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';[m
+[31m-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../components/ui/dialog';[m
+ import DepartmentStudents from '../../../containers/department/dashboard/DepartmentStudents';[m
+[31m-import { DepartmentLayout } from '../../../components/DepartmentLayout';[m
+ import { useProctor } from '../../../contexts/ProctorContext';[m
+[31m-import { getAllDepartments, getCoursesForDepartment } from '../../../lib/departments';[m
+[32m+[m[32mimport { getAllDepartments } from '../../../lib/departments';[m
+ [m
+ function page() {[m
+     const { students, users, addStudent, updateStudent, deleteStudent } = useProctor();[m
+[36m@@ -18,27 +18,22 @@[m [mfunction page() {[m
+     const [searchTerm, setSearchTerm] = useState('');[m
+     const [isAddModalOpen, setIsAddModalOpen] = useState(false);[m
+     const [selectedDepartment, setSelectedDepartment] = useState('all');[m
+[31m-    const [selectedCourse, setSelectedCourse] = useState('all');[m
+     const [formData, setFormData] = useState({[m
+         name: '',[m
+         email: '',[m
+         phone: '',[m
+         department: '',[m
+[31m-        course: '',[m
+         semester: '1'[m
+     });[m
+ [m
+     const departments = getAllDepartments();[m
+ [m
+[31m-    const availableCourses = selectedDepartment !== 'all' ? getCoursesForDepartment(selectedDepartment) : [];[m
+[31m-[m
+     const resetForm = () => {[m
+         setFormData({[m
+             name: '',[m
+             email: '',[m
+             phone: '',[m
+             department: '',[m
+[31m-            course: '',[m
+             semester: '1'[m
+         });[m
+         setIsAddModalOpen(false);[m
+[36m@@ -51,7 +46,6 @@[m [mfunction page() {[m
+             email: formData.email,[m
+             phone: formData.phone,[m
+             department: formData.department,[m
+[31m-            course: formData.course,[m
+             rollNumber: `STU${Date.now()}`,[m
+             examsTaken: 0,[m
+             averageScore: 0[m
+[36m@@ -67,10 +61,6 @@[m [mfunction page() {[m
+             if (selectedDepartment !== 'all' && student.departmentId !== selectedDepartment) {[m
+                 return false;[m
+             }[m
+[31m-            // Filter by selected course[m
+[31m-            if (selectedCourse !== 'all' && student.departmentId !== selectedCourse) {[m
+[31m-                return false;[m
+[31m-            }[m
+             return true;[m
+         })[m
+         .map(student => ({[m
+[36m@@ -79,7 +69,6 @@[m [mfunction page() {[m
+             email: users.find(u => u.id === student.userId)?.email || 'Unknown',[m
+             phone: users.find(u => u.id === student.userId)?.phone || 'Unknown',[m
+             department: getAllDepartments().find(d => d.id === student.departmentId)?.name || 'Unknown',[m
+[31m-            course: getCoursesForDepartment(student.departmentId).find(c => c.id === student.specializationId)?.name || 'Unknown',[m
+             semester: student.semester.toString(),[m
+             examsTaken: student.examsTaken,[m
+             averageScore: student.averageScore[m
+[36m@@ -88,7 +77,7 @@[m [mfunction page() {[m
+     const filteredStudents = mappedStudents.filter(student =>[m
+         student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||[m
+         student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||[m
+[31m-        student.course.toLowerCase().includes(searchTerm.toLowerCase())[m
+[32m+[m[32m        student.department.toLowerCase().includes(searchTerm.toLowerCase())[m
+     );[m
+ [m
+     // Wrapper functions to handle type differences[m
+[36m@@ -97,7 +86,6 @@[m [mfunction page() {[m
+         const globalStudent = {[m
+             userId: '', // Would need to create user first[m
+             rollNumber: student.rollNumber || `STU${Date.now()}`,[m
+[31m-            specializationId: student.course, // Course becomes specializationId[m
+             departmentId: student.department,[m
+             schoolId: 'school-1', // Default school[m
+             semester: parseInt(student.semester) || 1,[m
+[36m@@ -127,13 +115,10 @@[m [mfunction page() {[m
+             subtitle="Manage student enrollments and progress"[m
+         >[m
+             {/* Hierarchical Filters */}[m
+[31m-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">[m
+[32m+[m[32m            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">[m
+                 <div>[m
+                     <label className="text-sm font-medium mb-2 block">Department</label>[m
+[31m-                    <Select value={selectedDepartment} onValueChange={(value) => {[m
+[31m-                        setSelectedDepartment(value);[m
+[31m-                        setSelectedCourse('all');[m
+[31m-                    }}>[m
+[32m+[m[32m                    <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>[m
+                         <SelectTrigger>[m
+                             <SelectValue placeholder="All Departments" />[m
+                         </SelectTrigger>[m
+[36m@@ -148,35 +133,11 @@[m [mfunction page() {[m
+                     </Select>[m
+                 </div>[m
+ [m
+[31m-                <div>[m
+[31m-                    <label className="text-sm font-medium mb-2 block">Course</label>[m
+[31m-                    <Select[m
+[31m-                        value={selectedCourse}[m
+[31m-                        onValueChange={(value) => {[m
+[31m-                            setSelectedCourse(value);[m
+[31m-                        }}[m
+[31m-                        disabled={selectedDepartment === 'all'}[m
+[31m-                    >[m
+[31m-                        <SelectTrigger>[m
+[31m-                            <SelectValue placeholder="All Courses" />[m
+[31m-                        </SelectTrigger>[m
+[31m-                        <SelectContent>[m
+[31m-                            <SelectItem value="all">All Courses</SelectItem>[m
+[31m-                            {availableCourses.map((course: any) => ([m
+[31m-                                <SelectItem key={course.id} value={course.id}>[m
+[31m-                                    {course.name}[m
+[31m-                                </SelectItem>[m
+[31m-                            ))}[m
+[31m-                        </SelectContent>[m
+[31m-                    </Select>[m
+[31m-                </div>[m
+[31m-[m
+                 <div className="flex items-end">[m
+                     <Button[m
+                         variant="outline"[m
+                         onClick={() => {[m
+                             setSelectedDepartment('all');[m
+[31m-                            setSelectedCourse('all');[m
+                         }}[m
+                         className="w-full"[m
+                     >[m
+[36m@@ -262,7 +223,7 @@[m [mfunction page() {[m
+                                 </Label>[m
+                                 <Select[m
+                                     value={formData.department}[m
+[31m-                                    onValueChange={(value: string) => setFormData({ ...formData, department: value, course: '' })}[m
+[32m+[m[32m                                    onValueChange={(value: string) => setFormData({ ...formData, department: value })}[m
+                                 >[m
+                                     <SelectTrigger className="col-span-3">[m
+                                         <SelectValue placeholder="Select department" />[m
+[36m@@ -276,27 +237,6 @@[m [mfunction page() {[m
+                                     </SelectContent>[m
+                                 </Select>[m
+                             </div>[m
+[31m-                            <div className="grid grid-cols-4 items-center gap-4">[m
+[31m-                                <Label htmlFor="course" className="text-right">[m
+[31m-                                    Course[m
+[31m-                                </Label>[m
+[31m-                                <Select[m
+[31m-                                    value={formData.course}[m
+[31m-                                    onValueChange={(value: string) => setFormData({ ...formData, course: value })}[m
+[31m-                                    disabled={!formData.department}[m
+[31m-                                >[m
+[31m-                                    <SelectTrigger className="col-span-3">[m
+[31m-                                        <SelectValue placeholder="Select course" />[m
+[31m-                                    </SelectTrigger>[m
+[31m-                                    <SelectContent>[m
+[31m-                                        {getCoursesForDepartment(formData.department).map((course: any) => ([m
+[31m-                                            <SelectItem key={course.id} value={course.id}>[m
+[31m-                                                {course.name}[m
+[31m-                                            </SelectItem>[m
+[31m-                                        ))}[m
+[31m-                                    </SelectContent>[m
+[31m-                                </Select>[m
+[31m-                            </div>[m
+                             <div className="grid grid-cols-4 items-center gap-4">[m
+                                 <Label htmlFor="semester" className="text-right">[m
+                                     Semester[m
+[1mdiff --git a/src/app/faculty/exams/page.tsx b/src/app/faculty/exams/page.tsx[m
+[1mindex df54b87..2a7bd58 100644[m
+[1m--- a/src/app/faculty/exams/page.tsx[m
+[1m+++ b/src/app/faculty/exams/page.tsx[m
+[36m@@ -1,33 +1,22 @@[m
+ "use client";[m
+ [m
+[32m+[m[32mimport { FacultyLayout } from "@/components/FacultyLayout";[m
+ import { Badge } from "@/components/ui/badge";[m
+ import { Button } from "@/components/ui/button";[m
+ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";[m
+[31m-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";[m
+[31m-import { Input } from "@/components/ui/input";[m
+[31m-import { Label } from "@/components/ui/label";[m
+[31m-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";[m
+[31m-import { Textarea } from "@/components/ui/textarea";[m
+[31m-import { FacultyLayout } from "@/components/FacultyLayout";[m
+[32m+[m[32mimport { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";[m
+ import { useProctor } from '@/contexts/ProctorContext';[m
+ import {[m
+[31m-    BookOpen,[m
+[31m-    CheckCircle,[m
+[31m-    Edit,[m
+[31m-    Eye,[m
+[31m-    EyeOff,[m
+[31m-    FileText,[m
+[31m-    Plus,[m
+[31m-    Lock,[m
+[31m-    Globe,[m
+[31m-    PlayCircle,[m
+[31m-    Clock,[m
+[31m-    Shield,[m
+[31m-    Users,[m
+[31m-    Settings,[m
+[31m-    AlertTriangle,[m
+[31m-    CheckSquare,[m
+[31m-    X[m
+[32m+[m[32m  BookOpen,[m
+[32m+[m[32m  CheckCircle,[m
+[32m+[m[32m  Clock,[m
+[32m+[m[32m  Eye,[m
+[32m+[m[32m  EyeOff,[m
+[32m+[m[32m  FileText,[m
+[32m+[m[32m  Globe,[m
+[32m+[m[32m  Lock,[m
+[32m+[m[32m  PlayCircle,[m
+[32m+[m[32m  Plus[m
+ } from 'lucide-react';[m
+ import { useState } from 'react';[m
+ [m
+[36m@@ -36,8 +25,6 @@[m [mexport default function FacultyExamsPage() {[m
+     currentUser,[m
+     faculties,[m
+     exams,[m
+[31m-    addExam,[m
+[31m-    updateExam,[m
+     publishExam,[m
+     unpublishExam,[m
+     getExamsForFaculty[m
+[36m@@ -47,130 +34,9 @@[m [mexport default function FacultyExamsPage() {[m
+   const currentFaculty = faculties.find(f => f.userId === currentUser?.id);[m
+   const facultyExams = currentFaculty ? getExamsForFaculty(currentFaculty.id) : [];[m
+ [m
+[31m-  const [selectedSpecialization, setSelectedSpecialization] = useState<string>('');[m
+[31m-  const [isCreateExamOpen, setIsCreateExamOpen] = useState(false);[m
+[31m-  const [editingExam, setEditingExam] = useState<any>(null);[m
+   const [isViewExamOpen, setIsViewExamOpen] = useState(false);[m
+   const [viewingExam, setViewingExam] = useState<any>(null);[m
+ [m
+[31m-  // Exam form state[m
+[31m-  const [examForm, setExamForm] = useState({[m
+[31m-    title: '',[m
+[31m-    description: '',[m
+[31m-    type: 'private' as 'private' | 'public' | 'practice' | 'timed',[m
+[31m-    questions: [] as string[],[m
+[31m-    duration: 90,[m
+[31m-    startTime: '',[m
+[31m-    endTime: '',[m
+[31m-    instructions: '',[m
+[31m-    settings: {[m
+[31m-      allowTabSwitch: false,[m
+[31m-      allowCopyPaste: false,[m
+[31m-      showResults: true,[m
+[31m-      maxViolations: 3,[m
+[31m-      isPractice: false,[m
+[31m-      recordResults: true,[m
+[31m-      allowRetake: false,[m
+[31m-      showCorrectAnswers: false[m
+[31m-    }[m
+[31m-  });[m
+[31m-[m
+[31m-  // Helper to reset exam form[m
+[31m-  const resetExamForm = () => {[m
+[31m-    setExamForm({[m
+[31m-      title: '',[m
+[31m-      description: '',[m
+[31m-      type: 'private',[m
+[31m-      questions: [],[m
+[31m-      duration: 90,[m
+[31m-      startTime: '',[m
+[31m-      endTime: '',[m
+[31m-      instructions: '',[m
+[31m-      settings: {[m
+[31m-        allowTabSwitch: false,[m
+[31m-        allowCopyPaste: false,[m
+[31m-        showResults: true,[m
+[31m-        maxViolations: 3,[m
+[31m-        isPractice: false,[m
+[31m-        recordResults: true,[m
+[31m-        allowRetake: false,[m
+[31m-        showCorrectAnswers: false[m
+[31m-      }[m
+[31m-    });[m
+[31m-    setEditingExam(null);[m
+[31m-  };[m
+[31m-[m
+[31m-  // Populate form for editing exam[m
+[31m-  const populateExamForm = (exam: any) => {[m
+[31m-    setExamForm({[m
+[31m-      title: exam.title,[m
+[31m-      description: exam.description,[m
+[31m-      type: exam.type,[m
+[31m-      questions: exam.questions,[m
+[31m-      duration: exam.duration,[m
+[31m-      startTime: exam.startTime,[m
+[31m-      endTime: exam.endTime,[m
+[31m-      instructions: exam.instructions,[m
+[31m-      settings: exam.settings[m
+[31m-    });[m
+[31m-    setEditingExam(exam);[m
+[31m-    setIsCreateExamOpen(true);[m
+[31m-  };[m
+[31m-[m
+[31m-  const handleCreateExam = () => {[m
+[31m-    // Add validation[m
+[31m-    if (!examForm.title.trim() || !examForm.description.trim() || !examForm.startTime || !examForm.endTime) {[m
+[31m-      alert('Please fill in all required fields: title, description, start time, and end time.');[m
+[31m-      return;[m
+[31m-    }[m
+[31m-    if (new Date(examForm.startTime) >= new Date(examForm.endTime)) {[m
+[31m-      alert('Start time must be before end time.');[m
+[31m-      return;[m
+[31m-    }[m
+[31m-    if (examForm.duration <= 0) {[m
+[31m-      alert('Duration must be a positive number.');[m
+[31m-      return;[m
+[31m-    }[m
+[31m-[m
+[31m-    if (currentFaculty) {[m
+[31m-      let examQuestions = examForm.questions;[m
+[31m-      if (!editingExam) {[m
+[31m-        // For new exams, start with empty questions - faculty can add them later[m
+[31m-        examQuestions = [];[m
+[31m-      }[m
+[31m-[m
+[31m-      // Configure settings based on exam type[m
+[31m-      const configuredSettings = {[m
+[31m-        ...examForm.settings,[m
+[31m-        isPractice: examForm.type === 'practice',[m
+[31m-        recordResults: examForm.type !== 'practice',[m
+[31m-        allowRetake: examForm.type === 'practice',[m
+[31m-        showCorrectAnswers: examForm.type === 'practice',[m
+[31m-        allowTabSwitch: examForm.type === 'practice' || examForm.settings.allowTabSwitch,[m
+[31m-        allowCopyPaste: examForm.type === 'practice' || examForm.settings.allowCopyPaste,[m
+[31m-        maxViolations: examForm.type === 'timed' ? 1 : examForm.settings.maxViolations[m
+[31m-      };[m
+[31m-[m
+[31m-      const examData = {[m
+[31m-        ...examForm,[m
+[31m-        questions: examQuestions,[m
+[31m-        totalMarks: examQuestions.length * 5, // Assuming 5 marks per question[m
+[31m-        departmentId: currentFaculty.departmentId,[m
+[31m-        facultyId: currentFaculty.id,[m
+[31m-        status: editingExam ? editingExam.status : 'draft',[m
+[31m-        enrolledStudents: editingExam ? editingExam.enrolledStudents : [],[m
+[31m-        settings: configuredSettings[m
+[31m-      };[m
+[31m-      if (editingExam) {[m
+[31m-        updateExam(editingExam.id, examData);[m
+[31m-      } else {[m
+[31m-        addExam(examData);[m
+[31m-      }[m
+[31m-      resetExamForm();[m
+[31m-      setIsCreateExamOpen(false);[m
+[31m-    }[m
+[31m-  };[m
+[31m-[m
+   const handleViewExam = (exam: any) => {[m
+     setViewingExam(exam);[m
+     setIsViewExamOpen(true);[m
+[36m@@ -187,8 +53,8 @@[m [mexport default function FacultyExamsPage() {[m
+       title="Exam Management"[m
+       subtitle="Create and manage exams for your students"[m
+     >[m
+[31m-      {/* Stats Cards */}[m
+[31m-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">[m
+[32m+[m[32m          {/* Stats Cards */}[m
+[32m+[m[32m          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">[m
+         <Card>[m
+           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">[m
+             <CardTitle className="text-sm font-medium">Total Exams</CardTitle>[m
+[36m@@ -226,368 +92,11 @@[m [mexport default function FacultyExamsPage() {[m
+       {/* Exam Management */}[m
+       <div className="flex justify-between items-center mb-6">[m
+         <h2 className="text-xl font-semibold">Your Exams</h2>[m
+[31m-        <Dialog open={isCreateExamOpen} onOpenChange={(open) => {[m
+[31m-          setIsCreateExamOpen(open);[m
+[31m-          if (!open) resetExamForm();[m
+[31m-        }}>[m
+[31m-          <DialogTrigger asChild>[m
+[31m-            <Button>[m
+[31m-              <Plus className="h-4 w-4 mr-2" />[m
+[31m-              Create Exam[m
+[31m-            </Button>[m
+[31m-          </DialogTrigger>[m
+[31m-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">[m
+[31m-            <DialogHeader>[m
+[31m-              <DialogTitle className="text-2xl">{editingExam ? 'Edit Exam' : 'Create New Exam'}</DialogTitle>[m
+[31m-              <DialogDescription className="text-base">[m
+[31m-                {editingExam ? 'Update the exam details' : 'Create a new exam for your specialization'}[m
+[31m-              </DialogDescription>[m
+[31m-            </DialogHeader>[m
+[31m-[m
+[31m-            <div className="space-y-6">[m
+[31m-              {/* Basic Information */}[m
+[31m-              <div className="space-y-4">[m
+[31m-                <h3 className="text-lg font-semibold text-foreground">Basic Information</h3>[m
+[31m-                [m
+[31m-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">[m
+[31m-                  <div className="md:col-span-2">[m
+[31m-                    <Label htmlFor="exam-title" className="text-sm font-medium">Exam Title *</Label>[m
+[31m-                    <Input[m
+[31m-                      id="exam-title"[m
+[31m-                      value={examForm.title}[m
+[31m-                      onChange={(e) => setExamForm({...examForm, title: e.target.value})}[m
+[31m-                      placeholder="Enter exam title"[m
+[31m-                      className="mt-1"[m
+[31m-                    />[m
+[31m-                  </div>[m
+[31m-                  [m
+[31m-                  <div className="md:col-span-2">[m
+[31m-                    <Label htmlFor="exam-description" className="text-sm font-medium">Description *</Label>[m
+[31m-                    <Textarea[m
+[31m-                      id="exam-description"[m
+[31m-                      value={examForm.description}[m
+[31m-                      onChange={(e) => setExamForm({...examForm, description: e.target.value})}[m
+[31m-                      placeholder="Brief description of the exam"[m
+[31m-                      rows={3}[m
+[31m-                      className="mt-1"[m
+[31m-                    />[m
+[31m-                  </div>[m
+[31m-                </div>[m
+[31m-              </div>[m
+[31m-[m
+[31m-              {/* Exam Type Selection */}[m
+[31m-              <div className="space-y-4">[m
+[31m-                <h3 className="text-lg font-semibold text-foreground">Exam Type</h3>[m
+[31m-                <p className="text-sm text-muted-foreground">Choose the type of exam that best fits your assessment needs</p>[m
+[31m-                [m
+[31m-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">[m
+[31m-                  {/* Private Exam */}[m
+[31m-                  <Card [m
+[31m-                    className={`cursor-pointer transition-all duration-200 hover:shadow-md ${[m
+[31m-                      examForm.type === 'private' [m
+[31m-                        ? 'ring-2 ring-primary bg-accent border-primary/20' [m
+[31m-                        : 'hover:bg-accent/50'[m
+[31m-                    }`}[m
+[31m-                    onClick={() => setExamForm({...examForm, type: 'private'})}[m
+[31m-                  >[m
+[31m-                    <CardHeader className="pb-3">[m
+[31m-                      <div className="flex items-center space-x-3">[m
+[31m-                        <div className={`p-2 rounded-lg ${[m
+[31m-                          examForm.type === 'private' ? 'bg-primary/10' : 'bg-muted'[m
+[31m-                        }`}>[m
+[31m-                          <Lock className={`h-5 w-5 ${[m
+[31m-                            examForm.type === 'private' ? 'text-primary' : 'text-muted-foreground'[m
+[31m-                          }`} />[m
+[31m-                        </div>[m
+[31m-                        <div>[m
+[31m-                          <CardTitle className="text-base">Private Exam</CardTitle>[m
+[31m-                          <CardDescription className="text-sm">Manual student enrollment required</CardDescription>[m
+[31m-                        </div>[m
+[31m-                        {examForm.type === 'private' && ([m
+[31m-                          <CheckSquare className="h-5 w-5 text-primary ml-auto" />[m
+[31m-                        )}[m
+[31m-                      </div>[m
+[31m-                    </CardHeader>[m
+[31m-                    <CardContent className="pt-0">[m
+[31m-                      <p className="text-sm text-muted-foreground">[m
+[31m-                        Best for controlled assessments where you need to manually enroll specific students.[m
+[31m-                        Provides maximum security and control over exam access.[m
+[31m-                      </p>[m
+[31m-                    </CardContent>[m
+[31m-                  </Card>[m
+[31m-[m
+[31m-                  {/* Public Exam */}[m
+[31m-                  <Card [m
+[31m-                    className={`cursor-pointer transition-all duration-200 hover:shadow-md ${[m
+[31m-                      examForm.type === 'public' [m
+[31m-                        ? 'ring-2 ring-success bg-success/5 border-success/20' [m
+[31m-                        : 'hover:bg-accent/50'[m
+[31m-                    }`}[m
+[31m-                    onClick={() => setExamForm({...examForm, type: 'public'})}[m
+[31m-                  >[m
+[31m-                    <CardHeader className="pb-3">[m
+[31m-                      <div className="flex items-center space-x-3">[m
+[31m-                        <div className={`p-2 rounded-lg ${[m
+[31m-                          examForm.type === 'public' ? 'bg-success/10' : 'bg-muted'[m
+[31m-                        }`}>[m
+[31m-                          <Globe className={`h-5 w-5 ${[m
+[31m-                            examForm.type === 'public' ? 'text-success' : 'text-muted-foreground'[m
+[31m-                          }`} />[m
+[31m-                        </div>[m
+[31m-                        <div>[m
+[31m-                          <CardTitle className="text-base">Public Exam</CardTitle>[m
+[31m-                          <CardDescription className="text-sm">Open to all students in specialization</CardDescription>[m
+[31m-                        </div>[m
+[31m-                        {examForm.type === 'public' && ([m
+[31m-                          <CheckSquare className="h-5 w-5 text-success ml-auto" />[m
+[31m-                        )}[m
+[31m-                      </div>[m
+[31m-                    </CardHeader>[m
+[31m-                    <CardContent className="pt-0">[m
+[31m-                      <p className="text-sm text-muted-foreground">[m
+[31m-                        Automatically available to all students in the selected specialization.[m
+[31m-                        Ideal for general assessments and maximum participation.[m
+[31m-                      </p>[m
+[31m-                    </CardContent>[m
+[31m-                  </Card>[m
+[31m-[m
+[31m-                  {/* Practice Exam */}[m
+[31m-                  <Card [m
+[31m-                    className={`cursor-pointer transition-all duration-200 hover:shadow-md ${[m
+[31m-                      examForm.type === 'practice' [m
+[31m-                        ? 'ring-2 ring-purple-500 bg-purple-50 border-purple-200' [m
+[31m-                        : 'hover:bg-gray-50'[m
+[31m-                    }`}[m
+[31m-                    onClick={() => setExamForm({...examForm, type: 'practice'})}[m
+[31m-                  >[m
+[31m-                    <CardHeader className="pb-3">[m
+[31m-                      <div className="flex items-center space-x-3">[m
+[31m-                        <div className={`p-2 rounded-lg ${[m
+[31m-                          examForm.type === 'practice' ? 'bg-purple-100' : 'bg-gray-100'[m
+[31m-                        }`}>[m
+[31m-                          <PlayCircle className={`h-5 w-5 ${[m
+[31m-                            examForm.type === 'practice' ? 'text-purple-600' : 'text-gray-600'[m
+[31m-                          }`} />[m
+[31m-                        </div>[m
+[31m-                        <div>[m
+[31m-                          <CardTitle className="text-base">Practice Exam</CardTitle>[m
+[31m-                          <CardDescription className="text-sm">Non-graded learning assessment</CardDescription>[m
+[31m-                        </div>[m
+[31m-                        {examForm.type === 'practice' && ([m
+[31m-                          <CheckSquare className="h-5 w-5 text-purple-600 ml-auto" />[m
+[31m-                        )}[m
+[31m-                      </div>[m
+[31m-                    </CardHeader>[m
+[31m-                    <CardContent className="pt-0">[m
+[31m-                      <p className="text-sm text-gray-600">[m
+[31m-                        Non-graded exams for student practice and preparation. Results are not recorded[m
+[31m-                        in official transcripts and provide immediate feedback for learning.[m
+[31m-                      </p>[m
+[31m-                    </CardContent>[m
+[31m-                  </Card>[m
+[31m-[m
+[31m-                  {/* Timed Exam */}[m
+[31m-                  <Card [m
+[31m-                    className={`cursor-pointer transition-all duration-200 hover:shadow-md ${[m
+[31m-                      examForm.type === 'timed' [m
+[31m-                        ? 'ring-2 ring-red-500 bg-red-50 border-red-200' [m
+[31m-                        : 'hover:bg-gray-50'[m
+[31m-                    }`}[m
+[31m-                    onClick={() => setExamForm({...examForm, type: 'timed'})}[m
+[31m-                  >[m
+[31m-                    <CardHeader className="pb-3">[m
+[31m-                      <div className="flex items-center space-x-3">[m
+[31m-                        <div className={`p-2 rounded-lg ${[m
+[31m-                          examForm.type === 'timed' ? 'bg-red-100' : 'bg-gray-100'[m
+[31m-                        }`}>[m
+[31m-                          <Clock className={`h-5 w-5 ${[m
+[31m-                            examForm.type === 'timed' ? 'text-red-600' : 'text-gray-600'[m
+[31m-                          }`} />[m
+[31m-                        </div>[m
+[31m-                        <div>[m
+[31m-                          <CardTitle className="text-base">Timed Exam</CardTitle>[m
+[31m-                          <CardDescription className="text-sm">Strict time limits with proctoring</CardDescription>[m
+[31m-                        </div>[m
+[31m-                        {examForm.type === 'timed' && ([m
+[31m-                          <CheckSquare className="h-5 w-5 text-red-600 ml-auto" />[m
+[31m-                        )}[m
+[31m-                      </div>[m
+[31m-                    </CardHeader>[m
+[31m-                    <CardContent className="pt-0">[m
+[31m-                      <p className="text-sm text-gray-600">[m
+[31m-                        High-security exams with strict time limits and advanced proctoring features[m
+[31m-                        including anti-cheating measures and automatic submission.[m
+[31m-                      </p>[m
+[31m-                    </CardContent>[m
+[31m-                  </Card>[m
+[31m-                </div>[m
+[31m-              </div>[m
+[31m-[m
+[31m-              {/* Exam Configuration */}[m
+[31m-              <div className="space-y-4">[m
+[31m-                <h3 className="text-lg font-semibold text-gray-900">Exam Configuration</h3>[m
+[31m-                [m
+[31m-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">[m
+[31m-                  <div>[m
+[31m-                    <Label htmlFor="exam-duration" className="text-sm font-medium">Duration (minutes) *</Label>[m
+[31m-                    <Input[m
+[31m-                      id="exam-duration"[m
+[31m-                      type="number"[m
+[31m-                      value={examForm.duration}[m
+[31m-                      onChange={(e) => setExamForm({...examForm, duration: parseInt(e.target.value)})}[m
+[31m-                      className="mt-1"[m
+[31m-                      min="1"[m
+[31m-                    />[m
+[31m-                  </div>[m
+[31m-[m
+[31m-                  <div>[m
+[31m-                    <Label htmlFor="exam-start" className="text-sm font-medium">Start Time *</Label>[m
+[31m-                    <Input[m
+[31m-                      id="exam-start"[m
+[31m-                      type="datetime-local"[m
+[31m-                      value={examForm.startTime}[m
+[31m-                      onChange={(e) => setExamForm({...examForm, startTime: e.target.value})}[m
+[31m-                      className="mt-1"[m
+[31m-                    />[m
+[31m-                  </div>[m
+[31m-[m
+[31m-                  <div>[m
+[31m-                    <Label htmlFor="exam-end" className="text-sm font-medium">End Time *</Label>[m
+[31m-                    <Input[m
+[31m-                      id="exam-end"[m
+[31m-                      type="datetime-local"[m
+[31m-                      value={examForm.endTime}[m
+[31m-                      onChange={(e) => setExamForm({...examForm, endTime: e.target.value})}[m
+[31m-                      className="mt-1"[m
+[31m-                    />[m
+[31m-                  </div>[m
+[31m-                </div>[m
+[31m-[m
+[31m-                <div>[m
+[31m-                  <Label htmlFor="exam-instructions" className="text-sm font-medium">Instructions</Label>[m
+[31m-                  <Textarea[m
+[31m-                    id="exam-instructions"[m
+[31m-                    value={examForm.instructions}[m
+[31m-                    onChange={(e) => setExamForm({...examForm, instructions: e.target.value})}[m
+[31m-                    placeholder="Exam instructions for students"[m
+[31m-                    rows={4}[m
+[31m-                    className="mt-1"[m
+[31m-                  />[m
+[31m-                </div>[m
+[31m-              </div>[m
+[31m-[m
+[31m-              {/* Advanced Settings */}[m
+[31m-              <div className="space-y-4">[m
+[31m-                <h3 className="text-lg font-semibold text-gray-900">Advanced Settings</h3>[m
+[31m-                [m
+[31m-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">[m
+[31m-                  {/* Proctoring Settings */}[m
+[31m-                  <div className="space-y-3">[m
+[31m-                    <h4 className="font-medium text-gray-900 flex items-center">[m
+[31m-                      <Shield className="h-4 w-4 mr-2" />[m
+[31m-                      Proctoring Settings[m
+[31m-                    </h4>[m
+[31m-                    [m
+[31m-                    <div className="space-y-3">[m
+[31m-                      <div className="flex items-center justify-between">[m
+[31m-                        <div>[m
+[31m-                          <Label className="text-sm font-medium">Allow Tab Switching</Label>[m
+[31m-                          <p className="text-xs text-gray-500">Students can switch browser tabs</p>[m
+[31m-                        </div>[m
+[31m-                        <input[m
+[31m-                          type="checkbox"[m
+[31m-                          checked={examForm.settings.allowTabSwitch}[m
+[31m-                          onChange={(e) => setExamForm({[m
+[31m-                            ...examForm, [m
+[31m-                            settings: {...examForm.settings, allowTabSwitch: e.target.checked}[m
+[31m-                          })}[m
+[31m-                          className="rounded"[m
+[31m-                        />[m
+[31m-                      </div>[m
+[32m+[m[32m        <Button onClick={() => window.location.href = '/faculty/exams/create'}>[m
+[32m+[m[32m          <Plus className="h-4 w-4 mr-2" />[m
+[32m+[m[32m          Create Exam[m
+[32m+[m[32m        </Button>[m
+ [m
+[31m-                      <div className="flex items-center justify-between">[m
+[31m-                        <div>[m
+[31m-                          <Label className="text-sm font-medium">Allow Copy/Paste</Label>[m
+[31m-                          <p className="text-xs text-gray-500">Students can copy and paste content</p>[m
+[31m-                        </div>[m
+[31m-                        <input[m
+[31m-                          type="checkbox"[m
+[31m-                          checked={examForm.settings.allowCopyPaste}[m
+[31m-                          onChange={(e) => setExamForm({[m
+[31m-                            ...examForm, [m
+[31m-                            settings: {...examForm.settings, allowCopyPaste: e.target.checked}[m
+[31m-                          })}[m
+[31m-                          className="rounded"[m
+[31m-                        />[m
+[31m-                      </div>[m
+[31m-                    </div>[m
+[31m-                  </div>[m
+[31m-[m
+[31m-                  {/* Result Settings */}[m
+[31m-                  <div className="space-y-3">[m
+[31m-                    <h4 className="font-medium text-gray-900 flex items-center">[m
+[31m-                      <Settings className="h-4 w-4 mr-2" />[m
+[31m-                      Result Settings[m
+[31m-                    </h4>[m
+[31m-                    [m
+[31m-                    <div className="space-y-3">[m
+[31m-                      <div className="flex items-center justify-between">[m
+[31m-                        <div>[m
+[31m-                          <Label className="text-sm font-medium">Show Results Immediately</Label>[m
+[31m-                          <p className="text-xs text-gray-500">Display results after completion</p>[m
+[31m-                        </div>[m
+[31m-                        <input[m
+[31m-                          type="checkbox"[m
+[31m-                          checked={examForm.settings.showResults}[m
+[31m-                          onChange={(e) => setExamForm({[m
+[31m-                            ...examForm, [m
+[31m-                            settings: {...examForm.settings, showResults: e.target.checked}[m
+[31m-                          })}[m
+[31m-                          className="rounded"[m
+[31m-                        />[m
+[31m-                      </div>[m
+[31m-[m
+[31m-                      <div className="flex items-center justify-between">[m
+[31m-                        <div>[m
+[31m-                          <Label className="text-sm font-medium">Max Violations</Label>[m
+[31m-                          <p className="text-xs text-gray-500">Auto-terminate after violations</p>[m
+[31m-                        </div>[m
+[31m-                        <Input[m
+[31m-                          type="number"[m
+[31m-                          value={examForm.settings.maxViolations}[m
+[31m-                          onChange={(e) => setExamForm({[m
+[31m-                            ...examForm, [m
+[31m-                            settings: {...examForm.settings, maxViolations: parseInt(e.target.value)}[m
+[31m-                          })}[m
+[31m-                          className="w-20 h-8"[m
+[31m-                          min="0"[m
+[31m-                        />[m
+[31m-                      </div>[m
+[31m-                    </div>[m
+[31m-                  </div>[m
+[31m-                </div>[m
+[31m-              </div>[m
+[31m-[m
+[31m-              {/* Action Buttons */}[m
+[31m-              <div className="flex justify-end space-x-3 pt-4 border-t">[m
+[31m-                <Button [m
+[31m-                  variant="outline" [m
+[31m-                  onClick={() => {[m
+[31m-                    setIsCreateExamOpen(false);[m
+[31m-                    resetExamForm();[m
+[31m-                  }}[m
+[31m-                >[m
+[31m-                  <X className="h-4 w-4 mr-2" />[m
+[31m-                  Cancel[m
+[31m-                </Button>[m
+[31m-                <Button onClick={handleCreateExam}>[m
+[31m-                  <Plus className="h-4 w-4 mr-2" />[m
+[31m-                  {editingExam ? 'Update Exam' : 'Create Exam'}[m
+[31m-                </Button>[m
+[31m-              </div>[m
+[31m-            </div>[m
+[31m-          </DialogContent>[m
+[31m-        </Dialog>[m
+       </div>[m
+ [m
+       <div className="grid gap-4">[m
+[36m@@ -714,7 +223,7 @@[m [mexport default function FacultyExamsPage() {[m
+                     )}[m
+                     {exam.type === 'public' && ([m
+                       <>[m
+[31m-                        <p>• Open to all students in specialization</p>[m
+[32m+[m[32m                        <p>• Open to all enrolled students</p>[m
+                         <p>• Automatic enrollment available</p>[m
+                         <p>• Maximum participation opportunity</p>[m
+                       </>[m
+[36m@@ -727,9 +236,6 @@[m [mexport default function FacultyExamsPage() {[m
+                     Created: {new Date(exam.createdAt).toLocaleDateString()}[m
+                   </div>[m
+                   <div className="flex space-x-2">[m
+[31m-                    <Button variant="outline" size="sm" onClick={() => populateExamForm(exam)}>[m
+[31m-                      <Edit className="h-4 w-4" />[m
+[31m-                    </Button>[m
+                     <Button variant="outline" size="sm" onClick={() => handleViewExam(exam)}>[m
+                       <Eye className="h-4 w-4" />[m
+                     </Button>[m
+[1mdiff --git a/src/app/faculty/proctoring/page.tsx b/src/app/faculty/proctoring/page.tsx[m
+[1mindex 04c7712..bbd0c05 100644[m
+[1m--- a/src/app/faculty/proctoring/page.tsx[m
+[1m+++ b/src/app/faculty/proctoring/page.tsx[m
+[36m@@ -1,34 +1,32 @@[m
+ "use client";[m
+ [m
+[31m-import { useState, useEffect, useCallback } from 'react';[m
+ import { FacultyLayout } from '@/components/FacultyLayout';[m
+[31m-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';[m
+[32m+[m[32mimport SessionMonitor from '@/components/SessionMonitor';[m
+[32m+[m[32mimport { Alert } from '@/components/ui/alert';[m
+ import { Badge } from '@/components/ui/badge';[m
+ import { Button } from '@/components/ui/button';[m
+[31m-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';[m
+[31m-import { Alert, AlertDescription } from '@/components/ui/alert';[m
+[32m+[m[32mimport { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';[m
+ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';[m
+[32m+[m[32mimport { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';[m
+ import { useProctor } from '@/contexts/ProctorContext';[m
+ import {[m
+[31m-  Eye,[m
+[31m-  Users,[m
+   AlertTriangle,[m
+   Camera,[m
+[32m+[m[32m  Clock,[m
+[32m+[m[32m  Eye,[m
+   Mic,[m
+   Monitor,[m
+[32m+[m[32m  Pause,[m
+[32m+[m[32m  Play,[m
+[32m+[m[32m  RefreshCw,[m
+   Shield,[m
+   ShieldAlert,[m
+[31m-  Clock,[m
+[31m-  UserCheck,[m
+[31m-  UserX,[m
+[31m-  Play,[m
+[31m-  Pause,[m
+   Square,[m
+[31m-  MessageSquare,[m
+[31m-  RefreshCw,[m
+[32m+[m[32m  Users,[m
+   Wifi,[m
+   WifiOff[m
+ } from 'lucide-react';[m
+[32m+[m[32mimport { useCallback, useEffect, useState } from 'react';[m
+ [m
+ interface ProctoringSession {[m
+   id: string;[m
+[36m@@ -412,7 +410,6 @@[m [mexport default function ProctoringPage() {[m
+           <TabsList>[m
+             <TabsTrigger value="sessions">Active Sessions</TabsTrigger>[m
+             <TabsTrigger value="violations">Violation Reports</TabsTrigger>[m
+[31m-            <TabsTrigger value="alerts">Live Alerts</TabsTrigger>[m
+           </TabsList>[m
+ [m
+           <TabsContent value="sessions" className="space-y-4">[m
+[36m@@ -421,62 +418,110 @@[m [mexport default function ProctoringPage() {[m
+                 <CardTitle>Active Proctoring Sessions</CardTitle>[m
+               </CardHeader>[m
+               <CardContent>[m
+[31m-                <div className="space-y-4">[m
+[31m-                  {activeSessions.map((session) => ([m
+[31m-                    <div key={session.id} className="border rounded-lg p-4">[m
+[31m-                      <div className="flex items-center justify-between mb-3">[m
+[31m-                        <div className="flex items-center gap-3">[m
+[31m-                          <div className={`w-3 h-3 rounded-full ${getStatusColor(session.status)}`} />[m
+[31m-                          {getStatusIcon(session.status)}[m
+[31m-                          <div>[m
+[31m-                            <h3 className="font-semibold">{session.studentName}</h3>[m
+[31m-                            <p className="text-sm text-muted-foreground">{session.examTitle}</p>[m
+[32m+[m[32m                {/* Two-column layout: left = sessions, right = continuous live alerts */}[m
+[32m+[m[32m                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">[m
+[32m+[m[32m                  <div className="md:col-span-2 space-y-4">[m
+[32m+[m[32m                    {activeSessions.map((session) => ([m
+[32m+[m[32m                      <div key={session.id} className="border rounded-lg p-4">[m
+[32m+[m[32m                        <div className="flex items-center justify-between mb-3">[m
+[32m+[m[32m                          <div className="flex items-center gap-3">[m
+[32m+[m[32m                            <div className={`w-3 h-3 rounded-full ${getStatusColor(session.status)}`} />[m
+[32m+[m[32m                            {getStatusIcon(session.status)}[m
+[32m+[m[32m                            <div>[m
+[32m+[m[32m                              <h3 className="font-semibold">{session.studentName}</h3>[m
+[32m+[m[32m                              <p className="text-sm text-muted-foreground">{session.examTitle}</p>[m
+[32m+[m[32m                            </div>[m
+[32m+[m[32m                          </div>[m
+[32m+[m[32m                          <div className="flex items-center gap-2">[m
+[32m+[m[32m                            <Badge variant={session.status === 'active' ? 'default' : 'secondary'}>[m
+[32m+[m[32m                              {session.status}[m
+[32m+[m[32m                            </Badge>[m
+[32m+[m[32m                            <Button[m
+[32m+[m[32m                              variant="outline"[m
+[32m+[m[32m                              size="sm"[m
+[32m+[m[32m                              onClick={() => handleViewSession(session)}[m
+[32m+[m[32m                            >[m
+[32m+[m[32m                              <Eye className="w-4 h-4 mr-1" />[m
+[32m+[m[32m                              Monitor[m
+[32m+[m[32m                            </Button>[m
+                           </div>[m
+                         </div>[m
+[31m-                        <div className="flex items-center gap-2">[m
+[31m-                          <Badge variant={session.status === 'active' ? 'default' : 'secondary'}>[m
+[31m-                            {session.status}[m
+[31m-                          </Badge>[m
+[31m-                          <Button[m
+[31m-                            variant="outline"[m
+[31m-                            size="sm"[m
+[31m-                            onClick={() => handleViewSession(session)}[m
+[31m-                          >[m
+[31m-                            <Eye className="w-4 h-4 mr-1" />[m
+[31m-                            Monitor[m
+[31m-                          </Button>[m
+[31m-                        </div>[m
+[31m-                      </div>[m
+ [m
+[31m-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">[m
+[31m-                        <div className="flex items-center gap-2">[m
+[31m-                          <Camera className={`w-4 h-4 ${session.cameraActive ? 'text-green-600' : 'text-red-600'}`} />[m
+[31m-                          <span>Camera: {session.cameraActive ? 'Active' : 'Inactive'}</span>[m
+[31m-                        </div>[m
+[31m-                        <div className="flex items-center gap-2">[m
+[31m-                          <Mic className={`w-4 h-4 ${session.micActive ? 'text-green-600' : 'text-red-600'}`} />[m
+[31m-                          <span>Mic: {session.micActive ? 'Active' : 'Inactive'}</span>[m
+[31m-                        </div>[m
+[31m-                        <div className="flex items-center gap-2">[m
+[31m-                          <Monitor className={`w-4 h-4 ${session.tabVisible ? 'text-green-600' : 'text-red-600'}`} />[m
+[31m-                          <span>Tab: {session.tabVisible ? 'Focused' : 'Unfocused'}</span>[m
+[31m-                        </div>[m
+[31m-                        <div className="flex items-center gap-2">[m
+[31m-                          <Clock className="w-4 h-4 text-blue-600" />[m
+[31m-                          <span>Started: {new Date(session.startTime).toLocaleTimeString()}</span>[m
+[32m+[m[32m                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">[m
+[32m+[m[32m                          <div className="flex items-center gap-2">[m
+[32m+[m[32m                            <Camera className={`w-4 h-4 ${session.cameraActive ? 'text-green-600' : 'text-red-600'}`} />[m
+[32m+[m[32m                            <span>Camera: {session.cameraActive ? 'Active' : 'Inactive'}</span>[m
+[32m+[m[32m                          </div>[m
+[32m+[m[32m                          <div className="flex items-center gap-2">[m
+[32m+[m[32m                            <Mic className={`w-4 h-4 ${session.micActive ? 'text-green-600' : 'text-red-600'}`} />[m
+[32m+[m[32m                            <span>Mic: {session.micActive ? 'Active' : 'Inactive'}</span>[m
+[32m+[m[32m                          </div>[m
+[32m+[m[32m                          <div className="flex items-center gap-2">[m
+[32m+[m[32m                            <Monitor className={`w-4 h-4 ${session.tabVisible ? 'text-green-600' : 'text-red-600'}`} />[m
+[32m+[m[32m                            <span>Tab: {session.tabVisible ? 'Focused' : 'Unfocused'}</span>[m
+[32m+[m[32m                          </div>[m
+[32m+[m[32m                          <div className="flex items-center gap-2">[m
+[32m+[m[32m                            <Clock className="w-4 h-4 text-blue-600" />[m
+[32m+[m[32m                            <span>Started: {new Date(session.startTime).toLocaleTimeString()}</span>[m
+[32m+[m[32m                          </div>[m
+                         </div>[m
+[31m-                      </div>[m
+ [m
+[31m-                      {session.violations.length > 0 && ([m
+[31m-                        <div className="mt-3 pt-3 border-t">[m
+[31m-                          <div className="flex items-center gap-2 text-sm text-orange-600">[m
+[31m-                            <AlertTriangle className="w-4 h-4" />[m
+[31m-                            <span>{session.violations.length} violation(s) detected</span>[m
+[32m+[m[32m                        {session.violations.length > 0 && ([m
+[32m+[m[32m                          <div className="mt-3 pt-3 border-t">[m
+[32m+[m[32m                            <div className="flex items-center gap-2 text-sm text-orange-600">[m
+[32m+[m[32m                              <AlertTriangle className="w-4 h-4" />[m
+[32m+[m[32m                              <span>{session.violations.length} violation(s) detected</span>[m
+[32m+[m[32m                            </div>[m
+                           </div>[m
+[32m+[m[32m                        )}[m
+[32m+[m[32m                      </div>[m
+[32m+[m[32m                    ))}[m
+[32m+[m[32m                  </div>[m
+[32m+[m
+[32m+[m[32m                  {/* Continuous Live Alerts panel */}[m
+[32m+[m[32m                  <div className="md:col-span-1">[m
+[32m+[m[32m                    <Card>[m
+[32m+[m[32m                      <CardHeader>[m
+[32m+[m[32m                        <CardTitle>Live Alerts (Real-time)</CardTitle>[m
+[32m+[m[32m                      </CardHeader>[m
+[32m+[m[32m                      <CardContent>[m
+[32m+[m[32m                        <div className="space-y-3 max-h-[60vh] overflow-auto">[m
+[32m+[m[32m                          {activeSessions[m
+[32m+[m[32m                            .filter(session => !session.cameraActive || !session.micActive || !session.tabVisible || session.violations.some(v => !v.resolved))[m
+[32m+[m[32m                            .map((session) => ([m
+[32m+[m[32m                              <Alert key={session.id}>[m
+[32m+[m[32m                                <AlertTriangle className="h-4 w-4" />[m
+[32m+[m[32m                                <div className="ml-2">[m
+[32m+[m[32m                                  <div className="flex items-center justify-between">[m
+[32m+[m[32m                                    <strong>{session.studentName}</strong>[m
+[32m+[m[32m                                    <Badge variant={session.status === 'active' ? 'default' : 'secondary'}>{session.status}</Badge>[m
+[32m+[m[32m                                  </div>[m
+[32m+[m[32m                                  <div className="text-xs text-muted-foreground">{session.examTitle}</div>[m
+[32m+[m[32m                                  <div className="mt-2 text-sm">[m
+[32m+[m[32m                                    {!session.cameraActive && <div>• Camera is inactive</div>}[m
+[32m+[m[32m                                    {!session.micActive && <div>• Microphone is inactive</div>}[m
+[32m+[m[32m                                    {!session.tabVisible && <div>• Tab is not focused</div>}[m
+[32m+[m[32m                                    {session.violations.filter(v => !v.resolved).length > 0 && ([m
+[32m+[m[32m                                      <div>• {session.violations.filter(v => !v.resolved).length} unresolved violation(s)</div>[m
+[32m+[m[32m                                    )}[m
+[32m+[m[32m                                  </div>[m
+[32m+[m[32m                                </div>[m
+[32m+[m[32m                              </Alert>[m
+[32m+[m[32m                            ))}[m
+[32m+[m
+[32m+[m[32m                          {activeSessions.every(session =>[m
+[32m+[m[32m                            session.cameraActive && session.micActive && session.tabVisible &&[m
+[32m+[m[32m                            session.violations.every(v => v.resolved)[m
+[32m+[m[32m                          ) && ([m
+[32m+[m[32m                            <div className="text-center py-8 text-muted-foreground">[m
+[32m+[m[32m                              <Shield className="w-12 h-12 mx-auto mb-4 text-green-600" />[m
+[32m+[m[32m                              <p>All sessions are running smoothly. No alerts at this time.</p>[m
+[32m+[m[32m                            </div>[m
+[32m+[m[32m                          )}[m
+                         </div>[m
+[31m-                      )}[m
+[31m-                    </div>[m
+[31m-                  ))}[m
+[32m+[m[32m                      </CardContent>[m
+[32m+[m[32m                    </Card>[m
+[32m+[m[32m                  </div>[m
+                 </div>[m
+               </CardContent>[m
+             </Card>[m
+[36m@@ -531,135 +576,25 @@[m [mexport default function ProctoringPage() {[m
+             </Card>[m
+           </TabsContent>[m
+ [m
+[31m-          <TabsContent value="alerts" className="space-y-4">[m
+[31m-            <Card>[m
+[31m-              <CardHeader>[m
+[31m-                <CardTitle>Live Alerts</CardTitle>[m
+[31m-              </CardHeader>[m
+[31m-              <CardContent>[m
+[31m-                <div className="space-y-4">[m
+[31m-                  {activeSessions[m
+[31m-                    .filter(session => !session.cameraActive || !session.micActive || !session.tabVisible || session.violations.some(v => !v.resolved))[m
+[31m-                    .map((session) => ([m
+[31m-                      <Alert key={session.id}>[m
+[31m-                        <AlertTriangle className="h-4 w-4" />[m
+[31m-                        <AlertDescription>[m
+[31m-                          <strong>{session.studentName}</strong> - {session.examTitle}[m
+[31m-                          <div className="mt-2 space-y-1">[m
+[31m-                            {!session.cameraActive && <p>• Camera is inactive</p>}[m
+[31m-                            {!session.micActive && <p>• Microphone is inactive</p>}[m
+[31m-                            {!session.tabVisible && <p>• Tab is not focused</p>}[m
+[31m-                            {session.violations.filter(v => !v.resolved).length > 0 && ([m
+[31m-                              <p>• {session.violations.filter(v => !v.resolved).length} unresolved violation(s)</p>[m
+[31m-                            )}[m
+[31m-                          </div>[m
+[31m-                        </AlertDescription>[m
+[31m-                      </Alert>[m
+[31m-                    ))}[m
+[31m-                  {activeSessions.every(session =>[m
+[31m-                    session.cameraActive && session.micActive && session.tabVisible &&[m
+[31m-                    session.violations.every(v => v.resolved)[m
+[31m-                  ) && ([m
+[31m-                    <div className="text-center py-8 text-muted-foreground">[m
+[31m-                      <Shield className="w-12 h-12 mx-auto mb-4 text-green-600" />[m
+[31m-                      <p>All sessions are running smoothly. No alerts at this time.</p>[m
+[31m-                    </div>[m
+[31m-                  )}[m
+[31m-                </div>[m
+[31m-              </CardContent>[m
+[31m-            </Card>[m
+[31m-          </TabsContent>[m
+[32m+[m[32m          {/* Removed separate Live Alerts tab - live alerts are displayed inside Active Sessions view */}[m
+         </Tabs>[m
+ [m
+[31m-        {/* Session Detail Modal */}[m
+[31m-        {selectedSession && ([m
+[31m-          <Dialog open={!!selectedSession} onOpenChange={() => setSelectedSession(null)}>[m
+[31m-            <DialogContent className="max-w-4xl">[m
+[31m-              <DialogHeader>[m
+[31m-                <DialogTitle>Monitoring: {selectedSession.studentName}</DialogTitle>[m
+[31m-                <DialogDescription>{selectedSession.examTitle}</DialogDescription>[m
+[31m-              </DialogHeader>[m
+[31m-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">[m
+[31m-                {/* Live Feed Placeholder */}[m
+[31m-                <Card>[m
+[31m-                  <CardHeader>[m
+[31m-                    <CardTitle className="flex items-center gap-2">[m
+[31m-                      <Camera className="w-4 h-4" />[m
+[31m-                      Live Camera Feed[m
+[31m-                    </CardTitle>[m
+[31m-                  </CardHeader>[m
+[31m-                  <CardContent>[m
+[31m-                    <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">[m
+[31m-                      <div className="text-center">[m
+[31m-                        <Camera className="w-12 h-12 mx-auto mb-2 text-gray-400" />[m
+[31m-                        <p className="text-sm text-gray-600">Camera feed would appear here</p>[m
+[31m-                        <p className="text-xs text-gray-500">Status: {selectedSession.cameraActive ? 'Active' : 'Inactive'}</p>[m
+[31m-                      </div>[m
+[31m-                    </div>[m
+[31m-                  </CardContent>[m
+[31m-                </Card>[m
+[31m-[m
+[31m-                {/* Session Details */}[m
+[31m-                <Card>[m
+[31m-                  <CardHeader>[m
+[31m-                    <CardTitle>Session Details</CardTitle>[m
+[31m-                  </CardHeader>[m
+[31m-                  <CardContent className="space-y-4">[m
+[31m-                    <div className="grid grid-cols-2 gap-4 text-sm">[m
+[31m-                      <div>[m
+[31m-                        <p className="font-medium">Status</p>[m
+[31m-                        <Badge variant={selectedSession.status === 'active' ? 'default' : 'secondary'}>[m
+[31m-                          {selectedSession.status}[m
+[31m-                        </Badge>[m
+[31m-                      </div>[m
+[31m-                      <div>[m
+[31m-                        <p className="font-medium">Duration</p>[m
+[31m-                        <p>{selectedSession.duration} minutes</p>[m
+[31m-                      </div>[m
+[31m-                      <div>[m
+[31m-                        <p className="font-medium">Started</p>[m
+[31m-                        <p>{new Date(selectedSession.startTime).toLocaleString()}</p>[m
+[31m-                      </div>[m
+[31m-                      <div>[m
+[31m-                        <p className="font-medium">Last Activity</p>[m
+[31m-                        <p>{new Date(selectedSession.lastActivity).toLocaleString()}</p>[m
+[31m-                      </div>[m
+[31m-                    </div>[m
+[31m-[m
+[31m-                    <div className="space-y-2">[m
+[31m-                      <p className="font-medium">Technical Status</p>[m
+[31m-                      <div className="space-y-1 text-sm">[m
+[31m-                        <div className="flex items-center gap-2">[m
+[31m-                          <Camera className={`w-4 h-4 ${selectedSession.cameraActive ? 'text-green-600' : 'text-red-600'}`} />[m
+[31m-                          <span>Camera: {selectedSession.cameraActive ? 'Active' : 'Inactive'}</span>[m
+[31m-                        </div>[m
+[31m-                        <div className="flex items-center gap-2">[m
+[31m-                          <Mic className={`w-4 h-4 ${selectedSession.micActive ? 'text-green-600' : 'text-red-600'}`} />[m
+[31m-                          <span>Microphone: {selectedSession.micActive ? 'Active' : 'Inactive'}</span>[m
+[31m-                        </div>[m
+[31m-                        <div className="flex items-center gap-2">[m
+[31m-                          <Monitor className={`w-4 h-4 ${selectedSession.tabVisible ? 'text-green-600' : 'text-red-600'}`} />[m
+[31m-                          <span>Tab Focus: {selectedSession.tabVisible ? 'Focused' : 'Unfocused'}</span>[m
+[31m-                        </div>[m
+[31m-                      </div>[m
+[31m-                    </div>[m
+[31m-[m
+[31m-                    <div className="flex gap-2">[m
+[31m-                      <Button variant="outline" size="sm">[m
+[31m-                        <MessageSquare className="w-4 h-4 mr-1" />[m
+[31m-                        Send Message[m
+[31m-                      </Button>[m
+[31m-                      <Button variant="destructive" size="sm">[m
+[31m-                        <Square className="w-4 h-4 mr-1" />[m
+[31m-                        Terminate Session[m
+[31m-                      </Button>[m
+[31m-                    </div>[m
+[31m-                  </CardContent>[m
+[31m-                </Card>[m
+[31m-              </div>[m
+[31m-            </DialogContent>[m
+[31m-          </Dialog>[m
+[31m-        )}[m
+[32m+[m[32m        {/* Session Detail Modal (improved) */}[m
+[32m+[m[32m        <SessionMonitor[m
+[32m+[m[32m          session={selectedSession}[m
+[32m+[m[32m          open={!!selectedSession}[m
+[32m+[m[32m          onOpenChange={() => setSelectedSession(null)}[m
+[32m+[m[32m          onSendMessage={(s) => console.log('Send message to', s?.studentName)}[m
+[32m+[m[32m          onTerminate={(s) => {[m
+[32m+[m[32m            // terminate session locally (mock)[m
+[32m+[m[32m            setActiveSessions(prev => prev.map(sess => sess.id === s.id ? { ...sess, status: 'terminated' as const } : sess));[m
+[32m+[m[32m            setSelectedSession(null);[m
+[32m+[m[32m          }}[m
+[32m+[m[32m          onPrepareViolationAction={(v) => {[m
+[32m+[m[32m            setSelectedViolation(v);[m
+[32m+[m[32m            setShowViolationDialog(true);[m
+[32m+[m[32m          }}[m
+[32m+[m[32m        />[m
+ [m
+         {/* Violation Action Dialog */}[m
+         <Dialog open={showViolationDialog} onOpenChange={setShowViolationDialog}>[m
+[1mdiff --git a/src/app/faculty/profile/page.tsx b/src/app/faculty/profile/page.tsx[m
+[1mindex 347265b..3966f3e 100644[m
+[1m--- a/src/app/faculty/profile/page.tsx[m
+[1m+++ b/src/app/faculty/profile/page.tsx[m
+[36m@@ -1,31 +1,28 @@[m
+ "use client";[m
+ [m
+ import { FacultyLayout } from "@/components/FacultyLayout";[m
+[31m-import { useProctor } from '@/contexts/ProctorContext';[m
+[31m-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";[m
+[32m+[m[32mimport { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";[m
+ import { Badge } from "@/components/ui/badge";[m
+ import { Button } from "@/components/ui/button";[m
+[32m+[m[32mimport { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";[m
+ import { Input } from "@/components/ui/input";[m
+ import { Label } from "@/components/ui/label";[m
+[31m-import { Textarea } from "@/components/ui/textarea";[m
+[31m-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";[m
+[31m-import { Separator } from "@/components/ui/separator";[m
+ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";[m
+[32m+[m[32mimport { Textarea } from "@/components/ui/textarea";[m
+[32m+[m[32mimport { useProctor } from '@/contexts/ProctorContext';[m
+ import {[m
+[31m-  User,[m
+[31m-  Mail,[m
+[31m-  Phone,[m
+[31m-  MapPin,[m
+[31m-  GraduationCap,[m
+[31m-  Building,[m
+[31m-  Calendar,[m
+[31m-  Edit,[m
+[31m-  Camera,[m
+[31m-  Shield,[m
+   Award,[m
+   BookOpen,[m
+[31m-  Users,[m
+[31m-  TrendingUp[m
+[32m+[m[32m  Calendar,[m
+[32m+[m[32m  Camera,[m
+[32m+[m[32m  Edit,[m
+[32m+[m[32m  GraduationCap,[m
+[32m+[m[32m  Mail,[m
+[32m+[m[32m  MapPin,[m
+[32m+[m[32m  Phone,[m
+[32m+[m[32m  TrendingUp,[m
+[32m+[m[32m  User,[m
+[32m+[m[32m  Users[m
+ } from 'lucide-react';[m
+ import { useState } from 'react';[m
+ [m
+[36m@@ -80,7 +77,7 @@[m [mexport default function FacultyProfilePage() {[m
+             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">[m
+               <div className="relative">[m
+                 <Avatar className="w-24 h-24">[m
+[31m-                  <AvatarImage src="" alt={currentUser?.name} />[m
+[32m+[m[32m                  <AvatarImage src={undefined} alt={currentUser?.name} />[m
+                   <AvatarFallback className="text-2xl">[m
+                     {currentUser?.name?.split(' ').map(n => n[0]).join('') || 'F'}[m
+                   </AvatarFallback>[m
+[1mdiff --git a/src/app/faculty/settings/page.tsx b/src/app/faculty/settings/page.tsx[m
+[1mindex a54a15b..b4f65fc 100644[m
+[1m--- a/src/app/faculty/settings/page.tsx[m
+[1m+++ b/src/app/faculty/settings/page.tsx[m
+[36m@@ -1,32 +1,27 @@[m
+ "use client";[m
+ [m
+ import { FacultyLayout } from "@/components/FacultyLayout";[m
+[31m-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";[m
+[32m+[m[32mimport { Alert, AlertDescription } from "@/components/ui/alert";[m
+[32m+[m[32mimport { Badge } from "@/components/ui/badge";[m
+ import { Button } from "@/components/ui/button";[m
+[32m+[m[32mimport { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";[m
+ import { Input } from "@/components/ui/input";[m
+ import { Label } from "@/components/ui/label";[m
+[31m-import { Switch } from "@/components/ui/switch";[m
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";[m
+[31m-import { Textarea } from "@/components/ui/textarea";[m
+ import { Separator } from "@/components/ui/separator";[m
+[32m+[m[32mimport { Switch } from "@/components/ui/switch";[m
+ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";[m
+[31m-import { Badge } from "@/components/ui/badge";[m
+[31m-import { Alert, AlertDescription } from "@/components/ui/alert";[m
+ import {[m
+[31m-  Settings,[m
+[32m+[m[32m  AlertTriangle,[m
+   Bell,[m
+[31m-  Shield,[m
+[31m-  Palette,[m
+[31m-  Globe,[m
+[31m-  Lock,[m
+[32m+[m[32m  CheckCircle,[m
+   Eye,[m
+   EyeOff,[m
+[32m+[m[32m  Lock,[m
+[32m+[m[32m  Palette,[m
+   Save,[m
+[31m-  AlertTriangle,[m
+[31m-  CheckCircle,[m
+[31m-  Mail,[m
+[31m-  Smartphone,[m
+[31m-  Monitor[m
+[32m+[m[32m  Settings,[m
+[32m+[m[32m  Shield[m
+ } from 'lucide-react';[m
+ import { useState } from 'react';[m
+ [m
+[1mdiff --git a/src/app/school/departments/page.tsx b/src/app/school/departments/page.tsx[m
+[1mindex b932280..2ba0ec4 100644[m
+[1m--- a/src/app/school/departments/page.tsx[m
+[1m+++ b/src/app/school/departments/page.tsx[m
+[36m@@ -1,5 +1,6 @@[m
+ "use client";[m
+ [m
+[32m+[m[32mimport { SchoolLayout } from "@/components/SchoolLayout";[m
+ import { Badge } from "@/components/ui/badge";[m
+ import { Button } from "@/components/ui/button";[m
+ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";[m
+[36m@@ -7,17 +8,15 @@[m [mimport { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D[m
+ import { Input } from "@/components/ui/input";[m
+ import { Label } from "@/components/ui/label";[m
+ import { Textarea } from "@/components/ui/textarea";[m
+[31m-import { SchoolLayout } from "@/components/SchoolLayout";[m
+ import { useProctor } from '@/contexts/ProctorContext';[m
+ import {[m
+     Building2,[m
+[31m-    Users,[m
+[31m-    Plus,[m
+     CheckCircle,[m
+[31m-    Loader2,[m
+[31m-    Eye,[m
+     Edit,[m
+[31m-    Trash2[m
+[32m+[m[32m    Eye,[m
+[32m+[m[32m    Loader2,[m
+[32m+[m[32m    Plus,[m
+[32m+[m[32m    Users[m
+ } from 'lucide-react';[m
+ import { useState } from "react";[m
+ [m
+[36m@@ -35,7 +34,6 @@[m [minterface Faculty {[m
+   id: string;[m
+   employeeId: string;[m
+   departmentId: string;[m
+[31m-  specializationId?: string;[m
+   designation: string;[m
+   qualification: string;[m
+   experience: number;[m
+[1mdiff --git a/src/app/school/proctoring/page.tsx b/src/app/school/proctoring/page.tsx[m
+[1mindex c80ab57..63af5ad 100644[m
+[1m--- a/src/app/school/proctoring/page.tsx[m
+[1m+++ b/src/app/school/proctoring/page.tsx[m
+[36m@@ -1,35 +1,33 @@[m
+ "use client";[m
+ [m
+[31m-import { useState, useEffect, useCallback } from 'react';[m
+ import { SchoolLayout } from '@/components/SchoolLayout';[m
+[31m-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';[m
+[32m+[m[32mimport SessionMonitor from '@/components/SessionMonitor';[m
+[32m+[m[32mimport { Alert } from '@/components/ui/alert';[m
+ import { Badge } from '@/components/ui/badge';[m
+ import { Button } from '@/components/ui/button';[m
+[31m-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';[m
+[31m-import { Alert, AlertDescription } from '@/components/ui/alert';[m
+[32m+[m[32mimport { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';[m
+ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';[m
+[32m+[m[32mimport { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';[m
+ import { useProctor } from '@/contexts/ProctorContext';[m
+ import {[m
+[31m-  Eye,[m
+[31m-  Users,[m
+   AlertTriangle,[m
+[32m+[m[32m  Building,[m
+   Camera,[m
+[32m+[m[32m  Clock,[m
+[32m+[m[32m  Eye,[m
+   Mic,[m
+   Monitor,[m
+[32m+[m[32m  Pause,[m
+[32m+[m[32m  Play,[m
+[32m+[m[32m  RefreshCw,[m
+   Shield,[m
+   ShieldAlert,[m
+[31m-  Clock,[m
+[31m-  UserCheck,[m
+[31m-  UserX,[m
+[31m-  Play,[m
+[31m-  Pause,[m
+   Square,[m
+[31m-  MessageSquare,[m
+[31m-  RefreshCw,[m
+[32m+[m[32m  Users,[m
+   Wifi,[m
+[31m-  WifiOff,[m
+[31m-  Building[m
+[32m+[m[32m  WifiOff[m
+ } from 'lucide-react';[m
+[32m+[m[32mimport { useCallback, useEffect, useState } from 'react';[m
+ [m
+ interface ProctoringSession {[m
+   id: string;[m
+[36m@@ -469,7 +467,6 @@[m [mexport default function SchoolProctoringPage() {[m
+           <TabsList>[m
+             <TabsTrigger value="sessions">Active Sessions</TabsTrigger>[m
+             <TabsTrigger value="violations">Violation Reports</TabsTrigger>[m
+[31m-            <TabsTrigger value="alerts">Live Alerts</TabsTrigger>[m
+           </TabsList>[m
+ [m
+           <TabsContent value="sessions" className="space-y-4">[m
+[36m@@ -478,65 +475,113 @@[m [mexport default function SchoolProctoringPage() {[m
+                 <CardTitle>Active Proctoring Sessions</CardTitle>[m
+               </CardHeader>[m
+               <CardContent>[m
+[31m-                <div className="space-y-4">[m
+[31m-                  {filteredSessions.map((session) => ([m
+[31m-                    <div key={session.id} className="border rounded-lg p-4">[m
+[31m-                      <div className="flex items-center justify-between mb-3">[m
+[31m-                        <div className="flex items-center gap-3">[m
+[31m-                          <div className={`w-3 h-3 rounded-full ${getStatusColor(session.status)}`} />[m
+[31m-                          {getStatusIcon(session.status)}[m
+[31m-                          <div>[m
+[31m-                            <h3 className="font-semibold">{session.studentName}</h3>[m
+[31m-                            <p className="text-sm text-muted-foreground">{session.examTitle}</p>[m
+[31m-                            <p className="text-xs text-muted-foreground">[m
+[31m-                              {session.departmentName} • {session.facultyName}[m
+[31m-                            </p>[m
+[32m+[m[32m                {/* Two-column layout: left = sessions list, right = continuous live alerts */}[m
+[32m+[m[32m                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">[m
+[32m+[m[32m                  <div className="md:col-span-2 space-y-4">[m
+[32m+[m[32m                    {filteredSessions.map((session) => ([m
+[32m+[m[32m                      <div key={session.id} className="border rounded-lg p-4">[m
+[32m+[m[32m                        <div className="flex items-center justify-between mb-3">[m
+[32m+[m[32m                          <div className="flex items-center gap-3">[m
+[32m+[m[32m                            <div className={`w-3 h-3 rounded-full ${getStatusColor(session.status)}`} />[m
+[32m+[m[32m                            {getStatusIcon(session.status)}[m
+[32m+[m[32m                            <div>[m
+[32m+[m[32m                              <h3 className="font-semibold">{session.studentName}</h3>[m
+[32m+[m[32m                              <p className="text-sm text-muted-foreground">{session.examTitle}</p>[m
+[32m+[m[32m                              <p className="text-xs text-muted-foreground">[m
+[32m+[m[32m                                {session.departmentName} • {session.facultyName}[m
+[32m+[m[32m                              </p>[m
+[32m+[m[32m                            </div>[m
+[32m+[m[32m                          </div>[m
+[32m+[m[32m                          <div className="flex items-center gap-2">[m
+[32m+[m[32m                            <Badge variant={session.status === 'active' ? 'default' : 'secondary'}>[m
+[32m+[m[32m                              {session.status}[m
+[32m+[m[32m                            </Badge>[m
+[32m+[m[32m                            <Button[m
+[32m+[m[32m                              variant="outline"[m
+[32m+[m[32m                              size="sm"[m
+[32m+[m[32m                              onClick={() => handleViewSession(session)}[m
+[32m+[m[32m                            >[m
+[32m+[m[32m                              <Eye className="w-4 h-4 mr-1" />[m
+[32m+[m[32m                              Monitor[m
+[32m+[m[32m                            </Button>[m
+                           </div>[m
+                         </div>[m
+[31m-                        <div className="flex items-center gap-2">[m
+[31m-                          <Badge variant={session.status === 'active' ? 'default' : 'secondary'}>[m
+[31m-                            {session.status}[m
+[31m-                          </Badge>[m
+[31m-                          <Button[m
+[31m-                            variant="outline"[m
+[31m-                            size="sm"[m
+[31m-                            onClick={() => handleViewSession(session)}[m
+[31m-                          >[m
+[31m-                            <Eye className="w-4 h-4 mr-1" />[m
+[31m-                            Monitor[m
+[31m-                          </Button>[m
+[31m-                        </div>[m
+[31m-                      </div>[m
+ [m
+[31m-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">[m
+[31m-                        <div className="flex items-center gap-2">[m
+[31m-                          <Camera className={`w-4 h-4 ${session.cameraActive ? 'text-green-600' : 'text-red-600'}`} />[m
+[31m-                          <span>Camera: {session.cameraActive ? 'Active' : 'Inactive'}</span>[m
+[31m-                        </div>[m
+[31m-                        <div className="flex items-center gap-2">[m
+[31m-                          <Mic className={`w-4 h-4 ${session.micActive ? 'text-green-600' : 'text-red-600'}`} />[m
+[31m-                          <span>Mic: {session.micActive ? 'Active' : 'Inactive'}</span>[m
+[31m-                        </div>[m
+[31m-                        <div className="flex items-center gap-2">[m
+[31m-                          <Monitor className={`w-4 h-4 ${session.tabVisible ? 'text-green-600' : 'text-red-600'}`} />[m
+[31m-                          <span>Tab: {session.tabVisible ? 'Focused' : 'Unfocused'}</span>[m
+[31m-                        </div>[m
+[31m-                        <div className="flex items-center gap-2">[m
+[31m-                          <Clock className="w-4 h-4 text-blue-600" />[m
+[31m-                          <span>Started: {new Date(session.startTime).toLocaleTimeString()}</span>[m
+[32m+[m[32m                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">[m
+[32m+[m[32m                          <div className="flex items-center gap-2">[m
+[32m+[m[32m                            <Camera className={`w-4 h-4 ${session.cameraActive ? 'text-green-600' : 'text-red-600'}`} />[m
+[32m+[m[32m                            <span>Camera: {session.cameraActive ? 'Active' : 'Inactive'}</span>[m
+[32m+[m[32m                          </div>[m
+[32m+[m[32m                          <div className="flex items-center gap-2">[m
+[32m+[m[32m                            <Mic className={`w-4 h-4 ${session.micActive ? 'text-green-600' : 'text-red-600'}`} />[m
+[32m+[m[32m                            <span>Mic: {session.micActive ? 'Active' : 'Inactive'}</span>[m
+[32m+[m[32m                          </div>[m
+[32m+[m[32m                          <div className="flex items-center gap-2">[m
+[32m+[m[32m                            <Monitor className={`w-4 h-4 ${session.tabVisible ? 'text-green-600' : 'text-red-600'}`} />[m
+[32m+[m[32m                            <span>Tab: {session.tabVisible ? 'Focused' : 'Unfocused'}</span>[m
+[32m+[m[32m                          </div>[m
+[32m+[m[32m                          <div className="flex items-center gap-2">[m
+[32m+[m[32m                            <Clock className="w-4 h-4 text-blue-600" />[m
+[32m+[m[32m                            <span>Started: {new Date(session.startTime).toLocaleTimeString()}</span>[m
+[32m+[m[32m                          </div>[m
+                         </div>[m
+[31m-                      </div>[m
+ [m
+[31m-                      {session.violations.length > 0 && ([m
+[31m-                        <div className="mt-3 pt-3 border-t">[m
+[31m-                          <div className="flex items-center gap-2 text-sm text-orange-600">[m
+[31m-                            <AlertTriangle className="w-4 h-4" />[m
+[31m-                            <span>{session.violations.length} violation(s) detected</span>[m
+[32m+[m[32m                        {session.violations.length > 0 && ([m
+[32m+[m[32m                          <div className="mt-3 pt-3 border-t">[m
+[32m+[m[32m                            <div className="flex items-center gap-2 text-sm text-orange-600">[m
+[32m+[m[32m                              <AlertTriangle className="w-4 h-4" />[m
+[32m+[m[32m                              <span>{session.violations.length} violation(s) detected</span>[m
+[32m+[m[32m                            </div>[m
+                           </div>[m
+[32m+[m[32m                        )}[m
+[32m+[m[32m                      </div>[m
+[32m+[m[32m                    ))}[m
+[32m+[m[32m                  </div>[m
+[32m+[m
+[32m+[m[32m                  {/* Continuous Live Alerts panel */}[m
+[32m+[m[32m                  <div className="md:col-span-1">[m
+[32m+[m[32m                    <Card>[m
+[32m+[m[32m                      <CardHeader>[m
+[32m+[m[32m                        <CardTitle>Live Alerts (Real-time)</CardTitle>[m
+[32m+[m[32m                      </CardHeader>[m
+[32m+[m[32m                      <CardContent>[m
+[32m+[m[32m                        <div className="space-y-3 max-h-[60vh] overflow-auto">[m
+[32m+[m[32m                          {filteredSessions[m
+[32m+[m[32m                            .filter(session => !session.cameraActive || !session.micActive || !session.tabVisible || session.violations.some(v => !v.resolved))[m
+[32m+[m[32m                            .map((session) => ([m
+[32m+[m[32m                              <Alert key={session.id}>[m
+[32m+[m[32m                                <AlertTriangle className="h-4 w-4" />[m
+[32m+[m[32m                                <div className="ml-2">[m
+[32m+[m[32m                                  <div className="flex items-center justify-between">[m
+[32m+[m[32m                                    <strong>{session.studentName}</strong>[m
+[32m+[m[32m                                    <Badge variant={session.status === 'active' ? 'default' : 'secondary'}>{session.status}</Badge>[m
+[32m+[m[32m                                  </div>[m
+[32m+[m[32m                                  <div className="text-xs text-muted-foreground">{session.examTitle}</div>[m
+[32m+[m[32m                                  <div className="mt-2 text-sm">[m
+[32m+[m[32m                                    {!session.cameraActive && <div>• Camera is inactive</div>}[m
+[32m+[m[32m                                    {!session.micActive && <div>• Microphone is inactive</div>}[m
+[32m+[m[32m                                    {!session.tabVisible && <div>• Tab is not focused</div>}[m
+[32m+[m[32m                                    {session.violations.filter(v => !v.resolved).length > 0 && ([m
+[32m+[m[32m                                      <div>• {session.violations.filter(v => !v.resolved).length} unresolved violation(s)</div>[m
+[32m+[m[32m                                    )}[m
+[32m+[m[32m                                  </div>[m
+[32m+[m[32m                                </div>[m
+[32m+[m[32m                              </Alert>[m
+[32m+[m[32m                            ))}[m
+[32m+[m
+[32m+[m[32m                          {filteredSessions.every(session =>[m
+[32m+[m[32m                            session.cameraActive && session.micActive && session.tabVisible &&[m
+[32m+[m[32m                            session.violations.every(v => v.resolved)[m
+[32m+[m[32m                          ) && ([m
+[32m+[m[32m                            <div className="text-center py-8 text-muted-foreground">[m
+[32m+[m[32m                              <Shield className="w-12 h-12 mx-auto mb-4 text-green-600" />[m
+[32m+[m[32m                              <p>All sessions are running smoothly. No alerts at this time.</p>[m
+[32m+[m[32m                            </div>[m
+[32m+[m[32m                          )}[m
+                         </div>[m
+[31m-                      )}[m
+[31m-                    </div>[m
+[31m-                  ))}[m
+[32m+[m[32m                      </CardContent>[m
+[32m+[m[32m                    </Card>[m
+[32m+[m[32m                  </div>[m
+                 </div>[m
+               </CardContent>[m
+             </Card>[m
+[36m@@ -596,141 +641,23 @@[m [mexport default function SchoolProctoringPage() {[m
+               </CardContent>[m
+             </Card>[m
+           </TabsContent>[m
+[31m-[m
+[31m-          <TabsContent value="alerts" className="space-y-4">[m
+[31m-            <Card>[m
+[31m-              <CardHeader>[m
+[31m-                <CardTitle>Live Alerts Across Departments</CardTitle>[m
+[31m-              </CardHeader>[m
+[31m-              <CardContent>[m
+[31m-                <div className="space-y-4">[m
+[31m-                  {filteredSessions[m
+[31m-                    .filter(session => !session.cameraActive || !session.micActive || !session.tabVisible || session.violations.some(v => !v.resolved))[m
+[31m-                    .map((session) => ([m
+[31m-                      <Alert key={session.id}>[m
+[31m-                        <AlertTriangle className="h-4 w-4" />[m
+[31m-                        <AlertDescription>[m
+[31m-                          <strong>{session.studentName}</strong> - {session.examTitle}[m
+[31m-                          <div className="mt-1 text-xs text-muted-foreground">[m
+[31m-                            {session.departmentName} • {session.facultyName}[m
+[31m-                          </div>[m
+[31m-                          <div className="mt-2 space-y-1">[m
+[31m-                            {!session.cameraActive && <p>• Camera is inactive</p>}[m
+[31m-                            {!session.micActive && <p>• Microphone is inactive</p>}[m
+[31m-                            {!session.tabVisible && <p>• Tab is not focused</p>}[m
+[31m-                            {session.violations.filter(v => !v.resolved).length > 0 && ([m
+[31m-                              <p>• {session.violations.filter(v => !v.resolved).length} unresolved violation(s)</p>[m
+[31m-                            )}[m
+[31m-                          </div>[m
+[31m-                        </AlertDescription>[m
+[31m-                      </Alert>[m
+[31m-                    ))}[m
+[31m-                  {filteredSessions.every(session =>[m
+[31m-                    session.cameraActive && session.micActive && session.tabVisible &&[m
+[31m-                    session.violations.every(v => v.resolved)[m
+[31m-                  ) && ([m
+[31m-                    <div className="text-center py-8 text-muted-foreground">[m
+[31m-                      <Shield className="w-12 h-12 mx-auto mb-4 text-green-600" />[m
+[31m-                      <p>All sessions are running smoothly. No alerts at this time.</p>[m
+[31m-                    </div>[m
+[31m-                  )}[m
+[31m-                </div>[m
+[31m-              </CardContent>[m
+[31m-            </Card>[m
+[31m-          </TabsContent>[m
+         </Tabs>[m
+ [m
+[31m-        {/* Session Detail Modal */}[m
+[31m-        {selectedSession && ([m
+[31m-          <Dialog open={!!selectedSession} onOpenChange={() => setSelectedSession(null)}>[m
+[31m-            <DialogContent className="max-w-4xl">[m
+[31m-              <DialogHeader>[m
+[31m-                <DialogTitle>Monitoring: {selectedSession?.studentName}</DialogTitle>[m
+[31m-                <DialogDescription>[m
+[31m-                  {selectedSession?.examTitle} • {selectedSession?.departmentName} • {selectedSession?.facultyName}[m
+[31m-                </DialogDescription>[m
+[31m-              </DialogHeader>[m
+[31m-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">[m
+[31m-                {/* Live Feed Placeholder */}[m
+[31m-                <Card>[m
+[31m-                  <CardHeader>[m
+[31m-                    <CardTitle className="flex items-center gap-2">[m
+[31m-                      <Camera className="w-4 h-4" />[m
+[31m-                      Live Camera Feed[m
+[31m-                    </CardTitle>[m
+[31m-                  </CardHeader>[m
+[31m-                  <CardContent>[m
+[31m-                    <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">[m
+[31m-                      <div className="text-center">[m
+[31m-                        <Camera className="w-12 h-12 mx-auto mb-2 text-gray-400" />[m
+[31m-                        <p className="text-sm text-gray-600">Camera feed would appear here</p>[m
+[31m-                        <p className="text-xs text-gray-500">Status: {selectedSession?.cameraActive ? 'Active' : 'Inactive'}</p>[m
+[31m-                      </div>[m
+[31m-                    </div>[m
+[31m-                  </CardContent>[m
+[31m-                </Card>[m
+[31m-[m
+[31m-                {/* Session Details */}[m
+[31m-                <Card>[m
+[31m-                  <CardHeader>[m
+[31m-                    <CardTitle>Session Details</CardTitle>[m
+[31m-                  </CardHeader>[m
+[31m-                  <CardContent className="space-y-4">[m
+[31m-                    <div className="grid grid-cols-2 gap-4 text-sm">[m
+[31m-                      <div>[m
+[31m-                        <p className="font-medium">Status</p>[m
+[31m-                        <Badge variant={selectedSession?.status === 'active' ? 'default' : 'secondary'}>[m
+[31m-                          {selectedSession?.status}[m
+[31m-                        </Badge>[m
+[31m-                      </div>[m
+[31m-                      <div>[m
+[31m-                        <p className="font-medium">Duration</p>[m
+[31m-                        <p>{selectedSession?.duration} minutes</p>[m
+[31m-                      </div>[m
+[31m-                      <div>[m
+[31m-                        <p className="font-medium">Started</p>[m
+[31m-                        <p>{selectedSession ? new Date(selectedSession.startTime).toLocaleString() : ''}</p>[m
+[31m-                      </div>[m
+[31m-                      <div>[m
+[31m-                        <p className="font-medium">Last Activity</p>[m
+[31m-                        <p>{selectedSession ? new Date(selectedSession.lastActivity).toLocaleString() : ''}</p>[m
+[31m-                      </div>[m
+[31m-                    </div>[m
+[31m-[m
+[31m-                    <div className="space-y-2">[m
+[31m-                      <p className="font-medium">Technical Status</p>[m
+[31m-                      <div className="space-y-1 text-sm">[m
+[31m-                        <div className="flex items-center gap-2">[m
+[31m-                          <Camera className={`w-4 h-4 ${selectedSession?.cameraActive ? 'text-green-600' : 'text-red-600'}`} />[m
+[31m-                          <span>Camera: {selectedSession?.cameraActive ? 'Active' : 'Inactive'}</span>[m
+[31m-                        </div>[m
+[31m-                        <div className="flex items-center gap-2">[m
+[31m-                          <Mic className={`w-4 h-4 ${selectedSession?.micActive ? 'text-green-600' : 'text-red-600'}`} />[m
+[31m-                          <span>Microphone: {selectedSession?.micActive ? 'Active' : 'Inactive'}</span>[m
+[31m-                        </div>[m
+[31m-                        <div className="flex items-center gap-2">[m
+[31m-                          <Monitor className={`w-4 h-4 ${selectedSession?.tabVisible ? 'text-green-600' : 'text-red-600'}`} />[m
+[31m-                          <span>Tab Focus: {selectedSession?.tabVisible ? 'Focused' : 'Unfocused'}</span>[m
+[31m-                        </div>[m
+[31m-                      </div>[m
+[31m-                    </div>[m
+[31m-[m
+[31m-                    <div className="flex gap-2">[m
+[31m-                      <Button variant="outline" size="sm">[m
+[31m-                        <MessageSquare className="w-4 h-4 mr-1" />[m
+[31m-                        Send Message[m
+[31m-                      </Button>[m
+[31m-                      <Button variant="destructive" size="sm">[m
+[31m-                        <Square className="w-4 h-4 mr-1" />[m
+[31m-                        Terminate Session[m
+[31m-                      </Button>[m
+[31m-                    </div>[m
+[31m-                  </CardContent>[m
+[31m-                </Card>[m
+[31m-              </div>[m
+[31m-            </DialogContent>[m
+[31m-          </Dialog>[m
+[31m-        )}[m
+[32m+[m[32m        {/* Session Detail Modal (improved) */}[m
+[32m+[m[32m        <SessionMonitor[m
+[32m+[m[32m          session={selectedSession}[m
+[32m+[m[32m          open={!!selectedSession}[m
+[32m+[m[32m          onOpenChange={() => setSelectedSession(null)}[m
+[32m+[m[32m          onSendMessage={(s) => console.log('Send message to', s?.studentName)}[m
+[32m+[m[32m          onTerminate={(s) => {[m
+[32m+[m[32m            setActiveSessions(prev => prev.map(sess => sess.id === s.id ? { ...sess, status: 'terminated' as const } : sess));[m
+[32m+[m[32m            setSelectedSession(null);[m
+[32m+[m[32m          }}[m
+[32m+[m[32m          onPrepareViolationAction={(v) => {[m
+[32m+[m[32m            setSelectedViolation(v);[m
+[32m+[m[32m            setShowViolationDialog(true);[m
+[32m+[m[32m          }}[m
+[32m+[m[32m        />[m
+ [m
+         {/* Violation Action Dialog */}[m
+         <Dialog open={showViolationDialog} onOpenChange={setShowViolationDialog}>[m
+[1mdiff --git a/src/components/DepartmentSidebar.tsx b/src/components/DepartmentSidebar.tsx[m
+[1mindex a9295bb..ee5eece 100644[m
+[1m--- a/src/components/DepartmentSidebar.tsx[m
+[1m+++ b/src/components/DepartmentSidebar.tsx[m
+[36m@@ -2,12 +2,10 @@[m
+ [m
+ import { cn } from "@/lib/utils";[m
+ import {[m
+[31m-  LayoutDashboard,[m
+[31m-  Users,[m
+[31m-  GraduationCap,[m
+[31m-  BookOpen,[m
+[31m-  FileText,[m
+[31m-  TrendingUp[m
+[32m+[m[32m    FileText,[m
+[32m+[m[32m    LayoutDashboard,[m
+[32m+[m[32m    TrendingUp,[m
+[32m+[m[32m    Users[m
+ } from "lucide-react";[m
+ import Link from "next/link";[m
+ import { usePathname } from "next/navigation";[m
+[36m@@ -32,15 +30,9 @@[m [mconst navigationItems = [[m
+   {[m
+     title: "Faculty",[m
+     href: "/department/faculty",[m
+[31m-    icon: GraduationCap,[m
+[32m+[m[32m    icon: Users,[m
+     description: "Department faculty members"[m
+   },[m
+[31m-  {[m
+[31m-    title: "Specializations",[m
+[31m-    href: "/department/specializations",[m
+[31m-    icon: BookOpen,[m
+[31m-    description: "Academic programs"[m
+[31m-  },[m
+   {[m
+     title: "Exams",[m
+     href: "/department/exams",[m
+[1mdiff --git a/src/components/FacultySidebar.tsx b/src/components/FacultySidebar.tsx[m
+[1mindex b92d36c..57a995d 100644[m
+[1m--- a/src/components/FacultySidebar.tsx[m
+[1m+++ b/src/components/FacultySidebar.tsx[m
+[36m@@ -1,15 +1,22 @@[m
+ "use client";[m
+ [m
+[32m+[m[32mimport { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";[m
+[32m+[m[32mimport { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";[m
+ import { cn } from "@/lib/utils";[m
+ import {[m
+[31m-  LayoutDashboard,[m
+[32m+[m[32m  ChevronUp,[m
+   FileText,[m
+   HelpCircle,[m
+[32m+[m[32m  LayoutDashboard,[m
+[32m+[m[32m  Shield,[m
+[32m+[m[32m  Tag,[m
+   TrendingUp,[m
+[31m-  Shield[m
+[32m+[m[32m  User,[m
+[32m+[m[32m  Users[m
+ } from "lucide-react";[m
+ import Link from "next/link";[m
+ import { usePathname } from "next/navigation";[m
+[32m+[m[32mimport { useState } from "react";[m
+ [m
+ interface FacultySidebarProps {[m
+   className?: string;[m
+[36m@@ -34,6 +41,18 @@[m [mconst navigationItems = [[m
+     icon: FileText,[m
+     description: "Create and manage exams"[m
+   },[m
+[32m+[m[32m  {[m
+[32m+[m[32m    title: "Exam types",[m
+[32m+[m[32m    href: "/faculty/exam-types",[m
+[32m+[m[32m    icon: Tag,[m
+[32m+[m[32m    description: "Manage exam types and schedules"[m
+[32m+[m[32m  },[m
+[32m+[m[32m  {[m
+[32m+[m[32m    title: "Students",[m
+[32m+[m[32m    href: "/faculty/students",[m
+[32m+[m[32m    icon: Users,[m
+[32m+[m[32m    description: "Manage department students"[m
+[32m+[m[32m  },[m
+   {[m
+     title: "Proctoring",[m
+     href: "/faculty/proctoring",[m
+[36m@@ -50,6 +69,7 @@[m [mconst navigationItems = [[m
+ [m
+ export function FacultySidebar({ className }: FacultySidebarProps) {[m
+   const pathname = usePathname();[m
+[32m+[m[32m  const [isProfileOpen, setIsProfileOpen] = useState(false);[m
+ [m
+   return ([m
+     <div className={cn("flex h-full w-64 flex-col bg-sidebar border-r border-sidebar-border fixed left-0 top-16 z-40", className)}>[m
+[36m@@ -77,6 +97,33 @@[m [mexport function FacultySidebar({ className }: FacultySidebarProps) {[m
+           );[m
+         })}[m
+       </nav>[m
+[32m+[m
+[32m+[m[32m      {/* Profile Section */}[m
+[32m+[m[32m      <div className="border-t border-sidebar-border p-4">[m
+[32m+[m[32m        <DropdownMenu open={isProfileOpen} onOpenChange={setIsProfileOpen}>[m
+[32m+[m[32m          <DropdownMenuTrigger asChild>[m
+[32m+[m[32m            <button className="w-full flex items-center px-3 py-3 rounded-lg text-left transition-colors hover:bg-sidebar-accent">[m
+[32m+[m[32m              <Avatar className="mr-3 h-8 w-8">[m
+[32m+[m[32m                <AvatarImage src={undefined} alt="Profile" />[m
+[32m+[m[32m                <AvatarFallback>FA</AvatarFallback>[m
+[32m+[m[32m              </Avatar>[m
+[32m+[m[32m              <div className="flex-1 min-w-0">[m
+[32m+[m[32m                <div className="text-sm font-medium truncate">Faculty Name</div>[m
+[32m+[m[32m                <div className="text-xs text-muted-foreground truncate">faculty@university.edu</div>[m
+[32m+[m[32m              </div>[m
+[32m+[m[32m              <ChevronUp className={cn("h-4 w-4 transition-transform", isProfileOpen && "rotate-180")} />[m
+[32m+[m[32m            </button>[m
+[32m+[m[32m          </DropdownMenuTrigger>[m
+[32m+[m[32m          <DropdownMenuContent align="start" className="w-56">[m
+[32m+[m[32m            <DropdownMenuItem asChild>[m
+[32m+[m[32m              <Link href="/faculty/profile" className="flex items-center">[m
+[32m+[m[32m                <User className="mr-2 h-4 w-4" />[m
+[32m+[m[32m                Profile[m
+[32m+[m[32m              </Link>[m
+[32m+[m[32m            </DropdownMenuItem>[m
+[32m+[m[32m          </DropdownMenuContent>[m
+[32m+[m[32m        </DropdownMenu>[m
+[32m+[m[32m      </div>[m
+     </div>[m
+   );[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/src/components/SchoolSidebar.tsx b/src/components/SchoolSidebar.tsx[m
+[1mindex d0108e4..80bcdc9 100644[m
+[1m--- a/src/components/SchoolSidebar.tsx[m
+[1m+++ b/src/components/SchoolSidebar.tsx[m
+[36m@@ -2,11 +2,11 @@[m
+ [m
+ import { cn } from "@/lib/utils";[m
+ import {[m
+[31m-  LayoutDashboard,[m
+   Building2,[m
+[31m-  Users,[m
+   FileText,[m
+[31m-  Shield[m
+[32m+[m[32m  LayoutDashboard,[m
+[32m+[m[32m  Shield,[m
+[32m+[m[32m  Users[m
+ } from "lucide-react";[m
+ import Link from "next/link";[m
+ import { usePathname } from "next/navigation";[m
+[1mdiff --git a/src/containers/department/dashboard/DepartmentStudents.tsx b/src/containers/department/dashboard/DepartmentStudents.tsx[m
+[1mindex b342d1f..9644e40 100644[m
+[1m--- a/src/containers/department/dashboard/DepartmentStudents.tsx[m
+[1m+++ b/src/containers/department/dashboard/DepartmentStudents.tsx[m
+[36m@@ -4,12 +4,12 @@[m [mimport React, { useState } from 'react';[m
+ import { Badge } from '../../../components/ui/badge';[m
+ import { Button } from '../../../components/ui/button';[m
+ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';[m
+[31m-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../../../components/ui/dialog';[m
+[32m+[m[32mimport { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../components/ui/dialog';[m
+ import { Input } from '../../../components/ui/input';[m
+ import { Label } from '../../../components/ui/label';[m
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';[m
+ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table';[m
+[31m-import { getAllDepartments, getCourseName, getCoursesForDepartment, getDepartmentName } from '../../../lib/departments';[m
+[32m+[m[32mimport { getAllDepartments, getCoursesForDepartment, getDepartmentName } from '../../../lib/departments';[m
+ [m
+ type Student = {[m
+     id: string;[m
+[36m@@ -17,7 +17,6 @@[m [mtype Student = {[m
+     email: string;[m
+     phone: string;[m
+     department: string;[m
+[31m-    course: string;[m
+     semester: string;[m
+     examsTaken: number;[m
+     averageScore: number;[m
+[36m@@ -37,7 +36,6 @@[m [mfunction DepartmentStudents({ students, onAdd, onUpdate, onDelete }: DepartmentS[m
+         email: '',[m
+         phone: '',[m
+         department: '',[m
+[31m-        course: '',[m
+         semester: '1'[m
+     });[m
+ [m
+[36m@@ -50,7 +48,6 @@[m [mfunction DepartmentStudents({ students, onAdd, onUpdate, onDelete }: DepartmentS[m
+             email: '',[m
+             phone: '',[m
+             department: '',[m
+[31m-            course: '',[m
+             semester: '1'[m
+         });[m
+         setEditingStudent(null);[m
+[36m@@ -80,7 +77,6 @@[m [mfunction DepartmentStudents({ students, onAdd, onUpdate, onDelete }: DepartmentS[m
+             email: student.email,[m
+             phone: student.phone,[m
+             department: student.department,[m
+[31m-            course: student.course,[m
+             semester: student.semester[m
+         });[m
+     };[m
+[36m@@ -108,7 +104,6 @@[m [mfunction DepartmentStudents({ students, onAdd, onUpdate, onDelete }: DepartmentS[m
+                                 <TableHead>Name</TableHead>[m
+                                 <TableHead>Email</TableHead>[m
+                                 <TableHead>Department</TableHead>[m
+[31m-                                <TableHead>Course</TableHead>[m
+                                 <TableHead>Semester</TableHead>[m
+                                 <TableHead>Exams Taken</TableHead>[m
+                                 <TableHead>Avg Score</TableHead>[m
+[36m@@ -121,7 +116,6 @@[m [mfunction DepartmentStudents({ students, onAdd, onUpdate, onDelete }: DepartmentS[m
+                                     <TableCell className="font-medium">{student.name}</TableCell>[m
+                                     <TableCell>{student.email}</TableCell>[m
+                                     <TableCell>{getDepartmentName(student.department)}</TableCell>[m
+[31m-                                    <TableCell>{getCourseName(student.department, student.course)}</TableCell>[m
+                                     <TableCell>{student.semester}</TableCell>[m
+                                     <TableCell>{student.examsTaken}</TableCell>[m
+                                     <TableCell>[m
+[36m@@ -195,7 +189,7 @@[m [mfunction DepartmentStudents({ students, onAdd, onUpdate, onDelete }: DepartmentS[m
+                                     </Label>[m
+                                     <Select[m
+                                         value={formData.department}[m
+[31m-                                        onValueChange={(value: string) => setFormData({ ...formData, department: value, course: '' })}[m
+[32m+[m[32m                                        onValueChange={(value: string) => setFormData({ ...formData, department: value })}[m
+                                     >[m
+                                         <SelectTrigger className="col-span-3">[m
+                                             <SelectValue placeholder="Select department" />[m
+[36m@@ -209,27 +203,6 @@[m [mfunction DepartmentStudents({ students, onAdd, onUpdate, onDelete }: DepartmentS[m
+                                         </SelectContent>[m
+                                     </Select>[m
+                                 </div>[m
+[31m-                                <div className="grid grid-cols-4 items-center gap-4">[m
+[31m-                                    <Label htmlFor="edit-course" className="text-right">[m
+[31m-                                        Course[m
+[31m-                                    </Label>[m
+[31m-                                    <Select[m
+[31m-                                        value={formData.course}[m
+[31m-                                        onValueChange={(value: string) => setFormData({ ...formData, course: value })}[m
+[31m-                                        disabled={!formData.department}[m
+[31m-                                    >[m
+[31m-                                        <SelectTrigger className="col-span-3">[m
+[31m-                                            <SelectValue placeholder="Select course" />[m
+[31m-                                        </SelectTrigger>[m
+[31m-                                        <SelectContent>[m
+[31m-                                            {availableCourses.map((course: any) => ([m
+[31m-                                                <SelectItem key={course.id} value={course.id}>[m
+[31m-                                                    {course.name}[m
+[31m-                                                </SelectItem>[m
+[31m-                                            ))}[m
+[31m-                                        </SelectContent>[m
+[31m-                                    </Select>[m
+[31m-                                </div>[m
+                                 <div className="grid grid-cols-4 items-center gap-4">[m
+                                     <Label htmlFor="edit-semester" className="text-right">[m
+                                         Semester[m
+[1mdiff --git a/src/containers/faculty/dashboard/FacultyQuestionBank.tsx b/src/containers/faculty/dashboard/FacultyQuestionBank.tsx[m
+[1mindex 740f9a5..1122bb2 100644[m
+[1m--- a/src/containers/faculty/dashboard/FacultyQuestionBank.tsx[m
+[1m+++ b/src/containers/faculty/dashboard/FacultyQuestionBank.tsx[m
+[36m@@ -1,47 +1,26 @@[m
+ "use client";[m
+ [m
+[31m-import { useState } from 'react';[m
+[31m-import { useProctor } from '@/contexts/ProctorContext';[m
+[32m+[m[32mimport { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';[m
+[32m+[m[32mimport { Badge } from '@/components/ui/badge';[m
+ import { Button } from '@/components/ui/button';[m
+[31m-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';[m
+[32m+[m[32mimport { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';[m
+ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';[m
+ import { Input } from '@/components/ui/input';[m
+ import { Label } from '@/components/ui/label';[m
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';[m
+[31m-import { Textarea } from '@/components/ui/textarea';[m
+[31m-import { Badge } from '@/components/ui/badge';[m
+ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';[m
+[31m-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';[m
+[31m-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';[m
+[31m-import { ScrollArea } from '@/components/ui/scroll-area';[m
+[31m-import { Separator } from '@/components/ui/separator';[m
+[32m+[m[32mimport { useProctor } from '@/contexts/ProctorContext';[m
+ import {[m
+[31m-  Plus,[m
+[31m-  Edit,[m
+[31m-  Trash2,[m
+[31m-  Search,[m
+[31m-  Filter,[m
+   Download,[m
+   FileText,[m
+   HelpCircle,[m
+[31m-  Eye,[m
+[31m-  EyeOff,[m
+[31m-  Upload,[m
+[31m-  FileUp[m
+[32m+[m[32m  Plus,[m
+[32m+[m[32m  Search,[m
+[32m+[m[32m  Trash2,[m
+[32m+[m[32m  Upload[m
+ } from 'lucide-react';[m
+[31m-[m
+[31m-interface QuestionFormData {[m
+[31m-  title: string;[m
+[31m-  type: 'multiple-choice' | 'true-false' | 'short-answer' | 'essay';[m
+[31m-  content: string;[m
+[31m-  options: string[];[m
+[31m-  correctAnswer: string;[m
+[31m-  marks: number;[m
+[31m-  explanation: string;[m
+[31m-  difficulty: 'easy' | 'medium' | 'hard';[m
+[31m-  subject: string;[m
+[31m-  categoryId: string;[m
+[31m-}[m
+[32m+[m[32mimport Link from 'next/link';[m
+[32m+[m[32mimport { useState } from 'react';[m
+ [m
+ export default function FacultyQuestionBank() {[m
+   const {[m
+[36m@@ -63,140 +42,16 @@[m [mexport default function FacultyQuestionBank() {[m
+   const facultyQuestions = currentFaculty ? questions.filter(q => q.facultyId === currentFaculty.id) : [];[m
+ [m
+   // State management[m
+[31m-  const [isCreateQuestionOpen, setIsCreateQuestionOpen] = useState(false);[m
+[31m-  const [isCreateCategoryOpen, setIsCreateCategoryOpen] = useState(false);[m
+   const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);[m
+[31m-  const [editingQuestion, setEditingQuestion] = useState<any>(null);[m
+[31m-  const [selectedCategory, setSelectedCategory] = useState<string>('all');[m
+[32m+[m[32m  const [selectedExamType, setSelectedExamType] = useState<string>('all');[m
+   const [searchQuery, setSearchQuery] = useState('');[m
+ [m
+[31m-  // Question form state[m
+[31m-  const [questionForm, setQuestionForm] = useState<QuestionFormData>({[m
+[31m-    title: '',[m
+[31m-    type: 'multiple-choice',[m
+[31m-    content: '',[m
+[31m-    options: ['', '', '', ''],[m
+[31m-    correctAnswer: '',[m
+[31m-    marks: 5,[m
+[31m-    explanation: '',[m
+[31m-    difficulty: 'medium',[m
+[31m-    subject: '',[m
+[31m-    categoryId: ''[m
+[31m-  });[m
+[31m-[m
+[31m-  // Category form state[m
+[31m-  const [categoryForm, setCategoryForm] = useState({[m
+[31m-    name: '',[m
+[31m-    description: ''[m
+[31m-  });[m
+[31m-[m
+   // Bulk upload state[m
+   const [bulkUploadFile, setBulkUploadFile] = useState<File | null>(null);[m
+   const [bulkUploadType, setBulkUploadType] = useState<'csv' | 'pdf'>('csv');[m
+   const [isUploading, setIsUploading] = useState(false);[m
+ [m
+[31m-  // Helper to reset question form[m
+[31m-  const resetQuestionForm = () => {[m
+[31m-    setQuestionForm({[m
+[31m-      title: '',[m
+[31m-      type: 'multiple-choice',[m
+[31m-      content: '',[m
+[31m-      options: ['', '', '', ''],[m
+[31m-      correctAnswer: '',[m
+[31m-      marks: 5,[m
+[31m-      explanation: '',[m
+[31m-      difficulty: 'medium',[m
+[31m-      subject: '',[m
+[31m-      categoryId: 'none'[m
+[31m-    });[m
+[31m-    setEditingQuestion(null);[m
+[31m-  };[m
+[31m-[m
+[31m-  // Populate form for editing question[m
+[31m-  const populateQuestionForm = (question: any) => {[m
+[31m-    setQuestionForm({[m
+[31m-      title: question.title,[m
+[31m-      type: question.type,[m
+[31m-      content: question.content,[m
+[31m-      options: question.options || ['', '', '', ''],[m
+[31m-      correctAnswer: question.correctAnswer?.toString() || '',[m
+[31m-      marks: question.marks,[m
+[31m-      explanation: question.explanation || '',[m
+[31m-      difficulty: question.difficulty,[m
+[31m-      subject: question.subject,[m
+[31m-      categoryId: question.categoryId || 'none'[m
+[31m-    });[m
+[31m-    setEditingQuestion(question);[m
+[31m-    setIsCreateQuestionOpen(true);[m
+[31m-  };[m
+[31m-[m
+[31m-  // Handle question creation/update[m
+[31m-  const handleQuestionSubmit = () => {[m
+[31m-    // Validation[m
+[31m-    if (!questionForm.title.trim() || !questionForm.content.trim()) {[m
+[31m-      alert('Please fill in all required fields: title and content.');[m
+[31m-      return;[m
+[31m-    }[m
+[31m-[m
+[31m-    if (questionForm.type === 'multiple-choice') {[m
+[31m-      if (questionForm.options.some(option => !option.trim()) || questionForm.correctAnswer === '') {[m
+[31m-        alert('For multiple-choice questions, please fill all options and select the correct answer.');[m
+[31m-        return;[m
+[31m-      }[m
+[31m-    } else if (!questionForm.correctAnswer.trim()) {[m
+[31m-      alert('Please provide the correct answer.');[m
+[31m-      return;[m
+[31m-    }[m
+[31m-[m
+[31m-    if (questionForm.marks <= 0) {[m
+[31m-      alert('Marks must be a positive number.');[m
+[31m-      return;[m
+[31m-    }[m
+[31m-[m
+[31m-    if (!currentFaculty) return;[m
+[31m-[m
+[31m-    const questionData = {[m
+[31m-      ...questionForm,[m
+[31m-      facultyId: currentFaculty.id,[m
+[31m-      categoryId: questionForm.categoryId === 'none' ? '' : questionForm.categoryId,[m
+[31m-      correctAnswer: questionForm.type === 'multiple-choice' ?[m
+[31m-        parseInt(questionForm.correctAnswer) :[m
+[31m-        questionForm.correctAnswer,[m
+[31m-      isActive: true[m
+[31m-    };[m
+[31m-[m
+[31m-    if (editingQuestion) {[m
+[31m-      updateQuestion(editingQuestion.id, questionData);[m
+[31m-    } else {[m
+[31m-      addQuestion(questionData);[m
+[31m-    }[m
+ [m
+[31m-    resetQuestionForm();[m
+[31m-    setIsCreateQuestionOpen(false);[m
+[31m-  };[m
+[31m-[m
+[31m-  // Handle category creation[m
+[31m-  const handleCategorySubmit = () => {[m
+[31m-    if (!categoryForm.name.trim()) {[m
+[31m-      alert('Please enter a category name.');[m
+[31m-      return;[m
+[31m-    }[m
+[31m-[m
+[31m-    // Check if category already exists[m
+[31m-    if (categories.some(cat => cat.name.toLowerCase() === categoryForm.name.toLowerCase())) {[m
+[31m-      alert('A category with this name already exists.');[m
+[31m-      return;[m
+[31m-    }[m
+[31m-[m
+[31m-    addCategory({[m
+[31m-      name: categoryForm.name.trim(),[m
+[31m-      description: categoryForm.description.trim(),[m
+[31m-      isActive: true[m
+[31m-    });[m
+[31m-[m
+[31m-    setCategoryForm({ name: '', description: '' });[m
+[31m-    setIsCreateCategoryOpen(false);[m
+[31m-  };[m
+ [m
+   // Handle question deletion[m
+   const handleDeleteQuestion = (questionId: string) => {[m
+[36m@@ -240,7 +95,7 @@[m [mexport default function FacultyQuestionBank() {[m
+     }[m
+ [m
+     const headers = lines[0].split(',').map(h => h.trim().toLowerCase());[m
+[31m-    const expectedHeaders = ['title', 'type', 'content', 'option1', 'option2', 'option3', 'option4', 'correctanswer', 'marks', 'explanation', 'difficulty', 'subject', 'category'];[m
+[32m+[m[32m    const expectedHeaders = ['title', 'type', 'content', 'option1', 'option2', 'option3', 'option4', 'correctanswer', 'marks', 'explanation', 'difficulty', 'subject', 'categoryid'];[m
+ [m
+     // Check if required headers are present[m
+     const requiredHeaders = ['title', 'type', 'content', 'correctanswer', 'marks', 'difficulty', 'subject'];[m
+[36m@@ -296,8 +151,9 @@[m [mexport default function FacultyQuestionBank() {[m
+           case 'subject':[m
+             questionData.subject = value;[m
+             break;[m
+[32m+[m[32m          case 'categoryid':[m
+           case 'category':[m
+[31m-            // Find category by name[m
+[32m+[m[32m            // Find exam type by name[m
+             const category = categories.find(c => c.name.toLowerCase() === value.toLowerCase());[m
+             questionData.categoryId = category ? category.id : '';[m
+             break;[m
+[36m@@ -333,13 +189,13 @@[m [mexport default function FacultyQuestionBank() {[m
+ [m
+   // Filter questions based on category and search[m
+   const filteredQuestions = facultyQuestions.filter(question => {[m
+[31m-    const matchesCategory = selectedCategory === 'all' || question.categoryId === selectedCategory || (!question.categoryId && selectedCategory === 'all');[m
+[32m+[m[32m    const matchesExamType = selectedExamType === 'all' || question.categoryId === selectedExamType || (!question.categoryId && selectedExamType === 'all');[m
+     const matchesSearch = searchQuery === '' ||[m
+       question.title.toLowerCase().includes(searchQuery.toLowerCase()) ||[m
+       question.content.toLowerCase().includes(searchQuery.toLowerCase()) ||[m
+       question.subject.toLowerCase().includes(searchQuery.toLowerCase());[m
+ [m
+[31m-    return matchesCategory && matchesSearch;[m
+[32m+[m[32m    return matchesExamType && matchesSearch;[m
+   });[m
+ [m
+   return ([m
+[36m@@ -401,11 +257,11 @@[m [mexport default function FacultyQuestionBank() {[m
+                     </Button>[m
+                   </div>[m
+                   <ul className="text-sm text-accent-foreground space-y-1">[m
+[31m-                    <li>• Columns: title, type, content, option1, option2, option3, option4, correctAnswer, marks, explanation, difficulty, subject, category</li>[m
+[32m+[m[32m                    <li>• Columns: title, type, content, option1, option2, option3, option4, correctAnswer, marks, explanation, difficulty, subject, categoryId</li>[m
+                     <li>• Type values: multiple-choice, true-false, short-answer, essay</li>[m
+                     <li>• Difficulty values: easy, medium, hard</li>[m
+                     <li>• For multiple-choice: provide 4 options and correctAnswer as 0-3</li>[m
+[31m-                    <li>• Category should match existing category names</li>[m
+[32m+[m[32m                    <li>• Exam type should match existing exam type names</li>[m
+                   </ul>[m
+                 </div>[m
+ [m
+[36m@@ -432,230 +288,15 @@[m [mexport default function FacultyQuestionBank() {[m
+             </DialogContent>[m
+           </Dialog>[m
+ [m
+[31m-          <Dialog open={isCreateCategoryOpen} onOpenChange={setIsCreateCategoryOpen}>[m
+[31m-            <DialogTrigger asChild>[m
+[31m-              <Button variant="outline">[m
+[31m-                <Plus className="h-4 w-4 mr-2" />[m
+[31m-                Add Category[m
+[31m-              </Button>[m
+[31m-            </DialogTrigger>[m
+[31m-            <DialogContent>[m
+[31m-              <DialogHeader>[m
+[31m-                <DialogTitle>Add New Category</DialogTitle>[m
+[31m-                <DialogDescription>[m
+[31m-                  Create a new question category (e.g., Verbal, Technical, Reasoning, Aptitude)[m
+[31m-                </DialogDescription>[m
+[31m-              </DialogHeader>[m
+[31m-              <div className="space-y-4">[m
+[31m-                <div>[m
+[31m-                  <Label htmlFor="category-name">Category Name *</Label>[m
+[31m-                  <Input[m
+[31m-                    id="category-name"[m
+[31m-                    value={categoryForm.name}[m
+[31m-                    onChange={(e) => setCategoryForm({...categoryForm, name: e.target.value})}[m
+[31m-                    placeholder="e.g., Verbal, Technical, Reasoning"[m
+[31m-                  />[m
+[31m-                </div>[m
+[31m-                <div>[m
+[31m-                  <Label htmlFor="category-description">Description (Optional)</Label>[m
+[31m-                  <Textarea[m
+[31m-                    id="category-description"[m
+[31m-                    value={categoryForm.description}[m
+[31m-                    onChange={(e) => setCategoryForm({...categoryForm, description: e.target.value})}[m
+[31m-                    placeholder="Brief description of the category"[m
+[31m-                    rows={2}[m
+[31m-                  />[m
+[31m-                </div>[m
+[31m-                <div className="flex justify-end space-x-2">[m
+[31m-                  <Button variant="outline" onClick={() => {[m
+[31m-                    setIsCreateCategoryOpen(false);[m
+[31m-                    setCategoryForm({ name: '', description: '' });[m
+[31m-                  }}>[m
+[31m-                    Cancel[m
+[31m-                  </Button>[m
+[31m-                  <Button onClick={handleCategorySubmit}>[m
+[31m-                    Add Category[m
+[31m-                  </Button>[m
+[31m-                </div>[m
+[31m-              </div>[m
+[31m-            </DialogContent>[m
+[31m-          </Dialog>[m
+[31m-[m
+[31m-          <Dialog open={isCreateQuestionOpen} onOpenChange={(open) => {[m
+[31m-            setIsCreateQuestionOpen(open);[m
+[31m-            if (!open) resetQuestionForm();[m
+[31m-          }}>[m
+[31m-            <DialogTrigger asChild>[m
+[31m-              <Button>[m
+[31m-                <Plus className="h-4 w-4 mr-2" />[m
+[31m-                Create Question[m
+[31m-              </Button>[m
+[31m-            </DialogTrigger>[m
+[31m-            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">[m
+[31m-              <DialogHeader>[m
+[31m-                <DialogTitle>{editingQuestion ? 'Edit Question' : 'Create New Question'}</DialogTitle>[m
+[31m-                <DialogDescription>[m
+[31m-                  {editingQuestion ? 'Update the question details' : 'Add a new question to your question bank'}[m
+[31m-                </DialogDescription>[m
+[31m-              </DialogHeader>[m
+[31m-              <div className="space-y-4">[m
+[31m-                <div>[m
+[31m-                  <Label htmlFor="q-title">Question Title *</Label>[m
+[31m-                  <Input[m
+[31m-                    id="q-title"[m
+[31m-                    value={questionForm.title}[m
+[31m-                    onChange={(e) => setQuestionForm({...questionForm, title: e.target.value})}[m
+[31m-                    placeholder="Brief title for the question"[m
+[31m-                  />[m
+[31m-                </div>[m
+[31m-[m
+[31m-                <div>[m
+[31m-                  <Label htmlFor="q-type">Question Type *</Label>[m
+[31m-                  <Select value={questionForm.type} onValueChange={(value: any) => setQuestionForm({...questionForm, type: value})}>[m
+[31m-                    <SelectTrigger>[m
+[31m-                      <SelectValue />[m
+[31m-                    </SelectTrigger>[m
+[31m-                    <SelectContent>[m
+[31m-                      <SelectItem value="multiple-choice">Multiple Choice</SelectItem>[m
+[31m-                      <SelectItem value="true-false">True/False</SelectItem>[m
+[31m-                      <SelectItem value="short-answer">Short Answer</SelectItem>[m
+[31m-                      <SelectItem value="essay">Essay</SelectItem>[m
+[31m-                    </SelectContent>[m
+[31m-                  </Select>[m
+[31m-                </div>[m
+[31m-[m
+[31m-                <div>[m
+[31m-                  <Label htmlFor="q-content">Question Content *</Label>[m
+[31m-                  <Textarea[m
+[31m-                    id="q-content"[m
+[31m-                    value={questionForm.content}[m
+[31m-                    onChange={(e) => setQuestionForm({...questionForm, content: e.target.value})}[m
+[31m-                    placeholder="Enter the full question text"[m
+[31m-                    rows={3}[m
+[31m-                  />[m
+[31m-                </div>[m
+[31m-[m
+[31m-                {questionForm.type === 'multiple-choice' && ([m
+[31m-                  <div>[m
+[31m-                    <Label>Options *</Label>[m
+[31m-                    {questionForm.options.map((option, index) => ([m
+[31m-                      <Input[m
+[31m-                        key={index}[m
+[31m-                        value={option}[m
+[31m-                        onChange={(e) => {[m
+[31m-                          const newOptions = [...questionForm.options];[m
+[31m-                          newOptions[index] = e.target.value;[m
+[31m-                          setQuestionForm({...questionForm, options: newOptions});[m
+[31m-                        }}[m
+[31m-                        placeholder={`Option ${index + 1}`}[m
+[31m-                        className="mb-2"[m
+[31m-                      />[m
+[31m-                    ))}[m
+[31m-                  </div>[m
+[31m-                )}[m
+[31m-[m
+[31m-                <div>[m
+[31m-                  <Label htmlFor="q-answer">Correct Answer *</Label>[m
+[31m-                  {questionForm.type === 'multiple-choice' ? ([m
+[31m-                    <Select value={questionForm.correctAnswer} onValueChange={(value: string) => setQuestionForm({...questionForm, correctAnswer: value})}>[m
+[31m-                      <SelectTrigger>[m
+[31m-                        <SelectValue placeholder="Select correct option" />[m
+[31m-                      </SelectTrigger>[m
+[31m-                      <SelectContent>[m
+[31m-                        {questionForm.options.map((option, index) => ([m
+[31m-                          <SelectItem key={index} value={index.toString()}>[m
+[31m-                            Option {index + 1}: {option || `Option ${index + 1}`}[m
+[31m-                          </SelectItem>[m
+[31m-                        ))}[m
+[31m-                      </SelectContent>[m
+[31m-                    </Select>[m
+[31m-                  ) : ([m
+[31m-                    <Input[m
+[31m-                      id="q-answer"[m
+[31m-                      value={questionForm.correctAnswer}[m
+[31m-                      onChange={(e) => setQuestionForm({...questionForm, correctAnswer: e.target.value})}[m
+[31m-                      placeholder="Enter the correct answer"[m
+[31m-                    />[m
+[31m-                  )}[m
+[31m-                </div>[m
+[31m-[m
+[31m-                <div className="grid grid-cols-2 gap-4">[m
+[31m-                  <div>[m
+[31m-                    <Label htmlFor="q-marks">Marks *</Label>[m
+[31m-                    <Input[m
+[31m-                      id="q-marks"[m
+[31m-                      type="number"[m
+[31m-                      value={questionForm.marks}[m
+[31m-                      onChange={(e) => setQuestionForm({...questionForm, marks: parseInt(e.target.value) || 0})}[m
+[31m-                    />[m
+[31m-                  </div>[m
+[31m-                  <div>[m
+[31m-                    <Label htmlFor="q-difficulty">Difficulty *</Label>[m
+[31m-                    <Select value={questionForm.difficulty} onValueChange={(value: any) => setQuestionForm({...questionForm, difficulty: value})}>[m
+[31m-                      <SelectTrigger>[m
+[31m-                        <SelectValue />[m
+[31m-                      </SelectTrigger>[m
+[31m-                      <SelectContent>[m
+[31m-                        <SelectItem value="easy">Easy</SelectItem>[m
+[31m-                        <SelectItem value="medium">Medium</SelectItem>[m
+[31m-                        <SelectItem value="hard">Hard</SelectItem>[m
+[31m-                      </SelectContent>[m
+[31m-                    </Select>[m
+[31m-                  </div>[m
+[31m-                </div>[m
+[31m-[m
+[31m-                <div>[m
+[31m-                  <Label htmlFor="q-subject">Subject *</Label>[m
+[31m-                  <Input[m
+[31m-                    id="q-subject"[m
+[31m-                    value={questionForm.subject}[m
+[31m-                    onChange={(e) => setQuestionForm({...questionForm, subject: e.target.value})}[m
+[31m-                    placeholder="e.g., Data Structures, Algorithms"[m
+[31m-                  />[m
+[31m-                </div>[m
+ [m
+[31m-                <div>[m
+[31m-                  <Label htmlFor="q-category">Category (Optional)</Label>[m
+[31m-                  <Select value={questionForm.categoryId} onValueChange={(value: string) => setQuestionForm({...questionForm, categoryId: value})}>[m
+[31m-                    <SelectTrigger>[m
+[31m-                      <SelectValue placeholder="Select category (optional)" />[m
+[31m-                    </SelectTrigger>[m
+[31m-                    <SelectContent>[m
+[31m-                      <SelectItem value="none">No Category</SelectItem>[m
+[31m-                      {categories.map((category) => ([m
+[31m-                        <SelectItem key={category.id} value={category.id}>[m
+[31m-                          {category.name}[m
+[31m-                        </SelectItem>[m
+[31m-                      ))}[m
+[31m-                    </SelectContent>[m
+[31m-                  </Select>[m
+[31m-                </div>[m
+ [m
+[31m-                <div>[m
+[31m-                  <Label htmlFor="q-explanation">Explanation (Optional)</Label>[m
+[31m-                  <Textarea[m
+[31m-                    id="q-explanation"[m
+[31m-                    value={questionForm.explanation}[m
+[31m-                    onChange={(e) => setQuestionForm({...questionForm, explanation: e.target.value})}[m
+[31m-                    placeholder="Explain why this is the correct answer"[m
+[31m-                    rows={2}[m
+[31m-                  />[m
+[31m-                </div>[m
+[32m+[m[32m          <Link href="/faculty/questions/create">[m
+[32m+[m[32m            <Button>[m
+[32m+[m[32m              <Plus className="h-4 w-4 mr-2" />[m
+[32m+[m[32m              Create Question[m
+[32m+[m[32m            </Button>[m
+[32m+[m[32m          </Link>[m
+ [m
+[31m-                <div className="flex justify-end space-x-2">[m
+[31m-                  <Button variant="outline" onClick={() => {[m
+[31m-                    setIsCreateQuestionOpen(false);[m
+[31m-                    resetQuestionForm();[m
+[31m-                  }}>[m
+[31m-                    Cancel[m
+[31m-                  </Button>[m
+[31m-                  <Button onClick={handleQuestionSubmit}>[m
+[31m-                    {editingQuestion ? 'Update Question' : 'Create Question'}[m
+[31m-                  </Button>[m
+[31m-                </div>[m
+[31m-              </div>[m
+[31m-            </DialogContent>[m
+[31m-          </Dialog>[m
+         </div>[m
+       </div>[m
+ [m
+[36m@@ -673,7 +314,7 @@[m [mexport default function FacultyQuestionBank() {[m
+ [m
+         <Card>[m
+           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">[m
+[31m-            <CardTitle className="text-sm font-medium">Categories</CardTitle>[m
+[32m+[m[32m            <CardTitle className="text-sm font-medium">Exam Types</CardTitle>[m
+             <FileText className="h-4 w-4 text-muted-foreground" />[m
+           </CardHeader>[m
+           <CardContent>[m
+[36m@@ -724,12 +365,12 @@[m [mexport default function FacultyQuestionBank() {[m
+             </div>[m
+             <div>[m
+               <Label htmlFor="category-filter">Category</Label>[m
+[31m-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>[m
+[32m+[m[32m              <Select value={selectedExamType} onValueChange={setSelectedExamType}>[m
+                 <SelectTrigger className="w-40">[m
+                   <SelectValue />[m
+                 </SelectTrigger>[m
+                 <SelectContent>[m
+[31m-                  <SelectItem value="all">All Categories</SelectItem>[m
+[32m+[m[32m                  <SelectItem value="all">All Exam Types</SelectItem>[m
+                   {categories.map((category) => ([m
+                     <SelectItem key={category.id} value={category.id}>[m
+                       {category.name}[m
+[36m@@ -760,14 +401,16 @@[m [mexport default function FacultyQuestionBank() {[m
+                 <HelpCircle className="h-12 w-12 text-muted-foreground mb-4" />[m
+                 <h3 className="text-lg font-medium mb-2">No questions found</h3>[m
+                 <p className="text-muted-foreground text-center mb-4">[m
+[31m-                  {searchQuery || selectedCategory !== 'all'[m
+[32m+[m[32m                  {searchQuery || selectedExamType !== 'all'[m
+                     ? 'Try adjusting your search or filter criteria.'[m
+                     : 'Start by creating your first question.'}[m
+                 </p>[m
+[31m-                <Button onClick={() => setIsCreateQuestionOpen(true)}>[m
+[31m-                  <Plus className="h-4 w-4 mr-2" />[m
+[31m-                  Create Question[m
+[31m-                </Button>[m
+[32m+[m[32m                <Link href="/faculty/questions/create">[m
+[32m+[m[32m                  <Button>[m
+[32m+[m[32m                    <Plus className="h-4 w-4 mr-2" />[m
+[32m+[m[32m                    Create Question[m
+[32m+[m[32m                  </Button>[m
+[32m+[m[32m                </Link>[m
+               </CardContent>[m
+             </Card>[m
+           ) : ([m
+[36m@@ -797,9 +440,6 @@[m [mexport default function FacultyQuestionBank() {[m
+                           </div>[m
+                         </div>[m
+                         <div className="flex items-center space-x-2">[m
+[31m-                          <Button variant="outline" size="sm" onClick={() => populateQuestionForm(question)}>[m
+[31m-                            <Edit className="h-4 w-4" />[m
+[31m-                          </Button>[m
+                           <AlertDialog>[m
+                             <AlertDialogTrigger asChild>[m
+                               <Button variant="outline" size="sm">[m
+[36m@@ -891,9 +531,6 @@[m [mexport default function FacultyQuestionBank() {[m
+                           </div>[m
+                         </div>[m
+                         <div className="flex items-center space-x-2">[m
+[31m-                          <Button variant="outline" size="sm" onClick={() => populateQuestionForm(question)}>[m
+[31m-                            <Edit className="h-4 w-4" />[m
+[31m-                          </Button>[m
+                           <AlertDialog>[m
+                             <AlertDialogTrigger asChild>[m
+                               <Button variant="outline" size="sm">[m
+[1mdiff --git a/src/containers/faculty/dashboard/FacultyResults.tsx b/src/containers/faculty/dashboard/FacultyResults.tsx[m
+[1mindex cb70b22..2a68e61 100644[m
+[1m--- a/src/containers/faculty/dashboard/FacultyResults.tsx[m
+[1m+++ b/src/containers/faculty/dashboard/FacultyResults.tsx[m
+[36m@@ -1,14 +1,12 @@[m
+[31m-import { BarChart3, Download, Eye, Filter, Search, TrendingUp, TrendingDown, Users, Award, Target, Calendar, Clock, FileText, User } from 'lucide-react';[m
+[32m+[m[32mimport { Award, Clock, Download, Eye, FileText, Search, Target, TrendingDown, TrendingUp, User, Users } from 'lucide-react';[m
+[32m+[m[32mimport { useState } from 'react';[m
+ import { Badge } from '../../../components/ui/badge';[m
+ import { Button } from '../../../components/ui/button';[m
+ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';[m
+[31m-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../../../components/ui/dialog';[m
+[32m+[m[32mimport { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../../components/ui/dialog';[m
+ import { Input } from '../../../components/ui/input';[m
+[31m-import { Label } from '../../../components/ui/label';[m
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';[m
+ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table';[m
+[31m-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs';[m
+[31m-import { useState } from 'react';[m
+ [m
+ type FacultyResult = {[m
+   id: string;[m
+[36m@@ -23,7 +21,6 @@[m [mtype FacultyResult = {[m
+   feedback?: string;[m
+   submittedAt: string;[m
+   examDate: string;[m
+[31m-  specialization: string;[m
+ };[m
+ [m
+ interface FacultyResultsProps {[m
+[36m@@ -285,7 +282,6 @@[m [mfunction FacultyResults({ results, exams, onViewDetails, onExport }: FacultyResu[m
+                     <TableCell>[m
+                       <div>[m
+                         <div className="font-medium">{result.examName}</div>[m
+[31m-                        <div className="text-sm text-muted-foreground">{result.specialization}</div>[m
+                       </div>[m
+                     </TableCell>[m
+                     <TableCell>[m
+[36m@@ -370,10 +366,6 @@[m [mfunction FacultyResults({ results, exams, onViewDetails, onExport }: FacultyResu[m
+                       <span className="text-muted-foreground">Roll Number:</span>[m
+                       <span className="font-medium">{selectedResult.studentRollNumber}</span>[m
+                     </div>[m
+[31m-                    <div className="flex justify-between">[m
+[31m-                      <span className="text-muted-foreground">Specialization:</span>[m
+[31m-                      <span className="font-medium">{selectedResult.specialization}</span>[m
+[31m-                    </div>[m
+                   </CardContent>[m
+                 </Card>[m
+ [m
+[1mdiff --git a/src/containers/student/Topbar.tsx b/src/containers/student/Topbar.tsx[m
+[1mindex fabe56b..4aa2883 100644[m
+[1m--- a/src/containers/student/Topbar.tsx[m
+[1m+++ b/src/containers/student/Topbar.tsx[m
+[36m@@ -1,70 +1,73 @@[m
+ "use client";[m
+ [m
+[31m-import { ThemeToggle } from '@/components/ThemeToggle'[m
+[31m-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'[m
+[31m-import { User } from 'lucide-react'[m
+[31m-import Link from 'next/link'[m
+[31m-import { useProctor } from '@/contexts/ProctorContext'[m
+[32m+[m[32mimport { usePathname } from "next/navigation";[m
+[32m+[m[32mimport { ThemeToggle } from "@/components/ThemeToggle";[m
+[32m+[m[32mimport {[m
+[32m+[m[32m  DropdownMenu,[m
+[32m+[m[32m  DropdownMenuContent,[m
+[32m+[m[32m  DropdownMenuItem,[m
+[32m+[m[32m  DropdownMenuTrigger,[m
+[32m+[m[32m} from "@/components/ui/dropdown-menu";[m
+[32m+[m[32mimport { User } from "lucide-react";[m
+[32m+[m[32mimport Link from "next/link";[m
+ [m
+ function Topbar() {[m
+[31m-  const { currentUser, logout } = useProctor()[m
+[32m+[m[32m  const pathname = usePathname();[m
+ [m
+[31m-  const getProfileLinks = () => {[m
+[31m-    switch (currentUser?.role) {[m
+[31m-      case 'faculty':[m
+[31m-        return [[m
+[31m-          { href: '/faculty/profile', label: 'Profile' },[m
+[31m-          { href: '/faculty/settings', label: 'Settings' },[m
+[31m-        ][m
+[31m-      case 'department':[m
+[31m-        return [[m
+[31m-          { href: '/department/dashboard', label: 'Dashboard' },[m
+[31m-        ][m
+[31m-      case 'campus':[m
+[31m-        return [[m
+[31m-          { href: '/school/dashboard', label: 'Dashboard' },[m
+[31m-        ][m
+[31m-      case 'student':[m
+[31m-        return [[m
+[31m-          { href: '/student/dashboard', label: 'Dashboard' },[m
+[31m-        ][m
+[31m-      default:[m
+[31m-        return [][m
+[31m-    }[m
+[31m-  }[m
+[32m+[m[32m  // Detect which role's section the user is currently viewing[m
+[32m+[m[32m  const getBasePath = () => {[m
+[32m+[m[32m    if (pathname.startsWith("/student")) return "/student";[m
+[32m+[m[32m    if (pathname.startsWith("/faculty")) return "/faculty";[m
+[32m+[m[32m    if (pathname.startsWith("/department")) return "/department";[m
+[32m+[m[32m    if (pathname.startsWith("/school")) return "/school";[m
+[32m+[m[32m    return ""; // fallback for non-role routes[m
+[32m+[m[32m  };[m
+[32m+[m
+[32m+[m[32m  const basePath = getBasePath();[m
+[32m+[m
+[32m+[m[32m  const profileLink = `${basePath}/profile`;[m
+[32m+[m[32m  const settingsLink = `${basePath}/settings`;[m
+ [m
+   const handleLogout = () => {[m
+[31m-    logout()[m
+[31m-  }[m
+[32m+[m[32m    // optional: just redirect to home or clear local data[m
+[32m+[m[32m    window.location.href = "/";[m
+[32m+[m[32m  };[m
+ [m
+   return ([m
+     <nav className="fixed top-0 left-0 right-0 w-full h-16 flex items-center justify-between px-6 border-b shadow-lg bg-background z-50">[m
+       <div className="flex items-center gap-2">[m
+[31m-        {/* <Image src="/logo.svg" alt="Logo" width={32} height={32} /> */}[m
+         <span className="font-bold text-lg">Proctor</span>[m
+       </div>[m
+       <div className="flex items-center gap-4">[m
+         <ThemeToggle />[m
+         <DropdownMenu>[m
+           <DropdownMenuTrigger asChild>[m
+[31m-            <button className='bg-primary text-primary-foreground rounded-full aspect-square p-3 inline-block' aria-label="Open profile menu">[m
+[32m+[m[32m            <button[m
+[32m+[m[32m              className="bg-primary text-primary-foreground rounded-full aspect-square p-3 inline-block"[m
+[32m+[m[32m              aria-label="Open profile menu"[m
+[32m+[m[32m            >[m
+               <User className="w-5 h-5" />[m
+             </button>[m
+           </DropdownMenuTrigger>[m
+           <DropdownMenuContent align="end">[m
+[31m-            {getProfileLinks().map((link) => ([m
+[31m-              <DropdownMenuItem key={link.href} asChild>[m
+[31m-                <Link href={link.href}>{link.label}</Link>[m
+[31m-              </DropdownMenuItem>[m
+[31m-            ))}[m
+[31m-            <DropdownMenuItem onClick={handleLogout} className="text-destructive">[m
+[32m+[m[32m            <DropdownMenuItem asChild>[m
+[32m+[m[32m              <Link href={profileLink}>Profile</Link>[m
+[32m+[m[32m            </DropdownMenuItem>[m
+[32m+[m[32m            <DropdownMenuItem asChild>[m
+[32m+[m[32m              <Link href={settingsLink}>Settings</Link>[m
+[32m+[m[32m            </DropdownMenuItem>[m
+[32m+[m[32m            <DropdownMenuItem[m
+[32m+[m[32m              onClick={handleLogout}[m
+[32m+[m[32m              className="text-destructive cursor-pointer"[m
+[32m+[m[32m            >[m
+               Logout[m
+             </DropdownMenuItem>[m
+           </DropdownMenuContent>[m
+         </DropdownMenu>[m
+       </div>[m
+     </nav>[m
+[31m-  )[m
+[32m+[m[32m  );[m
+ }[m
+ [m
+[31m-export default Topbar[m
+\ No newline at end of file[m
+[32m+[m[32mexport default Topbar;[m
+[41m+[m
+[1mdiff --git a/src/containers/student/dashboard/CompletedExams.tsx b/src/containers/student/dashboard/CompletedExams.tsx[m
+[1mindex 69b0dc9..954443b 100644[m
+[1m--- a/src/containers/student/dashboard/CompletedExams.tsx[m
+[1m+++ b/src/containers/student/dashboard/CompletedExams.tsx[m
+[36m@@ -15,7 +15,6 @@[m [minterface Exam {[m
+   endTime: string;[m
+   duration: number;[m
+   departmentId: string;[m
+[31m-  specializationId: string;[m
+   status: string;[m
+ }[m
+ [m
+[36m@@ -40,7 +39,6 @@[m [mfunction CompletedExams() {[m
+             endTime: new Date(Date.now() - 604800000 + 7200000).toISOString(),[m
+             duration: 120,[m
+             departmentId: 'computer-science-it',[m
+[31m-            specializationId: 'bca',[m
+             status: 'completed'[m
+           },[m
+           {[m
+[36m@@ -51,7 +49,6 @@[m [mfunction CompletedExams() {[m
+             endTime: new Date(Date.now() - 259200000 + 3600000).toISOString(),[m
+             duration: 90,[m
+             departmentId: 'computer-science-it',[m
+[31m-            specializationId: 'bca',[m
+             status: 'completed'[m
+           }[m
+         ];[m
+[1mdiff --git a/src/containers/student/dashboard/OnGoingExams.tsx b/src/containers/student/dashboard/OnGoingExams.tsx[m
+[1mindex ee02817..83cc4e4 100644[m
+[1m--- a/src/containers/student/dashboard/OnGoingExams.tsx[m
+[1m+++ b/src/containers/student/dashboard/OnGoingExams.tsx[m
+[36m@@ -13,7 +13,6 @@[m [minterface Exam {[m
+   endTime: string;[m
+   duration: number;[m
+   departmentId: string;[m
+[31m-  specializationId: string;[m
+   status: string;[m
+ }[m
+ [m
+[36m@@ -38,7 +37,6 @@[m [mconst OngoingExams = () => {[m
+             endTime: new Date(Date.now() + 1800000).toISOString(), // Ends in 30 min[m
+             duration: 60,[m
+             departmentId: 'computer-science-it',[m
+[31m-            specializationId: 'bca',[m
+             status: 'active'[m
+           }[m
+         ];[m
+[1mdiff --git a/src/containers/student/dashboard/UpcomingExams.tsx b/src/containers/student/dashboard/UpcomingExams.tsx[m
+[1mindex 983f908..85e4181 100644[m
+[1m--- a/src/containers/student/dashboard/UpcomingExams.tsx[m
+[1m+++ b/src/containers/student/dashboard/UpcomingExams.tsx[m
+[36m@@ -15,7 +15,6 @@[m [minterface Exam {[m
+   endTime: string;[m
+   duration: number;[m
+   departmentId: string;[m
+[31m-  specializationId: string;[m
+   status: string;[m
+ }[m
+ [m
+[36m@@ -40,7 +39,6 @@[m [mfunction UpcomingExams() {[m
+             endTime: new Date(Date.now() + 86400000 + 7200000).toISOString(), // 2 hours later[m
+             duration: 120,[m
+             departmentId: 'computer-science-it',[m
+[31m-            specializationId: 'bca',[m
+             status: 'published'[m
+           },[m
+           {[m
+[36m@@ -51,7 +49,6 @@[m [mfunction UpcomingExams() {[m
+             endTime: new Date(Date.now() + 172800000 + 3600000).toISOString(), // 1 hour later[m
+             duration: 60,[m
+             departmentId: 'computer-science-it',[m
+[31m-            specializationId: 'bca',[m
+             status: 'published'[m
+           }[m
+         ];[m
+[1mdiff --git a/src/contexts/ProctorContext.tsx b/src/contexts/ProctorContext.tsx[m
+[1mindex ef86cb3..f1695b9 100644[m
+[1m--- a/src/contexts/ProctorContext.tsx[m
+[1m+++ b/src/contexts/ProctorContext.tsx[m
+[36m@@ -1,6 +1,6 @@[m
+ ﻿"use client";[m
+ [m
+[31m-import { User, UserRole, Exam, Result } from '@/lib/types';[m
+[32m+[m[32mimport { Exam, Result, User, UserRole } from '@/lib/types';[m
+ import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';[m
+ [m
+ interface ProctorContextType {[m
+[36m@@ -116,7 +116,43 @@[m [mexport const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })[m
+       createdAt: new Date().toISOString(),[m
+     }[m
+   ]);[m
+[31m-  const [categories, setCategories] = useState<any[]>([]);[m
+[32m+[m[32m  const [categories, setCategories] = useState<any[]>([[m
+[32m+[m[32m    {[m
+[32m+[m[32m      id: 'logical-reasoning',[m
+[32m+[m[32m      name: 'Logical Reasoning',[m
+[32m+[m[32m      description: 'Questions testing logical thinking and reasoning abilities',[m
+[32m+[m[32m      isActive: true,[m
+[32m+[m[32m      createdAt: new Date().toISOString(),[m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m      id: 'verbal-ability',[m
+[32m+[m[32m      name: 'Verbal Ability',[m
+[32m+[m[32m      description: 'Questions testing English language skills and comprehension',[m
+[32m+[m[32m      isActive: true,[m
+[32m+[m[32m      createdAt: new Date().toISOString(),[m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m      id: 'quantitative-aptitude',[m
+[32m+[m[32m      name: 'Quantitative Aptitude',[m
+[32m+[m[32m      description: 'Mathematics and numerical ability questions',[m
+[32m+[m[32m      isActive: true,[m
+[32m+[m[32m      createdAt: new Date().toISOString(),[m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m      id: 'general-knowledge',[m
+[32m+[m[32m      name: 'General Knowledge',[m
+[32m+[m[32m      description: 'General awareness and current affairs questions',[m
+[32m+[m[32m      isActive: true,[m
+[32m+[m[32m      createdAt: new Date().toISOString(),[m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m      id: 'data-interpretation',[m
+[32m+[m[32m      name: 'Data Interpretation',[m
+[32m+[m[32m      description: 'Questions involving analysis of data and charts',[m
+[32m+[m[32m      isActive: true,[m
+[32m+[m[32m      createdAt: new Date().toISOString(),[m
+[32m+[m[32m    }[m
+[32m+[m[32m  ]);[m
+   const [results, setResults] = useState<Result[]>([[m
+     {[m
+       id: 'result-1',[m
+[36m@@ -384,24 +420,17 @@[m [mexport const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })[m
+     const checkAuth = async () => {[m
+       try {[m
+         const token = localStorage.getItem('authToken');[m
+[31m-        if (token) {[m
+[31m-          // Mock user data - replace with actual user data structure[m
+[31m-          const mockUser: User = {[m
+[31m-            id: '1',[m
+[31m-            email: 'student@jainuniversity.ac.in',[m
+[31m-            password: '', // Not stored in state[m
+[31m-            role: 'student',[m
+[31m-            name: 'John Doe',[m
+[31m-            phone: '+91 9876543210',[m
+[31m-            isActive: true,[m
+[31m-            createdAt: new Date().toISOString(),[m
+[31m-            updatedAt: new Date().toISOString(),[m
+[31m-          };[m
+[31m-          setCurrentUser(mockUser);[m
+[32m+[m[32m        const storedUser = localStorage.getItem('userData');[m
+[32m+[m
+[32m+[m[32m        if (token && storedUser) {[m
+[32m+[m[32m          // Restore user data from localStorage[m
+[32m+[m[32m          const userData = JSON.parse(storedUser);[m
+[32m+[m[32m          setCurrentUser(userData);[m
+         }[m
+       } catch (error) {[m
+         console.error('Auth check failed:', error);[m
+         localStorage.removeItem('authToken');[m
+[32m+[m[32m        localStorage.removeItem('userData');[m
+       } finally {[m
+         setIsLoading(false);[m
+       }[m
+[36m@@ -441,6 +470,7 @@[m [mexport const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })[m
+         };[m
+         setCurrentUser(mockUser);[m
+         localStorage.setItem('authToken', 'mock-token');[m
+[32m+[m[32m        localStorage.setItem('userData', JSON.stringify(mockUser));[m
+         return { success: true, user: mockUser };[m
+       } else {[m
+         return { success: false, error: 'Invalid credentials' };[m
+[36m@@ -454,6 +484,7 @@[m [mexport const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })[m
+   const logout = () => {[m
+     setCurrentUser(null);[m
+     localStorage.removeItem('authToken');[m
+[32m+[m[32m    localStorage.removeItem('userData');[m
+   };[m
+ [m
+   const apiCall = async (endpoint: string, options: RequestInit = {}) => {[m

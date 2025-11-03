@@ -15,21 +15,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useProctor } from '@/contexts/ProctorContext';
 import {
-  AlertTriangle,
-  Bell,
-  CheckCircle,
-  Download,
-  Eye,
-  FileText,
-  Lock,
-  RefreshCw,
-  Save,
-  Settings,
-  Shield,
-  ShieldCheck,
-  Trash2,
-  Upload,
-  User
+    AlertTriangle,
+    Bell,
+    CheckCircle,
+    Download,
+    Eye,
+    FileText,
+    Lock,
+    RefreshCw,
+    Save,
+    Settings,
+    Shield,
+    ShieldCheck,
+    Trash2,
+    Upload,
+    User
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -151,7 +151,10 @@ export default function DepartmentSettingsPage() {
   };
 
   return (
-    <DepartmentLayout>
+    <DepartmentLayout
+      title="Department Settings"
+      subtitle="Configure department preferences and options"
+    >
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

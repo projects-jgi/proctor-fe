@@ -44,7 +44,7 @@ export default function SchoolProfilePage() {
       ? Math.round(results.reduce((sum, r) => sum + r.percentage, 0) / results.length)
       : 0,
     passRate: results.length > 0
-      ? Math.round((results.filter(r => r.status === 'passed').length / results.length) * 100)
+      ? Math.round((results.filter(r => r.percentage >= 50).length / results.length) * 100)
       : 0
   };
 

@@ -1,29 +1,12 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
+import { useProctor } from "@/contexts/ProctorContext";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import ExamCard from "./ExamCard";
 
-<<<<<<< Updated upstream
-const exams = [
-    {
-        name: "MATHEMATICS FINAL EXAM",
-        description: "Master of Computer Applications",
-        startDate: "01/01/2025",
-        endDate: "03/01/2025",
-        duration: "90"
-    },
-    {
-        name: "PHYSICS FINAL EXAM",
-        description: "Bachelor of Science",
-        startDate: "05/01/2025",
-        endDate: "07/01/2025",
-        duration: "120"
-    }
-]
-
-
-function CompletedExams() {
-=======
 interface Exam {
   id: string;
   title: string;
@@ -104,23 +87,37 @@ function CompletedExams() {
     );
   }
 
->>>>>>> Stashed changes
   return (
     <section className="mt-8">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">Completed Exams</h2>
-        <Button variant={"outline"}>
-          View All
-          <span>
-            <ArrowRight />
-          </span>
-        </Button>
+        <Link href="/student/exams/completed">
+          <Button variant={"outline"}>
+            View All
+            <span>
+              <ArrowRight />
+            </span>
+          </Button>
+        </Link>
       </div>
       <div className="grid grid-cols-1 gap-4 mt-4">
-        {exams
-          .map((exam, index) => (
-            <ExamCard key={index} {...exam} action={<Link href="/student/results"><Button>View Results</Button></Link>}  />
-          ))}
+        {completedExams.length > 0 ? (
+          completedExams.map((exam) => (
+            <ExamCard
+              key={exam.id}
+              name={exam.title}
+              description={exam.description}
+              startDate={new Date(exam.startTime).toLocaleDateString()}
+              endDate={new Date(exam.endTime).toLocaleDateString()}
+              duration={exam.duration.toString()}
+              action={<Link href={`/student/results/${exam.id}`}><Button>View Results</Button></Link>}
+            />
+          ))
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            No completed exams found.
+          </div>
+        )}
       </div>
     </section>
   );

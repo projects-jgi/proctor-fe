@@ -1,0 +1,2894 @@
+diff --git a/public/sample_questions.csv b/public/sample_questions.csv
+index b0f2af4..d4b8f37 100644
+--- a/public/sample_questions.csv
++++ b/public/sample_questions.csv
+@@ -1,5 +1,5 @@
+-title,type,content,option1,option2,option3,option4,correctAnswer,marks,explanation,difficulty,subject,category,specialization
+-Sample Multiple Choice Question,multiple-choice,What is the capital of France?,Paris,London,Berlin,Madrid,0,5,Paris is the capital and most populous city of France.,easy,Geography,General Knowledge,Computer Science
+-True/False Question,true-false,Is the Earth round?,true,, , ,true,3,Scientific evidence confirms the Earth is an oblate spheroid.,medium,Science,General Knowledge,Computer Science
+-Short Answer Question,short-answer,What is 2 + 2?,4,, , ,,4,2,Basic arithmetic operation.,easy,Mathematics,General Knowledge,Computer Science
+-Essay Question,essay,Explain the concept of recursion in programming.,,, , ,, ,10,Recursion is a programming technique where a function calls itself.,hard,Programming,Technical,Computer Science
+\ No newline at end of file
++title,type,content,option1,option2,option3,option4,correctAnswer,marks,explanation,difficulty,subject,category
++Sample Multiple Choice Question,multiple-choice,What is the capital of France?,Paris,London,Berlin,Madrid,0,5,Paris is the capital and most populous city of France.,easy,Geography,General Knowledge
++True/False Question,true-false,Is the Earth round?,true,, , ,true,3,Scientific evidence confirms the Earth is an oblate spheroid.,medium,Science,General Knowledge
++Short Answer Question,short-answer,What is 2 + 2?,4,, , ,,4,2,Basic arithmetic operation.,easy,Mathematics,General Knowledge
++Essay Question,essay,Explain the concept of recursion in programming.,,, , ,, ,10,Recursion is a programming technique where a function calls itself.,hard,Programming,Technical
+\ No newline at end of file
+diff --git a/src/app/department/faculty/page.tsx b/src/app/department/faculty/page.tsx
+index da33b57..3835471 100644
+--- a/src/app/department/faculty/page.tsx
++++ b/src/app/department/faculty/page.tsx
+@@ -1,18 +1,18 @@
+ "use client";
+ 
+-import { Search, UserPlus, Users, GraduationCap, Award, Clock, CheckCircle, Loader2 } from 'lucide-react';
++import { Award, CheckCircle, Clock, GraduationCap, Loader2, Search, UserPlus, Users } from 'lucide-react';
+ import { useState } from 'react';
++import { DepartmentLayout } from '../../../components/DepartmentLayout';
++import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avatar';
++import { Badge } from '../../../components/ui/badge';
+ import { Button } from '../../../components/ui/button';
++import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
++import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
+ import { Input } from '../../../components/ui/input';
+ import { Label } from '../../../components/ui/label';
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
+-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
+-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
+-import { Badge } from '../../../components/ui/badge';
+-import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avatar';
+-import { DepartmentLayout } from '../../../components/DepartmentLayout';
+ import { useProctor } from '../../../contexts/ProctorContext';
+-import { getAllDepartments, getCoursesForDepartment, getDepartmentName, getCourseName } from '../../../lib/departments';
++import { getAllDepartments, getCoursesForDepartment, getDepartmentName } from '../../../lib/departments';
+ 
+ function FacultyPage() {
+     const { faculties, users, addFaculty, updateFaculty, deleteFaculty, exams, questions } = useProctor();
+@@ -418,7 +418,7 @@ function FacultyPage() {
+                                 <div className="flex items-start justify-between">
+                                     <div className="flex items-start space-x-4">
+                                         <Avatar className="h-12 w-12">
+-                                            <AvatarImage src="" />
++                                            <AvatarImage src={undefined} />
+                                             <AvatarFallback>
+                                                 {faculty.name.split(' ').map((n: string) => n[0]).join('').toUpperCase()}
+                                             </AvatarFallback>
+diff --git a/src/app/department/students/page.tsx b/src/app/department/students/page.tsx
+index c62921f..88f89bd 100644
+--- a/src/app/department/students/page.tsx
++++ b/src/app/department/students/page.tsx
+@@ -2,15 +2,15 @@
+ 
+ import { Search, UserPlus } from 'lucide-react';
+ import { useState } from 'react';
++import { DepartmentLayout } from '../../../components/DepartmentLayout';
+ import { Button } from '../../../components/ui/button';
++import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
+ import { Input } from '../../../components/ui/input';
+ import { Label } from '../../../components/ui/label';
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
+-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
+ import DepartmentStudents from '../../../containers/department/dashboard/DepartmentStudents';
+-import { DepartmentLayout } from '../../../components/DepartmentLayout';
+ import { useProctor } from '../../../contexts/ProctorContext';
+-import { getAllDepartments, getCoursesForDepartment } from '../../../lib/departments';
++import { getAllDepartments } from '../../../lib/departments';
+ 
+ function page() {
+     const { students, users, addStudent, updateStudent, deleteStudent } = useProctor();
+@@ -18,27 +18,22 @@ function page() {
+     const [searchTerm, setSearchTerm] = useState('');
+     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+     const [selectedDepartment, setSelectedDepartment] = useState('all');
+-    const [selectedCourse, setSelectedCourse] = useState('all');
+     const [formData, setFormData] = useState({
+         name: '',
+         email: '',
+         phone: '',
+         department: '',
+-        course: '',
+         semester: '1'
+     });
+ 
+     const departments = getAllDepartments();
+ 
+-    const availableCourses = selectedDepartment !== 'all' ? getCoursesForDepartment(selectedDepartment) : [];
+-
+     const resetForm = () => {
+         setFormData({
+             name: '',
+             email: '',
+             phone: '',
+             department: '',
+-            course: '',
+             semester: '1'
+         });
+         setIsAddModalOpen(false);
+@@ -51,7 +46,6 @@ function page() {
+             email: formData.email,
+             phone: formData.phone,
+             department: formData.department,
+-            course: formData.course,
+             rollNumber: `STU${Date.now()}`,
+             examsTaken: 0,
+             averageScore: 0
+@@ -67,10 +61,6 @@ function page() {
+             if (selectedDepartment !== 'all' && student.departmentId !== selectedDepartment) {
+                 return false;
+             }
+-            // Filter by selected course
+-            if (selectedCourse !== 'all' && student.departmentId !== selectedCourse) {
+-                return false;
+-            }
+             return true;
+         })
+         .map(student => ({
+@@ -79,7 +69,6 @@ function page() {
+             email: users.find(u => u.id === student.userId)?.email || 'Unknown',
+             phone: users.find(u => u.id === student.userId)?.phone || 'Unknown',
+             department: getAllDepartments().find(d => d.id === student.departmentId)?.name || 'Unknown',
+-            course: getCoursesForDepartment(student.departmentId).find(c => c.id === student.specializationId)?.name || 'Unknown',
+             semester: student.semester.toString(),
+             examsTaken: student.examsTaken,
+             averageScore: student.averageScore
+@@ -88,7 +77,7 @@ function page() {
+     const filteredStudents = mappedStudents.filter(student =>
+         student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+         student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+-        student.course.toLowerCase().includes(searchTerm.toLowerCase())
++        student.department.toLowerCase().includes(searchTerm.toLowerCase())
+     );
+ 
+     // Wrapper functions to handle type differences
+@@ -97,7 +86,6 @@ function page() {
+         const globalStudent = {
+             userId: '', // Would need to create user first
+             rollNumber: student.rollNumber || `STU${Date.now()}`,
+-            specializationId: student.course, // Course becomes specializationId
+             departmentId: student.department,
+             schoolId: 'school-1', // Default school
+             semester: parseInt(student.semester) || 1,
+@@ -127,13 +115,10 @@ function page() {
+             subtitle="Manage student enrollments and progress"
+         >
+             {/* Hierarchical Filters */}
+-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
++            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                 <div>
+                     <label className="text-sm font-medium mb-2 block">Department</label>
+-                    <Select value={selectedDepartment} onValueChange={(value) => {
+-                        setSelectedDepartment(value);
+-                        setSelectedCourse('all');
+-                    }}>
++                    <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                         <SelectTrigger>
+                             <SelectValue placeholder="All Departments" />
+                         </SelectTrigger>
+@@ -148,35 +133,11 @@ function page() {
+                     </Select>
+                 </div>
+ 
+-                <div>
+-                    <label className="text-sm font-medium mb-2 block">Course</label>
+-                    <Select
+-                        value={selectedCourse}
+-                        onValueChange={(value) => {
+-                            setSelectedCourse(value);
+-                        }}
+-                        disabled={selectedDepartment === 'all'}
+-                    >
+-                        <SelectTrigger>
+-                            <SelectValue placeholder="All Courses" />
+-                        </SelectTrigger>
+-                        <SelectContent>
+-                            <SelectItem value="all">All Courses</SelectItem>
+-                            {availableCourses.map((course: any) => (
+-                                <SelectItem key={course.id} value={course.id}>
+-                                    {course.name}
+-                                </SelectItem>
+-                            ))}
+-                        </SelectContent>
+-                    </Select>
+-                </div>
+-
+                 <div className="flex items-end">
+                     <Button
+                         variant="outline"
+                         onClick={() => {
+                             setSelectedDepartment('all');
+-                            setSelectedCourse('all');
+                         }}
+                         className="w-full"
+                     >
+@@ -262,7 +223,7 @@ function page() {
+                                 </Label>
+                                 <Select
+                                     value={formData.department}
+-                                    onValueChange={(value: string) => setFormData({ ...formData, department: value, course: '' })}
++                                    onValueChange={(value: string) => setFormData({ ...formData, department: value })}
+                                 >
+                                     <SelectTrigger className="col-span-3">
+                                         <SelectValue placeholder="Select department" />
+@@ -276,27 +237,6 @@ function page() {
+                                     </SelectContent>
+                                 </Select>
+                             </div>
+-                            <div className="grid grid-cols-4 items-center gap-4">
+-                                <Label htmlFor="course" className="text-right">
+-                                    Course
+-                                </Label>
+-                                <Select
+-                                    value={formData.course}
+-                                    onValueChange={(value: string) => setFormData({ ...formData, course: value })}
+-                                    disabled={!formData.department}
+-                                >
+-                                    <SelectTrigger className="col-span-3">
+-                                        <SelectValue placeholder="Select course" />
+-                                    </SelectTrigger>
+-                                    <SelectContent>
+-                                        {getCoursesForDepartment(formData.department).map((course: any) => (
+-                                            <SelectItem key={course.id} value={course.id}>
+-                                                {course.name}
+-                                            </SelectItem>
+-                                        ))}
+-                                    </SelectContent>
+-                                </Select>
+-                            </div>
+                             <div className="grid grid-cols-4 items-center gap-4">
+                                 <Label htmlFor="semester" className="text-right">
+                                     Semester
+diff --git a/src/app/faculty/exams/page.tsx b/src/app/faculty/exams/page.tsx
+index df54b87..2a7bd58 100644
+--- a/src/app/faculty/exams/page.tsx
++++ b/src/app/faculty/exams/page.tsx
+@@ -1,33 +1,22 @@
+ "use client";
+ 
++import { FacultyLayout } from "@/components/FacultyLayout";
+ import { Badge } from "@/components/ui/badge";
+ import { Button } from "@/components/ui/button";
+ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+-import { Input } from "@/components/ui/input";
+-import { Label } from "@/components/ui/label";
+-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+-import { Textarea } from "@/components/ui/textarea";
+-import { FacultyLayout } from "@/components/FacultyLayout";
++import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+ import { useProctor } from '@/contexts/ProctorContext';
+ import {
+-    BookOpen,
+-    CheckCircle,
+-    Edit,
+-    Eye,
+-    EyeOff,
+-    FileText,
+-    Plus,
+-    Lock,
+-    Globe,
+-    PlayCircle,
+-    Clock,
+-    Shield,
+-    Users,
+-    Settings,
+-    AlertTriangle,
+-    CheckSquare,
+-    X
++  BookOpen,
++  CheckCircle,
++  Clock,
++  Eye,
++  EyeOff,
++  FileText,
++  Globe,
++  Lock,
++  PlayCircle,
++  Plus
+ } from 'lucide-react';
+ import { useState } from 'react';
+ 
+@@ -36,8 +25,6 @@ export default function FacultyExamsPage() {
+     currentUser,
+     faculties,
+     exams,
+-    addExam,
+-    updateExam,
+     publishExam,
+     unpublishExam,
+     getExamsForFaculty
+@@ -47,130 +34,9 @@ export default function FacultyExamsPage() {
+   const currentFaculty = faculties.find(f => f.userId === currentUser?.id);
+   const facultyExams = currentFaculty ? getExamsForFaculty(currentFaculty.id) : [];
+ 
+-  const [selectedSpecialization, setSelectedSpecialization] = useState<string>('');
+-  const [isCreateExamOpen, setIsCreateExamOpen] = useState(false);
+-  const [editingExam, setEditingExam] = useState<any>(null);
+   const [isViewExamOpen, setIsViewExamOpen] = useState(false);
+   const [viewingExam, setViewingExam] = useState<any>(null);
+ 
+-  // Exam form state
+-  const [examForm, setExamForm] = useState({
+-    title: '',
+-    description: '',
+-    type: 'private' as 'private' | 'public' | 'practice' | 'timed',
+-    questions: [] as string[],
+-    duration: 90,
+-    startTime: '',
+-    endTime: '',
+-    instructions: '',
+-    settings: {
+-      allowTabSwitch: false,
+-      allowCopyPaste: false,
+-      showResults: true,
+-      maxViolations: 3,
+-      isPractice: false,
+-      recordResults: true,
+-      allowRetake: false,
+-      showCorrectAnswers: false
+-    }
+-  });
+-
+-  // Helper to reset exam form
+-  const resetExamForm = () => {
+-    setExamForm({
+-      title: '',
+-      description: '',
+-      type: 'private',
+-      questions: [],
+-      duration: 90,
+-      startTime: '',
+-      endTime: '',
+-      instructions: '',
+-      settings: {
+-        allowTabSwitch: false,
+-        allowCopyPaste: false,
+-        showResults: true,
+-        maxViolations: 3,
+-        isPractice: false,
+-        recordResults: true,
+-        allowRetake: false,
+-        showCorrectAnswers: false
+-      }
+-    });
+-    setEditingExam(null);
+-  };
+-
+-  // Populate form for editing exam
+-  const populateExamForm = (exam: any) => {
+-    setExamForm({
+-      title: exam.title,
+-      description: exam.description,
+-      type: exam.type,
+-      questions: exam.questions,
+-      duration: exam.duration,
+-      startTime: exam.startTime,
+-      endTime: exam.endTime,
+-      instructions: exam.instructions,
+-      settings: exam.settings
+-    });
+-    setEditingExam(exam);
+-    setIsCreateExamOpen(true);
+-  };
+-
+-  const handleCreateExam = () => {
+-    // Add validation
+-    if (!examForm.title.trim() || !examForm.description.trim() || !examForm.startTime || !examForm.endTime) {
+-      alert('Please fill in all required fields: title, description, start time, and end time.');
+-      return;
+-    }
+-    if (new Date(examForm.startTime) >= new Date(examForm.endTime)) {
+-      alert('Start time must be before end time.');
+-      return;
+-    }
+-    if (examForm.duration <= 0) {
+-      alert('Duration must be a positive number.');
+-      return;
+-    }
+-
+-    if (currentFaculty) {
+-      let examQuestions = examForm.questions;
+-      if (!editingExam) {
+-        // For new exams, start with empty questions - faculty can add them later
+-        examQuestions = [];
+-      }
+-
+-      // Configure settings based on exam type
+-      const configuredSettings = {
+-        ...examForm.settings,
+-        isPractice: examForm.type === 'practice',
+-        recordResults: examForm.type !== 'practice',
+-        allowRetake: examForm.type === 'practice',
+-        showCorrectAnswers: examForm.type === 'practice',
+-        allowTabSwitch: examForm.type === 'practice' || examForm.settings.allowTabSwitch,
+-        allowCopyPaste: examForm.type === 'practice' || examForm.settings.allowCopyPaste,
+-        maxViolations: examForm.type === 'timed' ? 1 : examForm.settings.maxViolations
+-      };
+-
+-      const examData = {
+-        ...examForm,
+-        questions: examQuestions,
+-        totalMarks: examQuestions.length * 5, // Assuming 5 marks per question
+-        departmentId: currentFaculty.departmentId,
+-        facultyId: currentFaculty.id,
+-        status: editingExam ? editingExam.status : 'draft',
+-        enrolledStudents: editingExam ? editingExam.enrolledStudents : [],
+-        settings: configuredSettings
+-      };
+-      if (editingExam) {
+-        updateExam(editingExam.id, examData);
+-      } else {
+-        addExam(examData);
+-      }
+-      resetExamForm();
+-      setIsCreateExamOpen(false);
+-    }
+-  };
+-
+   const handleViewExam = (exam: any) => {
+     setViewingExam(exam);
+     setIsViewExamOpen(true);
+@@ -187,8 +53,8 @@ export default function FacultyExamsPage() {
+       title="Exam Management"
+       subtitle="Create and manage exams for your students"
+     >
+-      {/* Stats Cards */}
+-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
++          {/* Stats Cards */}
++          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+         <Card>
+           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+             <CardTitle className="text-sm font-medium">Total Exams</CardTitle>
+@@ -226,368 +92,11 @@ export default function FacultyExamsPage() {
+       {/* Exam Management */}
+       <div className="flex justify-between items-center mb-6">
+         <h2 className="text-xl font-semibold">Your Exams</h2>
+-        <Dialog open={isCreateExamOpen} onOpenChange={(open) => {
+-          setIsCreateExamOpen(open);
+-          if (!open) resetExamForm();
+-        }}>
+-          <DialogTrigger asChild>
+-            <Button>
+-              <Plus className="h-4 w-4 mr-2" />
+-              Create Exam
+-            </Button>
+-          </DialogTrigger>
+-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+-            <DialogHeader>
+-              <DialogTitle className="text-2xl">{editingExam ? 'Edit Exam' : 'Create New Exam'}</DialogTitle>
+-              <DialogDescription className="text-base">
+-                {editingExam ? 'Update the exam details' : 'Create a new exam for your specialization'}
+-              </DialogDescription>
+-            </DialogHeader>
+-
+-            <div className="space-y-6">
+-              {/* Basic Information */}
+-              <div className="space-y-4">
+-                <h3 className="text-lg font-semibold text-foreground">Basic Information</h3>
+-                
+-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+-                  <div className="md:col-span-2">
+-                    <Label htmlFor="exam-title" className="text-sm font-medium">Exam Title *</Label>
+-                    <Input
+-                      id="exam-title"
+-                      value={examForm.title}
+-                      onChange={(e) => setExamForm({...examForm, title: e.target.value})}
+-                      placeholder="Enter exam title"
+-                      className="mt-1"
+-                    />
+-                  </div>
+-                  
+-                  <div className="md:col-span-2">
+-                    <Label htmlFor="exam-description" className="text-sm font-medium">Description *</Label>
+-                    <Textarea
+-                      id="exam-description"
+-                      value={examForm.description}
+-                      onChange={(e) => setExamForm({...examForm, description: e.target.value})}
+-                      placeholder="Brief description of the exam"
+-                      rows={3}
+-                      className="mt-1"
+-                    />
+-                  </div>
+-                </div>
+-              </div>
+-
+-              {/* Exam Type Selection */}
+-              <div className="space-y-4">
+-                <h3 className="text-lg font-semibold text-foreground">Exam Type</h3>
+-                <p className="text-sm text-muted-foreground">Choose the type of exam that best fits your assessment needs</p>
+-                
+-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+-                  {/* Private Exam */}
+-                  <Card 
+-                    className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+-                      examForm.type === 'private' 
+-                        ? 'ring-2 ring-primary bg-accent border-primary/20' 
+-                        : 'hover:bg-accent/50'
+-                    }`}
+-                    onClick={() => setExamForm({...examForm, type: 'private'})}
+-                  >
+-                    <CardHeader className="pb-3">
+-                      <div className="flex items-center space-x-3">
+-                        <div className={`p-2 rounded-lg ${
+-                          examForm.type === 'private' ? 'bg-primary/10' : 'bg-muted'
+-                        }`}>
+-                          <Lock className={`h-5 w-5 ${
+-                            examForm.type === 'private' ? 'text-primary' : 'text-muted-foreground'
+-                          }`} />
+-                        </div>
+-                        <div>
+-                          <CardTitle className="text-base">Private Exam</CardTitle>
+-                          <CardDescription className="text-sm">Manual student enrollment required</CardDescription>
+-                        </div>
+-                        {examForm.type === 'private' && (
+-                          <CheckSquare className="h-5 w-5 text-primary ml-auto" />
+-                        )}
+-                      </div>
+-                    </CardHeader>
+-                    <CardContent className="pt-0">
+-                      <p className="text-sm text-muted-foreground">
+-                        Best for controlled assessments where you need to manually enroll specific students.
+-                        Provides maximum security and control over exam access.
+-                      </p>
+-                    </CardContent>
+-                  </Card>
+-
+-                  {/* Public Exam */}
+-                  <Card 
+-                    className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+-                      examForm.type === 'public' 
+-                        ? 'ring-2 ring-success bg-success/5 border-success/20' 
+-                        : 'hover:bg-accent/50'
+-                    }`}
+-                    onClick={() => setExamForm({...examForm, type: 'public'})}
+-                  >
+-                    <CardHeader className="pb-3">
+-                      <div className="flex items-center space-x-3">
+-                        <div className={`p-2 rounded-lg ${
+-                          examForm.type === 'public' ? 'bg-success/10' : 'bg-muted'
+-                        }`}>
+-                          <Globe className={`h-5 w-5 ${
+-                            examForm.type === 'public' ? 'text-success' : 'text-muted-foreground'
+-                          }`} />
+-                        </div>
+-                        <div>
+-                          <CardTitle className="text-base">Public Exam</CardTitle>
+-                          <CardDescription className="text-sm">Open to all students in specialization</CardDescription>
+-                        </div>
+-                        {examForm.type === 'public' && (
+-                          <CheckSquare className="h-5 w-5 text-success ml-auto" />
+-                        )}
+-                      </div>
+-                    </CardHeader>
+-                    <CardContent className="pt-0">
+-                      <p className="text-sm text-muted-foreground">
+-                        Automatically available to all students in the selected specialization.
+-                        Ideal for general assessments and maximum participation.
+-                      </p>
+-                    </CardContent>
+-                  </Card>
+-
+-                  {/* Practice Exam */}
+-                  <Card 
+-                    className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+-                      examForm.type === 'practice' 
+-                        ? 'ring-2 ring-purple-500 bg-purple-50 border-purple-200' 
+-                        : 'hover:bg-gray-50'
+-                    }`}
+-                    onClick={() => setExamForm({...examForm, type: 'practice'})}
+-                  >
+-                    <CardHeader className="pb-3">
+-                      <div className="flex items-center space-x-3">
+-                        <div className={`p-2 rounded-lg ${
+-                          examForm.type === 'practice' ? 'bg-purple-100' : 'bg-gray-100'
+-                        }`}>
+-                          <PlayCircle className={`h-5 w-5 ${
+-                            examForm.type === 'practice' ? 'text-purple-600' : 'text-gray-600'
+-                          }`} />
+-                        </div>
+-                        <div>
+-                          <CardTitle className="text-base">Practice Exam</CardTitle>
+-                          <CardDescription className="text-sm">Non-graded learning assessment</CardDescription>
+-                        </div>
+-                        {examForm.type === 'practice' && (
+-                          <CheckSquare className="h-5 w-5 text-purple-600 ml-auto" />
+-                        )}
+-                      </div>
+-                    </CardHeader>
+-                    <CardContent className="pt-0">
+-                      <p className="text-sm text-gray-600">
+-                        Non-graded exams for student practice and preparation. Results are not recorded
+-                        in official transcripts and provide immediate feedback for learning.
+-                      </p>
+-                    </CardContent>
+-                  </Card>
+-
+-                  {/* Timed Exam */}
+-                  <Card 
+-                    className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+-                      examForm.type === 'timed' 
+-                        ? 'ring-2 ring-red-500 bg-red-50 border-red-200' 
+-                        : 'hover:bg-gray-50'
+-                    }`}
+-                    onClick={() => setExamForm({...examForm, type: 'timed'})}
+-                  >
+-                    <CardHeader className="pb-3">
+-                      <div className="flex items-center space-x-3">
+-                        <div className={`p-2 rounded-lg ${
+-                          examForm.type === 'timed' ? 'bg-red-100' : 'bg-gray-100'
+-                        }`}>
+-                          <Clock className={`h-5 w-5 ${
+-                            examForm.type === 'timed' ? 'text-red-600' : 'text-gray-600'
+-                          }`} />
+-                        </div>
+-                        <div>
+-                          <CardTitle className="text-base">Timed Exam</CardTitle>
+-                          <CardDescription className="text-sm">Strict time limits with proctoring</CardDescription>
+-                        </div>
+-                        {examForm.type === 'timed' && (
+-                          <CheckSquare className="h-5 w-5 text-red-600 ml-auto" />
+-                        )}
+-                      </div>
+-                    </CardHeader>
+-                    <CardContent className="pt-0">
+-                      <p className="text-sm text-gray-600">
+-                        High-security exams with strict time limits and advanced proctoring features
+-                        including anti-cheating measures and automatic submission.
+-                      </p>
+-                    </CardContent>
+-                  </Card>
+-                </div>
+-              </div>
+-
+-              {/* Exam Configuration */}
+-              <div className="space-y-4">
+-                <h3 className="text-lg font-semibold text-gray-900">Exam Configuration</h3>
+-                
+-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+-                  <div>
+-                    <Label htmlFor="exam-duration" className="text-sm font-medium">Duration (minutes) *</Label>
+-                    <Input
+-                      id="exam-duration"
+-                      type="number"
+-                      value={examForm.duration}
+-                      onChange={(e) => setExamForm({...examForm, duration: parseInt(e.target.value)})}
+-                      className="mt-1"
+-                      min="1"
+-                    />
+-                  </div>
+-
+-                  <div>
+-                    <Label htmlFor="exam-start" className="text-sm font-medium">Start Time *</Label>
+-                    <Input
+-                      id="exam-start"
+-                      type="datetime-local"
+-                      value={examForm.startTime}
+-                      onChange={(e) => setExamForm({...examForm, startTime: e.target.value})}
+-                      className="mt-1"
+-                    />
+-                  </div>
+-
+-                  <div>
+-                    <Label htmlFor="exam-end" className="text-sm font-medium">End Time *</Label>
+-                    <Input
+-                      id="exam-end"
+-                      type="datetime-local"
+-                      value={examForm.endTime}
+-                      onChange={(e) => setExamForm({...examForm, endTime: e.target.value})}
+-                      className="mt-1"
+-                    />
+-                  </div>
+-                </div>
+-
+-                <div>
+-                  <Label htmlFor="exam-instructions" className="text-sm font-medium">Instructions</Label>
+-                  <Textarea
+-                    id="exam-instructions"
+-                    value={examForm.instructions}
+-                    onChange={(e) => setExamForm({...examForm, instructions: e.target.value})}
+-                    placeholder="Exam instructions for students"
+-                    rows={4}
+-                    className="mt-1"
+-                  />
+-                </div>
+-              </div>
+-
+-              {/* Advanced Settings */}
+-              <div className="space-y-4">
+-                <h3 className="text-lg font-semibold text-gray-900">Advanced Settings</h3>
+-                
+-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+-                  {/* Proctoring Settings */}
+-                  <div className="space-y-3">
+-                    <h4 className="font-medium text-gray-900 flex items-center">
+-                      <Shield className="h-4 w-4 mr-2" />
+-                      Proctoring Settings
+-                    </h4>
+-                    
+-                    <div className="space-y-3">
+-                      <div className="flex items-center justify-between">
+-                        <div>
+-                          <Label className="text-sm font-medium">Allow Tab Switching</Label>
+-                          <p className="text-xs text-gray-500">Students can switch browser tabs</p>
+-                        </div>
+-                        <input
+-                          type="checkbox"
+-                          checked={examForm.settings.allowTabSwitch}
+-                          onChange={(e) => setExamForm({
+-                            ...examForm, 
+-                            settings: {...examForm.settings, allowTabSwitch: e.target.checked}
+-                          })}
+-                          className="rounded"
+-                        />
+-                      </div>
++        <Button onClick={() => window.location.href = '/faculty/exams/create'}>
++          <Plus className="h-4 w-4 mr-2" />
++          Create Exam
++        </Button>
+ 
+-                      <div className="flex items-center justify-between">
+-                        <div>
+-                          <Label className="text-sm font-medium">Allow Copy/Paste</Label>
+-                          <p className="text-xs text-gray-500">Students can copy and paste content</p>
+-                        </div>
+-                        <input
+-                          type="checkbox"
+-                          checked={examForm.settings.allowCopyPaste}
+-                          onChange={(e) => setExamForm({
+-                            ...examForm, 
+-                            settings: {...examForm.settings, allowCopyPaste: e.target.checked}
+-                          })}
+-                          className="rounded"
+-                        />
+-                      </div>
+-                    </div>
+-                  </div>
+-
+-                  {/* Result Settings */}
+-                  <div className="space-y-3">
+-                    <h4 className="font-medium text-gray-900 flex items-center">
+-                      <Settings className="h-4 w-4 mr-2" />
+-                      Result Settings
+-                    </h4>
+-                    
+-                    <div className="space-y-3">
+-                      <div className="flex items-center justify-between">
+-                        <div>
+-                          <Label className="text-sm font-medium">Show Results Immediately</Label>
+-                          <p className="text-xs text-gray-500">Display results after completion</p>
+-                        </div>
+-                        <input
+-                          type="checkbox"
+-                          checked={examForm.settings.showResults}
+-                          onChange={(e) => setExamForm({
+-                            ...examForm, 
+-                            settings: {...examForm.settings, showResults: e.target.checked}
+-                          })}
+-                          className="rounded"
+-                        />
+-                      </div>
+-
+-                      <div className="flex items-center justify-between">
+-                        <div>
+-                          <Label className="text-sm font-medium">Max Violations</Label>
+-                          <p className="text-xs text-gray-500">Auto-terminate after violations</p>
+-                        </div>
+-                        <Input
+-                          type="number"
+-                          value={examForm.settings.maxViolations}
+-                          onChange={(e) => setExamForm({
+-                            ...examForm, 
+-                            settings: {...examForm.settings, maxViolations: parseInt(e.target.value)}
+-                          })}
+-                          className="w-20 h-8"
+-                          min="0"
+-                        />
+-                      </div>
+-                    </div>
+-                  </div>
+-                </div>
+-              </div>
+-
+-              {/* Action Buttons */}
+-              <div className="flex justify-end space-x-3 pt-4 border-t">
+-                <Button 
+-                  variant="outline" 
+-                  onClick={() => {
+-                    setIsCreateExamOpen(false);
+-                    resetExamForm();
+-                  }}
+-                >
+-                  <X className="h-4 w-4 mr-2" />
+-                  Cancel
+-                </Button>
+-                <Button onClick={handleCreateExam}>
+-                  <Plus className="h-4 w-4 mr-2" />
+-                  {editingExam ? 'Update Exam' : 'Create Exam'}
+-                </Button>
+-              </div>
+-            </div>
+-          </DialogContent>
+-        </Dialog>
+       </div>
+ 
+       <div className="grid gap-4">
+@@ -714,7 +223,7 @@ export default function FacultyExamsPage() {
+                     )}
+                     {exam.type === 'public' && (
+                       <>
+-                        <p>• Open to all students in specialization</p>
++                        <p>• Open to all enrolled students</p>
+                         <p>• Automatic enrollment available</p>
+                         <p>• Maximum participation opportunity</p>
+                       </>
+@@ -727,9 +236,6 @@ export default function FacultyExamsPage() {
+                     Created: {new Date(exam.createdAt).toLocaleDateString()}
+                   </div>
+                   <div className="flex space-x-2">
+-                    <Button variant="outline" size="sm" onClick={() => populateExamForm(exam)}>
+-                      <Edit className="h-4 w-4" />
+-                    </Button>
+                     <Button variant="outline" size="sm" onClick={() => handleViewExam(exam)}>
+                       <Eye className="h-4 w-4" />
+                     </Button>
+diff --git a/src/app/faculty/proctoring/page.tsx b/src/app/faculty/proctoring/page.tsx
+index 04c7712..bbd0c05 100644
+--- a/src/app/faculty/proctoring/page.tsx
++++ b/src/app/faculty/proctoring/page.tsx
+@@ -1,34 +1,32 @@
+ "use client";
+ 
+-import { useState, useEffect, useCallback } from 'react';
+ import { FacultyLayout } from '@/components/FacultyLayout';
+-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
++import SessionMonitor from '@/components/SessionMonitor';
++import { Alert } from '@/components/ui/alert';
+ import { Badge } from '@/components/ui/badge';
+ import { Button } from '@/components/ui/button';
+-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+-import { Alert, AlertDescription } from '@/components/ui/alert';
++import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
++import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+ import { useProctor } from '@/contexts/ProctorContext';
+ import {
+-  Eye,
+-  Users,
+   AlertTriangle,
+   Camera,
++  Clock,
++  Eye,
+   Mic,
+   Monitor,
++  Pause,
++  Play,
++  RefreshCw,
+   Shield,
+   ShieldAlert,
+-  Clock,
+-  UserCheck,
+-  UserX,
+-  Play,
+-  Pause,
+   Square,
+-  MessageSquare,
+-  RefreshCw,
++  Users,
+   Wifi,
+   WifiOff
+ } from 'lucide-react';
++import { useCallback, useEffect, useState } from 'react';
+ 
+ interface ProctoringSession {
+   id: string;
+@@ -412,7 +410,6 @@ export default function ProctoringPage() {
+           <TabsList>
+             <TabsTrigger value="sessions">Active Sessions</TabsTrigger>
+             <TabsTrigger value="violations">Violation Reports</TabsTrigger>
+-            <TabsTrigger value="alerts">Live Alerts</TabsTrigger>
+           </TabsList>
+ 
+           <TabsContent value="sessions" className="space-y-4">
+@@ -421,62 +418,110 @@ export default function ProctoringPage() {
+                 <CardTitle>Active Proctoring Sessions</CardTitle>
+               </CardHeader>
+               <CardContent>
+-                <div className="space-y-4">
+-                  {activeSessions.map((session) => (
+-                    <div key={session.id} className="border rounded-lg p-4">
+-                      <div className="flex items-center justify-between mb-3">
+-                        <div className="flex items-center gap-3">
+-                          <div className={`w-3 h-3 rounded-full ${getStatusColor(session.status)}`} />
+-                          {getStatusIcon(session.status)}
+-                          <div>
+-                            <h3 className="font-semibold">{session.studentName}</h3>
+-                            <p className="text-sm text-muted-foreground">{session.examTitle}</p>
++                {/* Two-column layout: left = sessions, right = continuous live alerts */}
++                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
++                  <div className="md:col-span-2 space-y-4">
++                    {activeSessions.map((session) => (
++                      <div key={session.id} className="border rounded-lg p-4">
++                        <div className="flex items-center justify-between mb-3">
++                          <div className="flex items-center gap-3">
++                            <div className={`w-3 h-3 rounded-full ${getStatusColor(session.status)}`} />
++                            {getStatusIcon(session.status)}
++                            <div>
++                              <h3 className="font-semibold">{session.studentName}</h3>
++                              <p className="text-sm text-muted-foreground">{session.examTitle}</p>
++                            </div>
++                          </div>
++                          <div className="flex items-center gap-2">
++                            <Badge variant={session.status === 'active' ? 'default' : 'secondary'}>
++                              {session.status}
++                            </Badge>
++                            <Button
++                              variant="outline"
++                              size="sm"
++                              onClick={() => handleViewSession(session)}
++                            >
++                              <Eye className="w-4 h-4 mr-1" />
++                              Monitor
++                            </Button>
+                           </div>
+                         </div>
+-                        <div className="flex items-center gap-2">
+-                          <Badge variant={session.status === 'active' ? 'default' : 'secondary'}>
+-                            {session.status}
+-                          </Badge>
+-                          <Button
+-                            variant="outline"
+-                            size="sm"
+-                            onClick={() => handleViewSession(session)}
+-                          >
+-                            <Eye className="w-4 h-4 mr-1" />
+-                            Monitor
+-                          </Button>
+-                        </div>
+-                      </div>
+ 
+-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+-                        <div className="flex items-center gap-2">
+-                          <Camera className={`w-4 h-4 ${session.cameraActive ? 'text-green-600' : 'text-red-600'}`} />
+-                          <span>Camera: {session.cameraActive ? 'Active' : 'Inactive'}</span>
+-                        </div>
+-                        <div className="flex items-center gap-2">
+-                          <Mic className={`w-4 h-4 ${session.micActive ? 'text-green-600' : 'text-red-600'}`} />
+-                          <span>Mic: {session.micActive ? 'Active' : 'Inactive'}</span>
+-                        </div>
+-                        <div className="flex items-center gap-2">
+-                          <Monitor className={`w-4 h-4 ${session.tabVisible ? 'text-green-600' : 'text-red-600'}`} />
+-                          <span>Tab: {session.tabVisible ? 'Focused' : 'Unfocused'}</span>
+-                        </div>
+-                        <div className="flex items-center gap-2">
+-                          <Clock className="w-4 h-4 text-blue-600" />
+-                          <span>Started: {new Date(session.startTime).toLocaleTimeString()}</span>
++                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
++                          <div className="flex items-center gap-2">
++                            <Camera className={`w-4 h-4 ${session.cameraActive ? 'text-green-600' : 'text-red-600'}`} />
++                            <span>Camera: {session.cameraActive ? 'Active' : 'Inactive'}</span>
++                          </div>
++                          <div className="flex items-center gap-2">
++                            <Mic className={`w-4 h-4 ${session.micActive ? 'text-green-600' : 'text-red-600'}`} />
++                            <span>Mic: {session.micActive ? 'Active' : 'Inactive'}</span>
++                          </div>
++                          <div className="flex items-center gap-2">
++                            <Monitor className={`w-4 h-4 ${session.tabVisible ? 'text-green-600' : 'text-red-600'}`} />
++                            <span>Tab: {session.tabVisible ? 'Focused' : 'Unfocused'}</span>
++                          </div>
++                          <div className="flex items-center gap-2">
++                            <Clock className="w-4 h-4 text-blue-600" />
++                            <span>Started: {new Date(session.startTime).toLocaleTimeString()}</span>
++                          </div>
+                         </div>
+-                      </div>
+ 
+-                      {session.violations.length > 0 && (
+-                        <div className="mt-3 pt-3 border-t">
+-                          <div className="flex items-center gap-2 text-sm text-orange-600">
+-                            <AlertTriangle className="w-4 h-4" />
+-                            <span>{session.violations.length} violation(s) detected</span>
++                        {session.violations.length > 0 && (
++                          <div className="mt-3 pt-3 border-t">
++                            <div className="flex items-center gap-2 text-sm text-orange-600">
++                              <AlertTriangle className="w-4 h-4" />
++                              <span>{session.violations.length} violation(s) detected</span>
++                            </div>
+                           </div>
++                        )}
++                      </div>
++                    ))}
++                  </div>
++
++                  {/* Continuous Live Alerts panel */}
++                  <div className="md:col-span-1">
++                    <Card>
++                      <CardHeader>
++                        <CardTitle>Live Alerts (Real-time)</CardTitle>
++                      </CardHeader>
++                      <CardContent>
++                        <div className="space-y-3 max-h-[60vh] overflow-auto">
++                          {activeSessions
++                            .filter(session => !session.cameraActive || !session.micActive || !session.tabVisible || session.violations.some(v => !v.resolved))
++                            .map((session) => (
++                              <Alert key={session.id}>
++                                <AlertTriangle className="h-4 w-4" />
++                                <div className="ml-2">
++                                  <div className="flex items-center justify-between">
++                                    <strong>{session.studentName}</strong>
++                                    <Badge variant={session.status === 'active' ? 'default' : 'secondary'}>{session.status}</Badge>
++                                  </div>
++                                  <div className="text-xs text-muted-foreground">{session.examTitle}</div>
++                                  <div className="mt-2 text-sm">
++                                    {!session.cameraActive && <div>• Camera is inactive</div>}
++                                    {!session.micActive && <div>• Microphone is inactive</div>}
++                                    {!session.tabVisible && <div>• Tab is not focused</div>}
++                                    {session.violations.filter(v => !v.resolved).length > 0 && (
++                                      <div>• {session.violations.filter(v => !v.resolved).length} unresolved violation(s)</div>
++                                    )}
++                                  </div>
++                                </div>
++                              </Alert>
++                            ))}
++
++                          {activeSessions.every(session =>
++                            session.cameraActive && session.micActive && session.tabVisible &&
++                            session.violations.every(v => v.resolved)
++                          ) && (
++                            <div className="text-center py-8 text-muted-foreground">
++                              <Shield className="w-12 h-12 mx-auto mb-4 text-green-600" />
++                              <p>All sessions are running smoothly. No alerts at this time.</p>
++                            </div>
++                          )}
+                         </div>
+-                      )}
+-                    </div>
+-                  ))}
++                      </CardContent>
++                    </Card>
++                  </div>
+                 </div>
+               </CardContent>
+             </Card>
+@@ -531,135 +576,25 @@ export default function ProctoringPage() {
+             </Card>
+           </TabsContent>
+ 
+-          <TabsContent value="alerts" className="space-y-4">
+-            <Card>
+-              <CardHeader>
+-                <CardTitle>Live Alerts</CardTitle>
+-              </CardHeader>
+-              <CardContent>
+-                <div className="space-y-4">
+-                  {activeSessions
+-                    .filter(session => !session.cameraActive || !session.micActive || !session.tabVisible || session.violations.some(v => !v.resolved))
+-                    .map((session) => (
+-                      <Alert key={session.id}>
+-                        <AlertTriangle className="h-4 w-4" />
+-                        <AlertDescription>
+-                          <strong>{session.studentName}</strong> - {session.examTitle}
+-                          <div className="mt-2 space-y-1">
+-                            {!session.cameraActive && <p>• Camera is inactive</p>}
+-                            {!session.micActive && <p>• Microphone is inactive</p>}
+-                            {!session.tabVisible && <p>• Tab is not focused</p>}
+-                            {session.violations.filter(v => !v.resolved).length > 0 && (
+-                              <p>• {session.violations.filter(v => !v.resolved).length} unresolved violation(s)</p>
+-                            )}
+-                          </div>
+-                        </AlertDescription>
+-                      </Alert>
+-                    ))}
+-                  {activeSessions.every(session =>
+-                    session.cameraActive && session.micActive && session.tabVisible &&
+-                    session.violations.every(v => v.resolved)
+-                  ) && (
+-                    <div className="text-center py-8 text-muted-foreground">
+-                      <Shield className="w-12 h-12 mx-auto mb-4 text-green-600" />
+-                      <p>All sessions are running smoothly. No alerts at this time.</p>
+-                    </div>
+-                  )}
+-                </div>
+-              </CardContent>
+-            </Card>
+-          </TabsContent>
++          {/* Removed separate Live Alerts tab - live alerts are displayed inside Active Sessions view */}
+         </Tabs>
+ 
+-        {/* Session Detail Modal */}
+-        {selectedSession && (
+-          <Dialog open={!!selectedSession} onOpenChange={() => setSelectedSession(null)}>
+-            <DialogContent className="max-w-4xl">
+-              <DialogHeader>
+-                <DialogTitle>Monitoring: {selectedSession.studentName}</DialogTitle>
+-                <DialogDescription>{selectedSession.examTitle}</DialogDescription>
+-              </DialogHeader>
+-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+-                {/* Live Feed Placeholder */}
+-                <Card>
+-                  <CardHeader>
+-                    <CardTitle className="flex items-center gap-2">
+-                      <Camera className="w-4 h-4" />
+-                      Live Camera Feed
+-                    </CardTitle>
+-                  </CardHeader>
+-                  <CardContent>
+-                    <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
+-                      <div className="text-center">
+-                        <Camera className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+-                        <p className="text-sm text-gray-600">Camera feed would appear here</p>
+-                        <p className="text-xs text-gray-500">Status: {selectedSession.cameraActive ? 'Active' : 'Inactive'}</p>
+-                      </div>
+-                    </div>
+-                  </CardContent>
+-                </Card>
+-
+-                {/* Session Details */}
+-                <Card>
+-                  <CardHeader>
+-                    <CardTitle>Session Details</CardTitle>
+-                  </CardHeader>
+-                  <CardContent className="space-y-4">
+-                    <div className="grid grid-cols-2 gap-4 text-sm">
+-                      <div>
+-                        <p className="font-medium">Status</p>
+-                        <Badge variant={selectedSession.status === 'active' ? 'default' : 'secondary'}>
+-                          {selectedSession.status}
+-                        </Badge>
+-                      </div>
+-                      <div>
+-                        <p className="font-medium">Duration</p>
+-                        <p>{selectedSession.duration} minutes</p>
+-                      </div>
+-                      <div>
+-                        <p className="font-medium">Started</p>
+-                        <p>{new Date(selectedSession.startTime).toLocaleString()}</p>
+-                      </div>
+-                      <div>
+-                        <p className="font-medium">Last Activity</p>
+-                        <p>{new Date(selectedSession.lastActivity).toLocaleString()}</p>
+-                      </div>
+-                    </div>
+-
+-                    <div className="space-y-2">
+-                      <p className="font-medium">Technical Status</p>
+-                      <div className="space-y-1 text-sm">
+-                        <div className="flex items-center gap-2">
+-                          <Camera className={`w-4 h-4 ${selectedSession.cameraActive ? 'text-green-600' : 'text-red-600'}`} />
+-                          <span>Camera: {selectedSession.cameraActive ? 'Active' : 'Inactive'}</span>
+-                        </div>
+-                        <div className="flex items-center gap-2">
+-                          <Mic className={`w-4 h-4 ${selectedSession.micActive ? 'text-green-600' : 'text-red-600'}`} />
+-                          <span>Microphone: {selectedSession.micActive ? 'Active' : 'Inactive'}</span>
+-                        </div>
+-                        <div className="flex items-center gap-2">
+-                          <Monitor className={`w-4 h-4 ${selectedSession.tabVisible ? 'text-green-600' : 'text-red-600'}`} />
+-                          <span>Tab Focus: {selectedSession.tabVisible ? 'Focused' : 'Unfocused'}</span>
+-                        </div>
+-                      </div>
+-                    </div>
+-
+-                    <div className="flex gap-2">
+-                      <Button variant="outline" size="sm">
+-                        <MessageSquare className="w-4 h-4 mr-1" />
+-                        Send Message
+-                      </Button>
+-                      <Button variant="destructive" size="sm">
+-                        <Square className="w-4 h-4 mr-1" />
+-                        Terminate Session
+-                      </Button>
+-                    </div>
+-                  </CardContent>
+-                </Card>
+-              </div>
+-            </DialogContent>
+-          </Dialog>
+-        )}
++        {/* Session Detail Modal (improved) */}
++        <SessionMonitor
++          session={selectedSession}
++          open={!!selectedSession}
++          onOpenChange={() => setSelectedSession(null)}
++          onSendMessage={(s) => console.log('Send message to', s?.studentName)}
++          onTerminate={(s) => {
++            // terminate session locally (mock)
++            setActiveSessions(prev => prev.map(sess => sess.id === s.id ? { ...sess, status: 'terminated' as const } : sess));
++            setSelectedSession(null);
++          }}
++          onPrepareViolationAction={(v) => {
++            setSelectedViolation(v);
++            setShowViolationDialog(true);
++          }}
++        />
+ 
+         {/* Violation Action Dialog */}
+         <Dialog open={showViolationDialog} onOpenChange={setShowViolationDialog}>
+diff --git a/src/app/faculty/profile/page.tsx b/src/app/faculty/profile/page.tsx
+index 347265b..3966f3e 100644
+--- a/src/app/faculty/profile/page.tsx
++++ b/src/app/faculty/profile/page.tsx
+@@ -1,31 +1,28 @@
+ "use client";
+ 
+ import { FacultyLayout } from "@/components/FacultyLayout";
+-import { useProctor } from '@/contexts/ProctorContext';
+-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
++import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+ import { Badge } from "@/components/ui/badge";
+ import { Button } from "@/components/ui/button";
++import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+ import { Input } from "@/components/ui/input";
+ import { Label } from "@/components/ui/label";
+-import { Textarea } from "@/components/ui/textarea";
+-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+-import { Separator } from "@/components/ui/separator";
+ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
++import { Textarea } from "@/components/ui/textarea";
++import { useProctor } from '@/contexts/ProctorContext';
+ import {
+-  User,
+-  Mail,
+-  Phone,
+-  MapPin,
+-  GraduationCap,
+-  Building,
+-  Calendar,
+-  Edit,
+-  Camera,
+-  Shield,
+   Award,
+   BookOpen,
+-  Users,
+-  TrendingUp
++  Calendar,
++  Camera,
++  Edit,
++  GraduationCap,
++  Mail,
++  MapPin,
++  Phone,
++  TrendingUp,
++  User,
++  Users
+ } from 'lucide-react';
+ import { useState } from 'react';
+ 
+@@ -80,7 +77,7 @@ export default function FacultyProfilePage() {
+             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+               <div className="relative">
+                 <Avatar className="w-24 h-24">
+-                  <AvatarImage src="" alt={currentUser?.name} />
++                  <AvatarImage src={undefined} alt={currentUser?.name} />
+                   <AvatarFallback className="text-2xl">
+                     {currentUser?.name?.split(' ').map(n => n[0]).join('') || 'F'}
+                   </AvatarFallback>
+diff --git a/src/app/faculty/settings/page.tsx b/src/app/faculty/settings/page.tsx
+index a54a15b..b4f65fc 100644
+--- a/src/app/faculty/settings/page.tsx
++++ b/src/app/faculty/settings/page.tsx
+@@ -1,32 +1,27 @@
+ "use client";
+ 
+ import { FacultyLayout } from "@/components/FacultyLayout";
+-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
++import { Alert, AlertDescription } from "@/components/ui/alert";
++import { Badge } from "@/components/ui/badge";
+ import { Button } from "@/components/ui/button";
++import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+ import { Input } from "@/components/ui/input";
+ import { Label } from "@/components/ui/label";
+-import { Switch } from "@/components/ui/switch";
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+-import { Textarea } from "@/components/ui/textarea";
+ import { Separator } from "@/components/ui/separator";
++import { Switch } from "@/components/ui/switch";
+ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+-import { Badge } from "@/components/ui/badge";
+-import { Alert, AlertDescription } from "@/components/ui/alert";
+ import {
+-  Settings,
++  AlertTriangle,
+   Bell,
+-  Shield,
+-  Palette,
+-  Globe,
+-  Lock,
++  CheckCircle,
+   Eye,
+   EyeOff,
++  Lock,
++  Palette,
+   Save,
+-  AlertTriangle,
+-  CheckCircle,
+-  Mail,
+-  Smartphone,
+-  Monitor
++  Settings,
++  Shield
+ } from 'lucide-react';
+ import { useState } from 'react';
+ 
+diff --git a/src/app/school/departments/page.tsx b/src/app/school/departments/page.tsx
+index b932280..2ba0ec4 100644
+--- a/src/app/school/departments/page.tsx
++++ b/src/app/school/departments/page.tsx
+@@ -1,5 +1,6 @@
+ "use client";
+ 
++import { SchoolLayout } from "@/components/SchoolLayout";
+ import { Badge } from "@/components/ui/badge";
+ import { Button } from "@/components/ui/button";
+ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+@@ -7,17 +8,15 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
+ import { Input } from "@/components/ui/input";
+ import { Label } from "@/components/ui/label";
+ import { Textarea } from "@/components/ui/textarea";
+-import { SchoolLayout } from "@/components/SchoolLayout";
+ import { useProctor } from '@/contexts/ProctorContext';
+ import {
+     Building2,
+-    Users,
+-    Plus,
+     CheckCircle,
+-    Loader2,
+-    Eye,
+     Edit,
+-    Trash2
++    Eye,
++    Loader2,
++    Plus,
++    Users
+ } from 'lucide-react';
+ import { useState } from "react";
+ 
+@@ -35,7 +34,6 @@ interface Faculty {
+   id: string;
+   employeeId: string;
+   departmentId: string;
+-  specializationId?: string;
+   designation: string;
+   qualification: string;
+   experience: number;
+diff --git a/src/app/school/proctoring/page.tsx b/src/app/school/proctoring/page.tsx
+index c80ab57..63af5ad 100644
+--- a/src/app/school/proctoring/page.tsx
++++ b/src/app/school/proctoring/page.tsx
+@@ -1,35 +1,33 @@
+ "use client";
+ 
+-import { useState, useEffect, useCallback } from 'react';
+ import { SchoolLayout } from '@/components/SchoolLayout';
+-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
++import SessionMonitor from '@/components/SessionMonitor';
++import { Alert } from '@/components/ui/alert';
+ import { Badge } from '@/components/ui/badge';
+ import { Button } from '@/components/ui/button';
+-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+-import { Alert, AlertDescription } from '@/components/ui/alert';
++import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
++import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+ import { useProctor } from '@/contexts/ProctorContext';
+ import {
+-  Eye,
+-  Users,
+   AlertTriangle,
++  Building,
+   Camera,
++  Clock,
++  Eye,
+   Mic,
+   Monitor,
++  Pause,
++  Play,
++  RefreshCw,
+   Shield,
+   ShieldAlert,
+-  Clock,
+-  UserCheck,
+-  UserX,
+-  Play,
+-  Pause,
+   Square,
+-  MessageSquare,
+-  RefreshCw,
++  Users,
+   Wifi,
+-  WifiOff,
+-  Building
++  WifiOff
+ } from 'lucide-react';
++import { useCallback, useEffect, useState } from 'react';
+ 
+ interface ProctoringSession {
+   id: string;
+@@ -469,7 +467,6 @@ export default function SchoolProctoringPage() {
+           <TabsList>
+             <TabsTrigger value="sessions">Active Sessions</TabsTrigger>
+             <TabsTrigger value="violations">Violation Reports</TabsTrigger>
+-            <TabsTrigger value="alerts">Live Alerts</TabsTrigger>
+           </TabsList>
+ 
+           <TabsContent value="sessions" className="space-y-4">
+@@ -478,65 +475,113 @@ export default function SchoolProctoringPage() {
+                 <CardTitle>Active Proctoring Sessions</CardTitle>
+               </CardHeader>
+               <CardContent>
+-                <div className="space-y-4">
+-                  {filteredSessions.map((session) => (
+-                    <div key={session.id} className="border rounded-lg p-4">
+-                      <div className="flex items-center justify-between mb-3">
+-                        <div className="flex items-center gap-3">
+-                          <div className={`w-3 h-3 rounded-full ${getStatusColor(session.status)}`} />
+-                          {getStatusIcon(session.status)}
+-                          <div>
+-                            <h3 className="font-semibold">{session.studentName}</h3>
+-                            <p className="text-sm text-muted-foreground">{session.examTitle}</p>
+-                            <p className="text-xs text-muted-foreground">
+-                              {session.departmentName} • {session.facultyName}
+-                            </p>
++                {/* Two-column layout: left = sessions list, right = continuous live alerts */}
++                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
++                  <div className="md:col-span-2 space-y-4">
++                    {filteredSessions.map((session) => (
++                      <div key={session.id} className="border rounded-lg p-4">
++                        <div className="flex items-center justify-between mb-3">
++                          <div className="flex items-center gap-3">
++                            <div className={`w-3 h-3 rounded-full ${getStatusColor(session.status)}`} />
++                            {getStatusIcon(session.status)}
++                            <div>
++                              <h3 className="font-semibold">{session.studentName}</h3>
++                              <p className="text-sm text-muted-foreground">{session.examTitle}</p>
++                              <p className="text-xs text-muted-foreground">
++                                {session.departmentName} • {session.facultyName}
++                              </p>
++                            </div>
++                          </div>
++                          <div className="flex items-center gap-2">
++                            <Badge variant={session.status === 'active' ? 'default' : 'secondary'}>
++                              {session.status}
++                            </Badge>
++                            <Button
++                              variant="outline"
++                              size="sm"
++                              onClick={() => handleViewSession(session)}
++                            >
++                              <Eye className="w-4 h-4 mr-1" />
++                              Monitor
++                            </Button>
+                           </div>
+                         </div>
+-                        <div className="flex items-center gap-2">
+-                          <Badge variant={session.status === 'active' ? 'default' : 'secondary'}>
+-                            {session.status}
+-                          </Badge>
+-                          <Button
+-                            variant="outline"
+-                            size="sm"
+-                            onClick={() => handleViewSession(session)}
+-                          >
+-                            <Eye className="w-4 h-4 mr-1" />
+-                            Monitor
+-                          </Button>
+-                        </div>
+-                      </div>
+ 
+-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+-                        <div className="flex items-center gap-2">
+-                          <Camera className={`w-4 h-4 ${session.cameraActive ? 'text-green-600' : 'text-red-600'}`} />
+-                          <span>Camera: {session.cameraActive ? 'Active' : 'Inactive'}</span>
+-                        </div>
+-                        <div className="flex items-center gap-2">
+-                          <Mic className={`w-4 h-4 ${session.micActive ? 'text-green-600' : 'text-red-600'}`} />
+-                          <span>Mic: {session.micActive ? 'Active' : 'Inactive'}</span>
+-                        </div>
+-                        <div className="flex items-center gap-2">
+-                          <Monitor className={`w-4 h-4 ${session.tabVisible ? 'text-green-600' : 'text-red-600'}`} />
+-                          <span>Tab: {session.tabVisible ? 'Focused' : 'Unfocused'}</span>
+-                        </div>
+-                        <div className="flex items-center gap-2">
+-                          <Clock className="w-4 h-4 text-blue-600" />
+-                          <span>Started: {new Date(session.startTime).toLocaleTimeString()}</span>
++                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
++                          <div className="flex items-center gap-2">
++                            <Camera className={`w-4 h-4 ${session.cameraActive ? 'text-green-600' : 'text-red-600'}`} />
++                            <span>Camera: {session.cameraActive ? 'Active' : 'Inactive'}</span>
++                          </div>
++                          <div className="flex items-center gap-2">
++                            <Mic className={`w-4 h-4 ${session.micActive ? 'text-green-600' : 'text-red-600'}`} />
++                            <span>Mic: {session.micActive ? 'Active' : 'Inactive'}</span>
++                          </div>
++                          <div className="flex items-center gap-2">
++                            <Monitor className={`w-4 h-4 ${session.tabVisible ? 'text-green-600' : 'text-red-600'}`} />
++                            <span>Tab: {session.tabVisible ? 'Focused' : 'Unfocused'}</span>
++                          </div>
++                          <div className="flex items-center gap-2">
++                            <Clock className="w-4 h-4 text-blue-600" />
++                            <span>Started: {new Date(session.startTime).toLocaleTimeString()}</span>
++                          </div>
+                         </div>
+-                      </div>
+ 
+-                      {session.violations.length > 0 && (
+-                        <div className="mt-3 pt-3 border-t">
+-                          <div className="flex items-center gap-2 text-sm text-orange-600">
+-                            <AlertTriangle className="w-4 h-4" />
+-                            <span>{session.violations.length} violation(s) detected</span>
++                        {session.violations.length > 0 && (
++                          <div className="mt-3 pt-3 border-t">
++                            <div className="flex items-center gap-2 text-sm text-orange-600">
++                              <AlertTriangle className="w-4 h-4" />
++                              <span>{session.violations.length} violation(s) detected</span>
++                            </div>
+                           </div>
++                        )}
++                      </div>
++                    ))}
++                  </div>
++
++                  {/* Continuous Live Alerts panel */}
++                  <div className="md:col-span-1">
++                    <Card>
++                      <CardHeader>
++                        <CardTitle>Live Alerts (Real-time)</CardTitle>
++                      </CardHeader>
++                      <CardContent>
++                        <div className="space-y-3 max-h-[60vh] overflow-auto">
++                          {filteredSessions
++                            .filter(session => !session.cameraActive || !session.micActive || !session.tabVisible || session.violations.some(v => !v.resolved))
++                            .map((session) => (
++                              <Alert key={session.id}>
++                                <AlertTriangle className="h-4 w-4" />
++                                <div className="ml-2">
++                                  <div className="flex items-center justify-between">
++                                    <strong>{session.studentName}</strong>
++                                    <Badge variant={session.status === 'active' ? 'default' : 'secondary'}>{session.status}</Badge>
++                                  </div>
++                                  <div className="text-xs text-muted-foreground">{session.examTitle}</div>
++                                  <div className="mt-2 text-sm">
++                                    {!session.cameraActive && <div>• Camera is inactive</div>}
++                                    {!session.micActive && <div>• Microphone is inactive</div>}
++                                    {!session.tabVisible && <div>• Tab is not focused</div>}
++                                    {session.violations.filter(v => !v.resolved).length > 0 && (
++                                      <div>• {session.violations.filter(v => !v.resolved).length} unresolved violation(s)</div>
++                                    )}
++                                  </div>
++                                </div>
++                              </Alert>
++                            ))}
++
++                          {filteredSessions.every(session =>
++                            session.cameraActive && session.micActive && session.tabVisible &&
++                            session.violations.every(v => v.resolved)
++                          ) && (
++                            <div className="text-center py-8 text-muted-foreground">
++                              <Shield className="w-12 h-12 mx-auto mb-4 text-green-600" />
++                              <p>All sessions are running smoothly. No alerts at this time.</p>
++                            </div>
++                          )}
+                         </div>
+-                      )}
+-                    </div>
+-                  ))}
++                      </CardContent>
++                    </Card>
++                  </div>
+                 </div>
+               </CardContent>
+             </Card>
+@@ -596,141 +641,23 @@ export default function SchoolProctoringPage() {
+               </CardContent>
+             </Card>
+           </TabsContent>
+-
+-          <TabsContent value="alerts" className="space-y-4">
+-            <Card>
+-              <CardHeader>
+-                <CardTitle>Live Alerts Across Departments</CardTitle>
+-              </CardHeader>
+-              <CardContent>
+-                <div className="space-y-4">
+-                  {filteredSessions
+-                    .filter(session => !session.cameraActive || !session.micActive || !session.tabVisible || session.violations.some(v => !v.resolved))
+-                    .map((session) => (
+-                      <Alert key={session.id}>
+-                        <AlertTriangle className="h-4 w-4" />
+-                        <AlertDescription>
+-                          <strong>{session.studentName}</strong> - {session.examTitle}
+-                          <div className="mt-1 text-xs text-muted-foreground">
+-                            {session.departmentName} • {session.facultyName}
+-                          </div>
+-                          <div className="mt-2 space-y-1">
+-                            {!session.cameraActive && <p>• Camera is inactive</p>}
+-                            {!session.micActive && <p>• Microphone is inactive</p>}
+-                            {!session.tabVisible && <p>• Tab is not focused</p>}
+-                            {session.violations.filter(v => !v.resolved).length > 0 && (
+-                              <p>• {session.violations.filter(v => !v.resolved).length} unresolved violation(s)</p>
+-                            )}
+-                          </div>
+-                        </AlertDescription>
+-                      </Alert>
+-                    ))}
+-                  {filteredSessions.every(session =>
+-                    session.cameraActive && session.micActive && session.tabVisible &&
+-                    session.violations.every(v => v.resolved)
+-                  ) && (
+-                    <div className="text-center py-8 text-muted-foreground">
+-                      <Shield className="w-12 h-12 mx-auto mb-4 text-green-600" />
+-                      <p>All sessions are running smoothly. No alerts at this time.</p>
+-                    </div>
+-                  )}
+-                </div>
+-              </CardContent>
+-            </Card>
+-          </TabsContent>
+         </Tabs>
+ 
+-        {/* Session Detail Modal */}
+-        {selectedSession && (
+-          <Dialog open={!!selectedSession} onOpenChange={() => setSelectedSession(null)}>
+-            <DialogContent className="max-w-4xl">
+-              <DialogHeader>
+-                <DialogTitle>Monitoring: {selectedSession?.studentName}</DialogTitle>
+-                <DialogDescription>
+-                  {selectedSession?.examTitle} • {selectedSession?.departmentName} • {selectedSession?.facultyName}
+-                </DialogDescription>
+-              </DialogHeader>
+-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+-                {/* Live Feed Placeholder */}
+-                <Card>
+-                  <CardHeader>
+-                    <CardTitle className="flex items-center gap-2">
+-                      <Camera className="w-4 h-4" />
+-                      Live Camera Feed
+-                    </CardTitle>
+-                  </CardHeader>
+-                  <CardContent>
+-                    <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
+-                      <div className="text-center">
+-                        <Camera className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+-                        <p className="text-sm text-gray-600">Camera feed would appear here</p>
+-                        <p className="text-xs text-gray-500">Status: {selectedSession?.cameraActive ? 'Active' : 'Inactive'}</p>
+-                      </div>
+-                    </div>
+-                  </CardContent>
+-                </Card>
+-
+-                {/* Session Details */}
+-                <Card>
+-                  <CardHeader>
+-                    <CardTitle>Session Details</CardTitle>
+-                  </CardHeader>
+-                  <CardContent className="space-y-4">
+-                    <div className="grid grid-cols-2 gap-4 text-sm">
+-                      <div>
+-                        <p className="font-medium">Status</p>
+-                        <Badge variant={selectedSession?.status === 'active' ? 'default' : 'secondary'}>
+-                          {selectedSession?.status}
+-                        </Badge>
+-                      </div>
+-                      <div>
+-                        <p className="font-medium">Duration</p>
+-                        <p>{selectedSession?.duration} minutes</p>
+-                      </div>
+-                      <div>
+-                        <p className="font-medium">Started</p>
+-                        <p>{selectedSession ? new Date(selectedSession.startTime).toLocaleString() : ''}</p>
+-                      </div>
+-                      <div>
+-                        <p className="font-medium">Last Activity</p>
+-                        <p>{selectedSession ? new Date(selectedSession.lastActivity).toLocaleString() : ''}</p>
+-                      </div>
+-                    </div>
+-
+-                    <div className="space-y-2">
+-                      <p className="font-medium">Technical Status</p>
+-                      <div className="space-y-1 text-sm">
+-                        <div className="flex items-center gap-2">
+-                          <Camera className={`w-4 h-4 ${selectedSession?.cameraActive ? 'text-green-600' : 'text-red-600'}`} />
+-                          <span>Camera: {selectedSession?.cameraActive ? 'Active' : 'Inactive'}</span>
+-                        </div>
+-                        <div className="flex items-center gap-2">
+-                          <Mic className={`w-4 h-4 ${selectedSession?.micActive ? 'text-green-600' : 'text-red-600'}`} />
+-                          <span>Microphone: {selectedSession?.micActive ? 'Active' : 'Inactive'}</span>
+-                        </div>
+-                        <div className="flex items-center gap-2">
+-                          <Monitor className={`w-4 h-4 ${selectedSession?.tabVisible ? 'text-green-600' : 'text-red-600'}`} />
+-                          <span>Tab Focus: {selectedSession?.tabVisible ? 'Focused' : 'Unfocused'}</span>
+-                        </div>
+-                      </div>
+-                    </div>
+-
+-                    <div className="flex gap-2">
+-                      <Button variant="outline" size="sm">
+-                        <MessageSquare className="w-4 h-4 mr-1" />
+-                        Send Message
+-                      </Button>
+-                      <Button variant="destructive" size="sm">
+-                        <Square className="w-4 h-4 mr-1" />
+-                        Terminate Session
+-                      </Button>
+-                    </div>
+-                  </CardContent>
+-                </Card>
+-              </div>
+-            </DialogContent>
+-          </Dialog>
+-        )}
++        {/* Session Detail Modal (improved) */}
++        <SessionMonitor
++          session={selectedSession}
++          open={!!selectedSession}
++          onOpenChange={() => setSelectedSession(null)}
++          onSendMessage={(s) => console.log('Send message to', s?.studentName)}
++          onTerminate={(s) => {
++            setActiveSessions(prev => prev.map(sess => sess.id === s.id ? { ...sess, status: 'terminated' as const } : sess));
++            setSelectedSession(null);
++          }}
++          onPrepareViolationAction={(v) => {
++            setSelectedViolation(v);
++            setShowViolationDialog(true);
++          }}
++        />
+ 
+         {/* Violation Action Dialog */}
+         <Dialog open={showViolationDialog} onOpenChange={setShowViolationDialog}>
+diff --git a/src/components/DepartmentSidebar.tsx b/src/components/DepartmentSidebar.tsx
+index a9295bb..ee5eece 100644
+--- a/src/components/DepartmentSidebar.tsx
++++ b/src/components/DepartmentSidebar.tsx
+@@ -2,12 +2,10 @@
+ 
+ import { cn } from "@/lib/utils";
+ import {
+-  LayoutDashboard,
+-  Users,
+-  GraduationCap,
+-  BookOpen,
+-  FileText,
+-  TrendingUp
++    FileText,
++    LayoutDashboard,
++    TrendingUp,
++    Users
+ } from "lucide-react";
+ import Link from "next/link";
+ import { usePathname } from "next/navigation";
+@@ -32,15 +30,9 @@ const navigationItems = [
+   {
+     title: "Faculty",
+     href: "/department/faculty",
+-    icon: GraduationCap,
++    icon: Users,
+     description: "Department faculty members"
+   },
+-  {
+-    title: "Specializations",
+-    href: "/department/specializations",
+-    icon: BookOpen,
+-    description: "Academic programs"
+-  },
+   {
+     title: "Exams",
+     href: "/department/exams",
+diff --git a/src/components/FacultySidebar.tsx b/src/components/FacultySidebar.tsx
+index b92d36c..57a995d 100644
+--- a/src/components/FacultySidebar.tsx
++++ b/src/components/FacultySidebar.tsx
+@@ -1,15 +1,22 @@
+ "use client";
+ 
++import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
++import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+ import { cn } from "@/lib/utils";
+ import {
+-  LayoutDashboard,
++  ChevronUp,
+   FileText,
+   HelpCircle,
++  LayoutDashboard,
++  Shield,
++  Tag,
+   TrendingUp,
+-  Shield
++  User,
++  Users
+ } from "lucide-react";
+ import Link from "next/link";
+ import { usePathname } from "next/navigation";
++import { useState } from "react";
+ 
+ interface FacultySidebarProps {
+   className?: string;
+@@ -34,6 +41,18 @@ const navigationItems = [
+     icon: FileText,
+     description: "Create and manage exams"
+   },
++  {
++    title: "Exam types",
++    href: "/faculty/exam-types",
++    icon: Tag,
++    description: "Manage exam types and schedules"
++  },
++  {
++    title: "Students",
++    href: "/faculty/students",
++    icon: Users,
++    description: "Manage department students"
++  },
+   {
+     title: "Proctoring",
+     href: "/faculty/proctoring",
+@@ -50,6 +69,7 @@ const navigationItems = [
+ 
+ export function FacultySidebar({ className }: FacultySidebarProps) {
+   const pathname = usePathname();
++  const [isProfileOpen, setIsProfileOpen] = useState(false);
+ 
+   return (
+     <div className={cn("flex h-full w-64 flex-col bg-sidebar border-r border-sidebar-border fixed left-0 top-16 z-40", className)}>
+@@ -77,6 +97,33 @@ export function FacultySidebar({ className }: FacultySidebarProps) {
+           );
+         })}
+       </nav>
++
++      {/* Profile Section */}
++      <div className="border-t border-sidebar-border p-4">
++        <DropdownMenu open={isProfileOpen} onOpenChange={setIsProfileOpen}>
++          <DropdownMenuTrigger asChild>
++            <button className="w-full flex items-center px-3 py-3 rounded-lg text-left transition-colors hover:bg-sidebar-accent">
++              <Avatar className="mr-3 h-8 w-8">
++                <AvatarImage src={undefined} alt="Profile" />
++                <AvatarFallback>FA</AvatarFallback>
++              </Avatar>
++              <div className="flex-1 min-w-0">
++                <div className="text-sm font-medium truncate">Faculty Name</div>
++                <div className="text-xs text-muted-foreground truncate">faculty@university.edu</div>
++              </div>
++              <ChevronUp className={cn("h-4 w-4 transition-transform", isProfileOpen && "rotate-180")} />
++            </button>
++          </DropdownMenuTrigger>
++          <DropdownMenuContent align="start" className="w-56">
++            <DropdownMenuItem asChild>
++              <Link href="/faculty/profile" className="flex items-center">
++                <User className="mr-2 h-4 w-4" />
++                Profile
++              </Link>
++            </DropdownMenuItem>
++          </DropdownMenuContent>
++        </DropdownMenu>
++      </div>
+     </div>
+   );
+ }
+\ No newline at end of file
+diff --git a/src/components/SchoolSidebar.tsx b/src/components/SchoolSidebar.tsx
+index d0108e4..80bcdc9 100644
+--- a/src/components/SchoolSidebar.tsx
++++ b/src/components/SchoolSidebar.tsx
+@@ -2,11 +2,11 @@
+ 
+ import { cn } from "@/lib/utils";
+ import {
+-  LayoutDashboard,
+   Building2,
+-  Users,
+   FileText,
+-  Shield
++  LayoutDashboard,
++  Shield,
++  Users
+ } from "lucide-react";
+ import Link from "next/link";
+ import { usePathname } from "next/navigation";
+diff --git a/src/containers/department/dashboard/DepartmentStudents.tsx b/src/containers/department/dashboard/DepartmentStudents.tsx
+index b342d1f..9644e40 100644
+--- a/src/containers/department/dashboard/DepartmentStudents.tsx
++++ b/src/containers/department/dashboard/DepartmentStudents.tsx
+@@ -4,12 +4,12 @@ import React, { useState } from 'react';
+ import { Badge } from '../../../components/ui/badge';
+ import { Button } from '../../../components/ui/button';
+ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
+-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../../../components/ui/dialog';
++import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
+ import { Input } from '../../../components/ui/input';
+ import { Label } from '../../../components/ui/label';
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
+ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table';
+-import { getAllDepartments, getCourseName, getCoursesForDepartment, getDepartmentName } from '../../../lib/departments';
++import { getAllDepartments, getCoursesForDepartment, getDepartmentName } from '../../../lib/departments';
+ 
+ type Student = {
+     id: string;
+@@ -17,7 +17,6 @@ type Student = {
+     email: string;
+     phone: string;
+     department: string;
+-    course: string;
+     semester: string;
+     examsTaken: number;
+     averageScore: number;
+@@ -37,7 +36,6 @@ function DepartmentStudents({ students, onAdd, onUpdate, onDelete }: DepartmentS
+         email: '',
+         phone: '',
+         department: '',
+-        course: '',
+         semester: '1'
+     });
+ 
+@@ -50,7 +48,6 @@ function DepartmentStudents({ students, onAdd, onUpdate, onDelete }: DepartmentS
+             email: '',
+             phone: '',
+             department: '',
+-            course: '',
+             semester: '1'
+         });
+         setEditingStudent(null);
+@@ -80,7 +77,6 @@ function DepartmentStudents({ students, onAdd, onUpdate, onDelete }: DepartmentS
+             email: student.email,
+             phone: student.phone,
+             department: student.department,
+-            course: student.course,
+             semester: student.semester
+         });
+     };
+@@ -108,7 +104,6 @@ function DepartmentStudents({ students, onAdd, onUpdate, onDelete }: DepartmentS
+                                 <TableHead>Name</TableHead>
+                                 <TableHead>Email</TableHead>
+                                 <TableHead>Department</TableHead>
+-                                <TableHead>Course</TableHead>
+                                 <TableHead>Semester</TableHead>
+                                 <TableHead>Exams Taken</TableHead>
+                                 <TableHead>Avg Score</TableHead>
+@@ -121,7 +116,6 @@ function DepartmentStudents({ students, onAdd, onUpdate, onDelete }: DepartmentS
+                                     <TableCell className="font-medium">{student.name}</TableCell>
+                                     <TableCell>{student.email}</TableCell>
+                                     <TableCell>{getDepartmentName(student.department)}</TableCell>
+-                                    <TableCell>{getCourseName(student.department, student.course)}</TableCell>
+                                     <TableCell>{student.semester}</TableCell>
+                                     <TableCell>{student.examsTaken}</TableCell>
+                                     <TableCell>
+@@ -195,7 +189,7 @@ function DepartmentStudents({ students, onAdd, onUpdate, onDelete }: DepartmentS
+                                     </Label>
+                                     <Select
+                                         value={formData.department}
+-                                        onValueChange={(value: string) => setFormData({ ...formData, department: value, course: '' })}
++                                        onValueChange={(value: string) => setFormData({ ...formData, department: value })}
+                                     >
+                                         <SelectTrigger className="col-span-3">
+                                             <SelectValue placeholder="Select department" />
+@@ -209,27 +203,6 @@ function DepartmentStudents({ students, onAdd, onUpdate, onDelete }: DepartmentS
+                                         </SelectContent>
+                                     </Select>
+                                 </div>
+-                                <div className="grid grid-cols-4 items-center gap-4">
+-                                    <Label htmlFor="edit-course" className="text-right">
+-                                        Course
+-                                    </Label>
+-                                    <Select
+-                                        value={formData.course}
+-                                        onValueChange={(value: string) => setFormData({ ...formData, course: value })}
+-                                        disabled={!formData.department}
+-                                    >
+-                                        <SelectTrigger className="col-span-3">
+-                                            <SelectValue placeholder="Select course" />
+-                                        </SelectTrigger>
+-                                        <SelectContent>
+-                                            {availableCourses.map((course: any) => (
+-                                                <SelectItem key={course.id} value={course.id}>
+-                                                    {course.name}
+-                                                </SelectItem>
+-                                            ))}
+-                                        </SelectContent>
+-                                    </Select>
+-                                </div>
+                                 <div className="grid grid-cols-4 items-center gap-4">
+                                     <Label htmlFor="edit-semester" className="text-right">
+                                         Semester
+diff --git a/src/containers/faculty/dashboard/FacultyQuestionBank.tsx b/src/containers/faculty/dashboard/FacultyQuestionBank.tsx
+index 740f9a5..1122bb2 100644
+--- a/src/containers/faculty/dashboard/FacultyQuestionBank.tsx
++++ b/src/containers/faculty/dashboard/FacultyQuestionBank.tsx
+@@ -1,47 +1,26 @@
+ "use client";
+ 
+-import { useState } from 'react';
+-import { useProctor } from '@/contexts/ProctorContext';
++import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
++import { Badge } from '@/components/ui/badge';
+ import { Button } from '@/components/ui/button';
+-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
++import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+ import { Input } from '@/components/ui/input';
+ import { Label } from '@/components/ui/label';
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+-import { Textarea } from '@/components/ui/textarea';
+-import { Badge } from '@/components/ui/badge';
+ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+-import { ScrollArea } from '@/components/ui/scroll-area';
+-import { Separator } from '@/components/ui/separator';
++import { useProctor } from '@/contexts/ProctorContext';
+ import {
+-  Plus,
+-  Edit,
+-  Trash2,
+-  Search,
+-  Filter,
+   Download,
+   FileText,
+   HelpCircle,
+-  Eye,
+-  EyeOff,
+-  Upload,
+-  FileUp
++  Plus,
++  Search,
++  Trash2,
++  Upload
+ } from 'lucide-react';
+-
+-interface QuestionFormData {
+-  title: string;
+-  type: 'multiple-choice' | 'true-false' | 'short-answer' | 'essay';
+-  content: string;
+-  options: string[];
+-  correctAnswer: string;
+-  marks: number;
+-  explanation: string;
+-  difficulty: 'easy' | 'medium' | 'hard';
+-  subject: string;
+-  categoryId: string;
+-}
++import Link from 'next/link';
++import { useState } from 'react';
+ 
+ export default function FacultyQuestionBank() {
+   const {
+@@ -63,140 +42,16 @@ export default function FacultyQuestionBank() {
+   const facultyQuestions = currentFaculty ? questions.filter(q => q.facultyId === currentFaculty.id) : [];
+ 
+   // State management
+-  const [isCreateQuestionOpen, setIsCreateQuestionOpen] = useState(false);
+-  const [isCreateCategoryOpen, setIsCreateCategoryOpen] = useState(false);
+   const [isBulkUploadOpen, setIsBulkUploadOpen] = useState(false);
+-  const [editingQuestion, setEditingQuestion] = useState<any>(null);
+-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
++  const [selectedExamType, setSelectedExamType] = useState<string>('all');
+   const [searchQuery, setSearchQuery] = useState('');
+ 
+-  // Question form state
+-  const [questionForm, setQuestionForm] = useState<QuestionFormData>({
+-    title: '',
+-    type: 'multiple-choice',
+-    content: '',
+-    options: ['', '', '', ''],
+-    correctAnswer: '',
+-    marks: 5,
+-    explanation: '',
+-    difficulty: 'medium',
+-    subject: '',
+-    categoryId: ''
+-  });
+-
+-  // Category form state
+-  const [categoryForm, setCategoryForm] = useState({
+-    name: '',
+-    description: ''
+-  });
+-
+   // Bulk upload state
+   const [bulkUploadFile, setBulkUploadFile] = useState<File | null>(null);
+   const [bulkUploadType, setBulkUploadType] = useState<'csv' | 'pdf'>('csv');
+   const [isUploading, setIsUploading] = useState(false);
+ 
+-  // Helper to reset question form
+-  const resetQuestionForm = () => {
+-    setQuestionForm({
+-      title: '',
+-      type: 'multiple-choice',
+-      content: '',
+-      options: ['', '', '', ''],
+-      correctAnswer: '',
+-      marks: 5,
+-      explanation: '',
+-      difficulty: 'medium',
+-      subject: '',
+-      categoryId: 'none'
+-    });
+-    setEditingQuestion(null);
+-  };
+-
+-  // Populate form for editing question
+-  const populateQuestionForm = (question: any) => {
+-    setQuestionForm({
+-      title: question.title,
+-      type: question.type,
+-      content: question.content,
+-      options: question.options || ['', '', '', ''],
+-      correctAnswer: question.correctAnswer?.toString() || '',
+-      marks: question.marks,
+-      explanation: question.explanation || '',
+-      difficulty: question.difficulty,
+-      subject: question.subject,
+-      categoryId: question.categoryId || 'none'
+-    });
+-    setEditingQuestion(question);
+-    setIsCreateQuestionOpen(true);
+-  };
+-
+-  // Handle question creation/update
+-  const handleQuestionSubmit = () => {
+-    // Validation
+-    if (!questionForm.title.trim() || !questionForm.content.trim()) {
+-      alert('Please fill in all required fields: title and content.');
+-      return;
+-    }
+-
+-    if (questionForm.type === 'multiple-choice') {
+-      if (questionForm.options.some(option => !option.trim()) || questionForm.correctAnswer === '') {
+-        alert('For multiple-choice questions, please fill all options and select the correct answer.');
+-        return;
+-      }
+-    } else if (!questionForm.correctAnswer.trim()) {
+-      alert('Please provide the correct answer.');
+-      return;
+-    }
+-
+-    if (questionForm.marks <= 0) {
+-      alert('Marks must be a positive number.');
+-      return;
+-    }
+-
+-    if (!currentFaculty) return;
+-
+-    const questionData = {
+-      ...questionForm,
+-      facultyId: currentFaculty.id,
+-      categoryId: questionForm.categoryId === 'none' ? '' : questionForm.categoryId,
+-      correctAnswer: questionForm.type === 'multiple-choice' ?
+-        parseInt(questionForm.correctAnswer) :
+-        questionForm.correctAnswer,
+-      isActive: true
+-    };
+-
+-    if (editingQuestion) {
+-      updateQuestion(editingQuestion.id, questionData);
+-    } else {
+-      addQuestion(questionData);
+-    }
+ 
+-    resetQuestionForm();
+-    setIsCreateQuestionOpen(false);
+-  };
+-
+-  // Handle category creation
+-  const handleCategorySubmit = () => {
+-    if (!categoryForm.name.trim()) {
+-      alert('Please enter a category name.');
+-      return;
+-    }
+-
+-    // Check if category already exists
+-    if (categories.some(cat => cat.name.toLowerCase() === categoryForm.name.toLowerCase())) {
+-      alert('A category with this name already exists.');
+-      return;
+-    }
+-
+-    addCategory({
+-      name: categoryForm.name.trim(),
+-      description: categoryForm.description.trim(),
+-      isActive: true
+-    });
+-
+-    setCategoryForm({ name: '', description: '' });
+-    setIsCreateCategoryOpen(false);
+-  };
+ 
+   // Handle question deletion
+   const handleDeleteQuestion = (questionId: string) => {
+@@ -240,7 +95,7 @@ export default function FacultyQuestionBank() {
+     }
+ 
+     const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+-    const expectedHeaders = ['title', 'type', 'content', 'option1', 'option2', 'option3', 'option4', 'correctanswer', 'marks', 'explanation', 'difficulty', 'subject', 'category'];
++    const expectedHeaders = ['title', 'type', 'content', 'option1', 'option2', 'option3', 'option4', 'correctanswer', 'marks', 'explanation', 'difficulty', 'subject', 'categoryid'];
+ 
+     // Check if required headers are present
+     const requiredHeaders = ['title', 'type', 'content', 'correctanswer', 'marks', 'difficulty', 'subject'];
+@@ -296,8 +151,9 @@ export default function FacultyQuestionBank() {
+           case 'subject':
+             questionData.subject = value;
+             break;
++          case 'categoryid':
+           case 'category':
+-            // Find category by name
++            // Find exam type by name
+             const category = categories.find(c => c.name.toLowerCase() === value.toLowerCase());
+             questionData.categoryId = category ? category.id : '';
+             break;
+@@ -333,13 +189,13 @@ export default function FacultyQuestionBank() {
+ 
+   // Filter questions based on category and search
+   const filteredQuestions = facultyQuestions.filter(question => {
+-    const matchesCategory = selectedCategory === 'all' || question.categoryId === selectedCategory || (!question.categoryId && selectedCategory === 'all');
++    const matchesExamType = selectedExamType === 'all' || question.categoryId === selectedExamType || (!question.categoryId && selectedExamType === 'all');
+     const matchesSearch = searchQuery === '' ||
+       question.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+       question.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+       question.subject.toLowerCase().includes(searchQuery.toLowerCase());
+ 
+-    return matchesCategory && matchesSearch;
++    return matchesExamType && matchesSearch;
+   });
+ 
+   return (
+@@ -401,11 +257,11 @@ export default function FacultyQuestionBank() {
+                     </Button>
+                   </div>
+                   <ul className="text-sm text-accent-foreground space-y-1">
+-                    <li>• Columns: title, type, content, option1, option2, option3, option4, correctAnswer, marks, explanation, difficulty, subject, category</li>
++                    <li>• Columns: title, type, content, option1, option2, option3, option4, correctAnswer, marks, explanation, difficulty, subject, categoryId</li>
+                     <li>• Type values: multiple-choice, true-false, short-answer, essay</li>
+                     <li>• Difficulty values: easy, medium, hard</li>
+                     <li>• For multiple-choice: provide 4 options and correctAnswer as 0-3</li>
+-                    <li>• Category should match existing category names</li>
++                    <li>• Exam type should match existing exam type names</li>
+                   </ul>
+                 </div>
+ 
+@@ -432,230 +288,15 @@ export default function FacultyQuestionBank() {
+             </DialogContent>
+           </Dialog>
+ 
+-          <Dialog open={isCreateCategoryOpen} onOpenChange={setIsCreateCategoryOpen}>
+-            <DialogTrigger asChild>
+-              <Button variant="outline">
+-                <Plus className="h-4 w-4 mr-2" />
+-                Add Category
+-              </Button>
+-            </DialogTrigger>
+-            <DialogContent>
+-              <DialogHeader>
+-                <DialogTitle>Add New Category</DialogTitle>
+-                <DialogDescription>
+-                  Create a new question category (e.g., Verbal, Technical, Reasoning, Aptitude)
+-                </DialogDescription>
+-              </DialogHeader>
+-              <div className="space-y-4">
+-                <div>
+-                  <Label htmlFor="category-name">Category Name *</Label>
+-                  <Input
+-                    id="category-name"
+-                    value={categoryForm.name}
+-                    onChange={(e) => setCategoryForm({...categoryForm, name: e.target.value})}
+-                    placeholder="e.g., Verbal, Technical, Reasoning"
+-                  />
+-                </div>
+-                <div>
+-                  <Label htmlFor="category-description">Description (Optional)</Label>
+-                  <Textarea
+-                    id="category-description"
+-                    value={categoryForm.description}
+-                    onChange={(e) => setCategoryForm({...categoryForm, description: e.target.value})}
+-                    placeholder="Brief description of the category"
+-                    rows={2}
+-                  />
+-                </div>
+-                <div className="flex justify-end space-x-2">
+-                  <Button variant="outline" onClick={() => {
+-                    setIsCreateCategoryOpen(false);
+-                    setCategoryForm({ name: '', description: '' });
+-                  }}>
+-                    Cancel
+-                  </Button>
+-                  <Button onClick={handleCategorySubmit}>
+-                    Add Category
+-                  </Button>
+-                </div>
+-              </div>
+-            </DialogContent>
+-          </Dialog>
+-
+-          <Dialog open={isCreateQuestionOpen} onOpenChange={(open) => {
+-            setIsCreateQuestionOpen(open);
+-            if (!open) resetQuestionForm();
+-          }}>
+-            <DialogTrigger asChild>
+-              <Button>
+-                <Plus className="h-4 w-4 mr-2" />
+-                Create Question
+-              </Button>
+-            </DialogTrigger>
+-            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+-              <DialogHeader>
+-                <DialogTitle>{editingQuestion ? 'Edit Question' : 'Create New Question'}</DialogTitle>
+-                <DialogDescription>
+-                  {editingQuestion ? 'Update the question details' : 'Add a new question to your question bank'}
+-                </DialogDescription>
+-              </DialogHeader>
+-              <div className="space-y-4">
+-                <div>
+-                  <Label htmlFor="q-title">Question Title *</Label>
+-                  <Input
+-                    id="q-title"
+-                    value={questionForm.title}
+-                    onChange={(e) => setQuestionForm({...questionForm, title: e.target.value})}
+-                    placeholder="Brief title for the question"
+-                  />
+-                </div>
+-
+-                <div>
+-                  <Label htmlFor="q-type">Question Type *</Label>
+-                  <Select value={questionForm.type} onValueChange={(value: any) => setQuestionForm({...questionForm, type: value})}>
+-                    <SelectTrigger>
+-                      <SelectValue />
+-                    </SelectTrigger>
+-                    <SelectContent>
+-                      <SelectItem value="multiple-choice">Multiple Choice</SelectItem>
+-                      <SelectItem value="true-false">True/False</SelectItem>
+-                      <SelectItem value="short-answer">Short Answer</SelectItem>
+-                      <SelectItem value="essay">Essay</SelectItem>
+-                    </SelectContent>
+-                  </Select>
+-                </div>
+-
+-                <div>
+-                  <Label htmlFor="q-content">Question Content *</Label>
+-                  <Textarea
+-                    id="q-content"
+-                    value={questionForm.content}
+-                    onChange={(e) => setQuestionForm({...questionForm, content: e.target.value})}
+-                    placeholder="Enter the full question text"
+-                    rows={3}
+-                  />
+-                </div>
+-
+-                {questionForm.type === 'multiple-choice' && (
+-                  <div>
+-                    <Label>Options *</Label>
+-                    {questionForm.options.map((option, index) => (
+-                      <Input
+-                        key={index}
+-                        value={option}
+-                        onChange={(e) => {
+-                          const newOptions = [...questionForm.options];
+-                          newOptions[index] = e.target.value;
+-                          setQuestionForm({...questionForm, options: newOptions});
+-                        }}
+-                        placeholder={`Option ${index + 1}`}
+-                        className="mb-2"
+-                      />
+-                    ))}
+-                  </div>
+-                )}
+-
+-                <div>
+-                  <Label htmlFor="q-answer">Correct Answer *</Label>
+-                  {questionForm.type === 'multiple-choice' ? (
+-                    <Select value={questionForm.correctAnswer} onValueChange={(value: string) => setQuestionForm({...questionForm, correctAnswer: value})}>
+-                      <SelectTrigger>
+-                        <SelectValue placeholder="Select correct option" />
+-                      </SelectTrigger>
+-                      <SelectContent>
+-                        {questionForm.options.map((option, index) => (
+-                          <SelectItem key={index} value={index.toString()}>
+-                            Option {index + 1}: {option || `Option ${index + 1}`}
+-                          </SelectItem>
+-                        ))}
+-                      </SelectContent>
+-                    </Select>
+-                  ) : (
+-                    <Input
+-                      id="q-answer"
+-                      value={questionForm.correctAnswer}
+-                      onChange={(e) => setQuestionForm({...questionForm, correctAnswer: e.target.value})}
+-                      placeholder="Enter the correct answer"
+-                    />
+-                  )}
+-                </div>
+-
+-                <div className="grid grid-cols-2 gap-4">
+-                  <div>
+-                    <Label htmlFor="q-marks">Marks *</Label>
+-                    <Input
+-                      id="q-marks"
+-                      type="number"
+-                      value={questionForm.marks}
+-                      onChange={(e) => setQuestionForm({...questionForm, marks: parseInt(e.target.value) || 0})}
+-                    />
+-                  </div>
+-                  <div>
+-                    <Label htmlFor="q-difficulty">Difficulty *</Label>
+-                    <Select value={questionForm.difficulty} onValueChange={(value: any) => setQuestionForm({...questionForm, difficulty: value})}>
+-                      <SelectTrigger>
+-                        <SelectValue />
+-                      </SelectTrigger>
+-                      <SelectContent>
+-                        <SelectItem value="easy">Easy</SelectItem>
+-                        <SelectItem value="medium">Medium</SelectItem>
+-                        <SelectItem value="hard">Hard</SelectItem>
+-                      </SelectContent>
+-                    </Select>
+-                  </div>
+-                </div>
+-
+-                <div>
+-                  <Label htmlFor="q-subject">Subject *</Label>
+-                  <Input
+-                    id="q-subject"
+-                    value={questionForm.subject}
+-                    onChange={(e) => setQuestionForm({...questionForm, subject: e.target.value})}
+-                    placeholder="e.g., Data Structures, Algorithms"
+-                  />
+-                </div>
+ 
+-                <div>
+-                  <Label htmlFor="q-category">Category (Optional)</Label>
+-                  <Select value={questionForm.categoryId} onValueChange={(value: string) => setQuestionForm({...questionForm, categoryId: value})}>
+-                    <SelectTrigger>
+-                      <SelectValue placeholder="Select category (optional)" />
+-                    </SelectTrigger>
+-                    <SelectContent>
+-                      <SelectItem value="none">No Category</SelectItem>
+-                      {categories.map((category) => (
+-                        <SelectItem key={category.id} value={category.id}>
+-                          {category.name}
+-                        </SelectItem>
+-                      ))}
+-                    </SelectContent>
+-                  </Select>
+-                </div>
+ 
+-                <div>
+-                  <Label htmlFor="q-explanation">Explanation (Optional)</Label>
+-                  <Textarea
+-                    id="q-explanation"
+-                    value={questionForm.explanation}
+-                    onChange={(e) => setQuestionForm({...questionForm, explanation: e.target.value})}
+-                    placeholder="Explain why this is the correct answer"
+-                    rows={2}
+-                  />
+-                </div>
++          <Link href="/faculty/questions/create">
++            <Button>
++              <Plus className="h-4 w-4 mr-2" />
++              Create Question
++            </Button>
++          </Link>
+ 
+-                <div className="flex justify-end space-x-2">
+-                  <Button variant="outline" onClick={() => {
+-                    setIsCreateQuestionOpen(false);
+-                    resetQuestionForm();
+-                  }}>
+-                    Cancel
+-                  </Button>
+-                  <Button onClick={handleQuestionSubmit}>
+-                    {editingQuestion ? 'Update Question' : 'Create Question'}
+-                  </Button>
+-                </div>
+-              </div>
+-            </DialogContent>
+-          </Dialog>
+         </div>
+       </div>
+ 
+@@ -673,7 +314,7 @@ export default function FacultyQuestionBank() {
+ 
+         <Card>
+           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+-            <CardTitle className="text-sm font-medium">Categories</CardTitle>
++            <CardTitle className="text-sm font-medium">Exam Types</CardTitle>
+             <FileText className="h-4 w-4 text-muted-foreground" />
+           </CardHeader>
+           <CardContent>
+@@ -724,12 +365,12 @@ export default function FacultyQuestionBank() {
+             </div>
+             <div>
+               <Label htmlFor="category-filter">Category</Label>
+-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
++              <Select value={selectedExamType} onValueChange={setSelectedExamType}>
+                 <SelectTrigger className="w-40">
+                   <SelectValue />
+                 </SelectTrigger>
+                 <SelectContent>
+-                  <SelectItem value="all">All Categories</SelectItem>
++                  <SelectItem value="all">All Exam Types</SelectItem>
+                   {categories.map((category) => (
+                     <SelectItem key={category.id} value={category.id}>
+                       {category.name}
+@@ -760,14 +401,16 @@ export default function FacultyQuestionBank() {
+                 <HelpCircle className="h-12 w-12 text-muted-foreground mb-4" />
+                 <h3 className="text-lg font-medium mb-2">No questions found</h3>
+                 <p className="text-muted-foreground text-center mb-4">
+-                  {searchQuery || selectedCategory !== 'all'
++                  {searchQuery || selectedExamType !== 'all'
+                     ? 'Try adjusting your search or filter criteria.'
+                     : 'Start by creating your first question.'}
+                 </p>
+-                <Button onClick={() => setIsCreateQuestionOpen(true)}>
+-                  <Plus className="h-4 w-4 mr-2" />
+-                  Create Question
+-                </Button>
++                <Link href="/faculty/questions/create">
++                  <Button>
++                    <Plus className="h-4 w-4 mr-2" />
++                    Create Question
++                  </Button>
++                </Link>
+               </CardContent>
+             </Card>
+           ) : (
+@@ -797,9 +440,6 @@ export default function FacultyQuestionBank() {
+                           </div>
+                         </div>
+                         <div className="flex items-center space-x-2">
+-                          <Button variant="outline" size="sm" onClick={() => populateQuestionForm(question)}>
+-                            <Edit className="h-4 w-4" />
+-                          </Button>
+                           <AlertDialog>
+                             <AlertDialogTrigger asChild>
+                               <Button variant="outline" size="sm">
+@@ -891,9 +531,6 @@ export default function FacultyQuestionBank() {
+                           </div>
+                         </div>
+                         <div className="flex items-center space-x-2">
+-                          <Button variant="outline" size="sm" onClick={() => populateQuestionForm(question)}>
+-                            <Edit className="h-4 w-4" />
+-                          </Button>
+                           <AlertDialog>
+                             <AlertDialogTrigger asChild>
+                               <Button variant="outline" size="sm">
+diff --git a/src/containers/faculty/dashboard/FacultyResults.tsx b/src/containers/faculty/dashboard/FacultyResults.tsx
+index cb70b22..2a68e61 100644
+--- a/src/containers/faculty/dashboard/FacultyResults.tsx
++++ b/src/containers/faculty/dashboard/FacultyResults.tsx
+@@ -1,14 +1,12 @@
+-import { BarChart3, Download, Eye, Filter, Search, TrendingUp, TrendingDown, Users, Award, Target, Calendar, Clock, FileText, User } from 'lucide-react';
++import { Award, Clock, Download, Eye, FileText, Search, Target, TrendingDown, TrendingUp, User, Users } from 'lucide-react';
++import { useState } from 'react';
+ import { Badge } from '../../../components/ui/badge';
+ import { Button } from '../../../components/ui/button';
+ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card';
+-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../../../components/ui/dialog';
++import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
+ import { Input } from '../../../components/ui/input';
+-import { Label } from '../../../components/ui/label';
+ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
+ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../../components/ui/table';
+-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../../components/ui/tabs';
+-import { useState } from 'react';
+ 
+ type FacultyResult = {
+   id: string;
+@@ -23,7 +21,6 @@ type FacultyResult = {
+   feedback?: string;
+   submittedAt: string;
+   examDate: string;
+-  specialization: string;
+ };
+ 
+ interface FacultyResultsProps {
+@@ -285,7 +282,6 @@ function FacultyResults({ results, exams, onViewDetails, onExport }: FacultyResu
+                     <TableCell>
+                       <div>
+                         <div className="font-medium">{result.examName}</div>
+-                        <div className="text-sm text-muted-foreground">{result.specialization}</div>
+                       </div>
+                     </TableCell>
+                     <TableCell>
+@@ -370,10 +366,6 @@ function FacultyResults({ results, exams, onViewDetails, onExport }: FacultyResu
+                       <span className="text-muted-foreground">Roll Number:</span>
+                       <span className="font-medium">{selectedResult.studentRollNumber}</span>
+                     </div>
+-                    <div className="flex justify-between">
+-                      <span className="text-muted-foreground">Specialization:</span>
+-                      <span className="font-medium">{selectedResult.specialization}</span>
+-                    </div>
+                   </CardContent>
+                 </Card>
+ 
+diff --git a/src/containers/student/Topbar.tsx b/src/containers/student/Topbar.tsx
+index fabe56b..4aa2883 100644
+--- a/src/containers/student/Topbar.tsx
++++ b/src/containers/student/Topbar.tsx
+@@ -1,70 +1,73 @@
+ "use client";
+ 
+-import { ThemeToggle } from '@/components/ThemeToggle'
+-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+-import { User } from 'lucide-react'
+-import Link from 'next/link'
+-import { useProctor } from '@/contexts/ProctorContext'
++import { usePathname } from "next/navigation";
++import { ThemeToggle } from "@/components/ThemeToggle";
++import {
++  DropdownMenu,
++  DropdownMenuContent,
++  DropdownMenuItem,
++  DropdownMenuTrigger,
++} from "@/components/ui/dropdown-menu";
++import { User } from "lucide-react";
++import Link from "next/link";
+ 
+ function Topbar() {
+-  const { currentUser, logout } = useProctor()
++  const pathname = usePathname();
+ 
+-  const getProfileLinks = () => {
+-    switch (currentUser?.role) {
+-      case 'faculty':
+-        return [
+-          { href: '/faculty/profile', label: 'Profile' },
+-          { href: '/faculty/settings', label: 'Settings' },
+-        ]
+-      case 'department':
+-        return [
+-          { href: '/department/dashboard', label: 'Dashboard' },
+-        ]
+-      case 'campus':
+-        return [
+-          { href: '/school/dashboard', label: 'Dashboard' },
+-        ]
+-      case 'student':
+-        return [
+-          { href: '/student/dashboard', label: 'Dashboard' },
+-        ]
+-      default:
+-        return []
+-    }
+-  }
++  // Detect which role's section the user is currently viewing
++  const getBasePath = () => {
++    if (pathname.startsWith("/student")) return "/student";
++    if (pathname.startsWith("/faculty")) return "/faculty";
++    if (pathname.startsWith("/department")) return "/department";
++    if (pathname.startsWith("/school")) return "/school";
++    return ""; // fallback for non-role routes
++  };
++
++  const basePath = getBasePath();
++
++  const profileLink = `${basePath}/profile`;
++  const settingsLink = `${basePath}/settings`;
+ 
+   const handleLogout = () => {
+-    logout()
+-  }
++    // optional: just redirect to home or clear local data
++    window.location.href = "/";
++  };
+ 
+   return (
+     <nav className="fixed top-0 left-0 right-0 w-full h-16 flex items-center justify-between px-6 border-b shadow-lg bg-background z-50">
+       <div className="flex items-center gap-2">
+-        {/* <Image src="/logo.svg" alt="Logo" width={32} height={32} /> */}
+         <span className="font-bold text-lg">Proctor</span>
+       </div>
+       <div className="flex items-center gap-4">
+         <ThemeToggle />
+         <DropdownMenu>
+           <DropdownMenuTrigger asChild>
+-            <button className='bg-primary text-primary-foreground rounded-full aspect-square p-3 inline-block' aria-label="Open profile menu">
++            <button
++              className="bg-primary text-primary-foreground rounded-full aspect-square p-3 inline-block"
++              aria-label="Open profile menu"
++            >
+               <User className="w-5 h-5" />
+             </button>
+           </DropdownMenuTrigger>
+           <DropdownMenuContent align="end">
+-            {getProfileLinks().map((link) => (
+-              <DropdownMenuItem key={link.href} asChild>
+-                <Link href={link.href}>{link.label}</Link>
+-              </DropdownMenuItem>
+-            ))}
+-            <DropdownMenuItem onClick={handleLogout} className="text-destructive">
++            <DropdownMenuItem asChild>
++              <Link href={profileLink}>Profile</Link>
++            </DropdownMenuItem>
++            <DropdownMenuItem asChild>
++              <Link href={settingsLink}>Settings</Link>
++            </DropdownMenuItem>
++            <DropdownMenuItem
++              onClick={handleLogout}
++              className="text-destructive cursor-pointer"
++            >
+               Logout
+             </DropdownMenuItem>
+           </DropdownMenuContent>
+         </DropdownMenu>
+       </div>
+     </nav>
+-  )
++  );
+ }
+ 
+-export default Topbar
+\ No newline at end of file
++export default Topbar;
++
+diff --git a/src/containers/student/dashboard/CompletedExams.tsx b/src/containers/student/dashboard/CompletedExams.tsx
+index 69b0dc9..954443b 100644
+--- a/src/containers/student/dashboard/CompletedExams.tsx
++++ b/src/containers/student/dashboard/CompletedExams.tsx
+@@ -15,7 +15,6 @@ interface Exam {
+   endTime: string;
+   duration: number;
+   departmentId: string;
+-  specializationId: string;
+   status: string;
+ }
+ 
+@@ -40,7 +39,6 @@ function CompletedExams() {
+             endTime: new Date(Date.now() - 604800000 + 7200000).toISOString(),
+             duration: 120,
+             departmentId: 'computer-science-it',
+-            specializationId: 'bca',
+             status: 'completed'
+           },
+           {
+@@ -51,7 +49,6 @@ function CompletedExams() {
+             endTime: new Date(Date.now() - 259200000 + 3600000).toISOString(),
+             duration: 90,
+             departmentId: 'computer-science-it',
+-            specializationId: 'bca',
+             status: 'completed'
+           }
+         ];
+diff --git a/src/containers/student/dashboard/OnGoingExams.tsx b/src/containers/student/dashboard/OnGoingExams.tsx
+index ee02817..83cc4e4 100644
+--- a/src/containers/student/dashboard/OnGoingExams.tsx
++++ b/src/containers/student/dashboard/OnGoingExams.tsx
+@@ -13,7 +13,6 @@ interface Exam {
+   endTime: string;
+   duration: number;
+   departmentId: string;
+-  specializationId: string;
+   status: string;
+ }
+ 
+@@ -38,7 +37,6 @@ const OngoingExams = () => {
+             endTime: new Date(Date.now() + 1800000).toISOString(), // Ends in 30 min
+             duration: 60,
+             departmentId: 'computer-science-it',
+-            specializationId: 'bca',
+             status: 'active'
+           }
+         ];
+diff --git a/src/containers/student/dashboard/UpcomingExams.tsx b/src/containers/student/dashboard/UpcomingExams.tsx
+index 983f908..85e4181 100644
+--- a/src/containers/student/dashboard/UpcomingExams.tsx
++++ b/src/containers/student/dashboard/UpcomingExams.tsx
+@@ -15,7 +15,6 @@ interface Exam {
+   endTime: string;
+   duration: number;
+   departmentId: string;
+-  specializationId: string;
+   status: string;
+ }
+ 
+@@ -40,7 +39,6 @@ function UpcomingExams() {
+             endTime: new Date(Date.now() + 86400000 + 7200000).toISOString(), // 2 hours later
+             duration: 120,
+             departmentId: 'computer-science-it',
+-            specializationId: 'bca',
+             status: 'published'
+           },
+           {
+@@ -51,7 +49,6 @@ function UpcomingExams() {
+             endTime: new Date(Date.now() + 172800000 + 3600000).toISOString(), // 1 hour later
+             duration: 60,
+             departmentId: 'computer-science-it',
+-            specializationId: 'bca',
+             status: 'published'
+           }
+         ];
+diff --git a/src/contexts/ProctorContext.tsx b/src/contexts/ProctorContext.tsx
+index ef86cb3..f1695b9 100644
+--- a/src/contexts/ProctorContext.tsx
++++ b/src/contexts/ProctorContext.tsx
+@@ -1,6 +1,6 @@
+ ﻿"use client";
+ 
+-import { User, UserRole, Exam, Result } from '@/lib/types';
++import { Exam, Result, User, UserRole } from '@/lib/types';
+ import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+ 
+ interface ProctorContextType {
+@@ -116,7 +116,43 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
+       createdAt: new Date().toISOString(),
+     }
+   ]);
+-  const [categories, setCategories] = useState<any[]>([]);
++  const [categories, setCategories] = useState<any[]>([
++    {
++      id: 'logical-reasoning',
++      name: 'Logical Reasoning',
++      description: 'Questions testing logical thinking and reasoning abilities',
++      isActive: true,
++      createdAt: new Date().toISOString(),
++    },
++    {
++      id: 'verbal-ability',
++      name: 'Verbal Ability',
++      description: 'Questions testing English language skills and comprehension',
++      isActive: true,
++      createdAt: new Date().toISOString(),
++    },
++    {
++      id: 'quantitative-aptitude',
++      name: 'Quantitative Aptitude',
++      description: 'Mathematics and numerical ability questions',
++      isActive: true,
++      createdAt: new Date().toISOString(),
++    },
++    {
++      id: 'general-knowledge',
++      name: 'General Knowledge',
++      description: 'General awareness and current affairs questions',
++      isActive: true,
++      createdAt: new Date().toISOString(),
++    },
++    {
++      id: 'data-interpretation',
++      name: 'Data Interpretation',
++      description: 'Questions involving analysis of data and charts',
++      isActive: true,
++      createdAt: new Date().toISOString(),
++    }
++  ]);
+   const [results, setResults] = useState<Result[]>([
+     {
+       id: 'result-1',
+@@ -384,24 +420,17 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
+     const checkAuth = async () => {
+       try {
+         const token = localStorage.getItem('authToken');
+-        if (token) {
+-          // Mock user data - replace with actual user data structure
+-          const mockUser: User = {
+-            id: '1',
+-            email: 'student@jainuniversity.ac.in',
+-            password: '', // Not stored in state
+-            role: 'student',
+-            name: 'John Doe',
+-            phone: '+91 9876543210',
+-            isActive: true,
+-            createdAt: new Date().toISOString(),
+-            updatedAt: new Date().toISOString(),
+-          };
+-          setCurrentUser(mockUser);
++        const storedUser = localStorage.getItem('userData');
++
++        if (token && storedUser) {
++          // Restore user data from localStorage
++          const userData = JSON.parse(storedUser);
++          setCurrentUser(userData);
+         }
+       } catch (error) {
+         console.error('Auth check failed:', error);
+         localStorage.removeItem('authToken');
++        localStorage.removeItem('userData');
+       } finally {
+         setIsLoading(false);
+       }
+@@ -441,6 +470,7 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
+         };
+         setCurrentUser(mockUser);
+         localStorage.setItem('authToken', 'mock-token');
++        localStorage.setItem('userData', JSON.stringify(mockUser));
+         return { success: true, user: mockUser };
+       } else {
+         return { success: false, error: 'Invalid credentials' };
+@@ -454,6 +484,7 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
+   const logout = () => {
+     setCurrentUser(null);
+     localStorage.removeItem('authToken');
++    localStorage.removeItem('userData');
+   };
+ 
+   const apiCall = async (endpoint: string, options: RequestInit = {}) => {

@@ -103,7 +103,10 @@ export default function DepartmentProfilePage() {
   );
 
   return (
-    <DepartmentLayout>
+    <DepartmentLayout
+      title="Department Profile"
+      subtitle="Manage department information and settings"
+    >
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
