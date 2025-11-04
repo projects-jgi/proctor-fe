@@ -24,6 +24,7 @@ function Login() {
             router.push("/student/dashboard")
             setLoginError("")
         }catch(err){
+            console.log(err)
             let err_message = "Unable to login. Please try again!"
             if(err instanceof Error){
                 if(err.message){

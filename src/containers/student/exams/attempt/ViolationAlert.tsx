@@ -14,14 +14,15 @@ function ViolationAlert({onClose, description}: {description: string, onClose: (
     const attempt = useSelector((state: RootState) => state.exam_attempt.attempt);
     const violations = useSelector((state: RootState) => state.exam_attempt.violations);
     const queryClient = useQueryClient();
-    const violation_count = useRef(violations.length + 1)
+    let violation_count = violations.length + 1
 
     const store_violation_mutation = useMutation({
         mutationFn: create_attempt_violation,
         onSuccess: (data, variables, context) => {
             queryClient.invalidateQueries({
-                queryKey: ["exams", variables.exam_id, "attempts", variables.attempt_id, "violations"],
+                queryKey: ["exams", variables.exam_id, "attempts", attempt.id, "violations"],
             })
+            violation_count = violations.length
         }
     })
 
@@ -54,7 +55,7 @@ function ViolationAlert({onClose, description}: {description: string, onClose: (
                     <DialogDescription asChild>
                         <div>
                             <p className='mb-2'>{description}</p>
-                            <p className='text-destructive'><b>{Math.max(0, attempt.exam.max_violation_count - violation_count.current)}</b> out of <b>{attempt.exam.max_violation_count}</b> violations left</p>
+                            <p className='text-destructive'><b>{Math.max(0, attempt.exam.max_violation_count - violation_count)}</b> out of <b>{attempt.exam.max_violation_count}</b> violations left</p>
                         </div>
                     </DialogDescription>
                 </DialogHeader>

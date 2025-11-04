@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react"
 
 export default function useCameraCapture(
-    isExamActive: boolean
+    isExamActive: boolean,
+    onCapture: (base64_image: string) => void
 ){
 
     const initialized = useRef(false);
@@ -48,7 +49,7 @@ export default function useCameraCapture(
                     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                 
                     const imageBase64 = canvas.toDataURL('image/jpeg', 0.7);
-                    // console.log(imageBase64)
+                    onCapture(imageBase64)
                 }, 3000)
             })
         })

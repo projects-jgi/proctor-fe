@@ -113,3 +113,29 @@ export async function get_attempt_violation({ exam_id, attempt_id }: { exam_id: 
     }
 }
 
+export async function exam_camera_upload({ exam_id, attempt_id, file }: {
+    exam_id: number,
+    attempt_id: number,
+    file: string
+}){
+    try{
+        const body = {
+            file
+        }
+
+        const response = await Request({
+            url: `${process.env.BACKEND_HOST}/api/students/exams/${exam_id}/attempts/${attempt_id}/camera_upload`,
+            method: 'POST',
+            isAuthorized: true,
+            body
+        })
+
+        if(response.data.success){
+            return {status: true}
+        }else{
+            return {status: false}
+        }
+    }catch(err){
+        return {status:false}
+    }
+}

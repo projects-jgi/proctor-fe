@@ -13,7 +13,7 @@ import { useFullscreenStatus } from '@/hooks/browser_permissions/useFullscreenSt
 import { RootState } from '@/lib/redux/store';
 import useCameraCapture from '@/hooks/useCameraCapture';
 import { useQuery } from '@tanstack/react-query';
-import { get_attempt_violation } from '@/lib/server_api/student';
+import { exam_camera_upload, get_attempt_violation } from '@/lib/server_api/student';
 import { setAttempt, setViolations } from '@/lib/redux/state/ExamAttempt';
 
 function ExamWrapper({ exam_id, exam_questions }: { exam_id: number, exam_questions: any}) {
@@ -24,7 +24,6 @@ function ExamWrapper({ exam_id, exam_questions }: { exam_id: number, exam_questi
     const isEligible = useSelector((state: RootState) => state.exam_eligibility_test.is_eligible);
     const attempt_id = useSelector((state: RootState) => state.exam_attempt.attempt?.id)
     const dispatch = useDispatch();
-    useCameraCapture(video_permission);
 
     const violationQuery = useQuery({
         queryKey: ["exams", parseInt(exam_id.toString()), "attempts", parseInt(attempt_id), "violations"],

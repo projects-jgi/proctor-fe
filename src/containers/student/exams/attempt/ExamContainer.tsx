@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ExamSidebar } from './ExamSidebar';
 import { ExamQuestion } from '@/types/exam';
 import Topbar from './Topbar';
@@ -12,11 +12,14 @@ import { SidebarInset } from '@/components/ui/sidebar';
 import useTabActive from '@/hooks/useTabActive';
 import { RootState } from '@/lib/redux/store';
 import ViolationAlert from './ViolationAlert';
-import { useMutation } from '@tanstack/react-query';
-import { save_student_exam_attempt } from '@/lib/server_api/student';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { exam_camera_upload, save_student_exam_attempt } from '@/lib/server_api/student';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import SubmissionLoading from './SubmissionLoading';
+import { useSocket } from '@/hooks/useSocket';
+import useCameraCapture from '@/hooks/useCameraCapture';
+import useVideoPermission from '@/hooks/browser_permissions/useVideoPermission';
 
 function ExamContainer({ exam_id, exam_questions }: { exam_id: number, exam_questions: any }) {
     const [isActiveTab, setIsActiveTab] = useTabActive();
@@ -25,15 +28,46 @@ function ExamContainer({ exam_id, exam_questions }: { exam_id: number, exam_ques
     const currentQuestion = useSelector((state: RootState) => state.exam_attempt.currentQuestion);
     const violations = useSelector((state: RootState) => state.exam_attempt.violations);
     const attempt = useSelector((state: RootState) => state.exam_attempt.attempt);
+    const [violation, setViolation] = useState<string | null>(null);
+    const video_permission = useVideoPermission();
+
+    const queryClient = useQueryClient();
 
     const router = useRouter()
     const dispatch = useDispatch();
+
+    async function onImageCapture(image: string){
+        const res = await exam_camera_upload({ exam_id, attempt_id: attempt.id, file: image})
+        console.log(res)
+    }
+
+    useCameraCapture(video_permission, onImageCapture);
 
     useEffect(() => {
         if(violations.length >= attempt.exam.max_violation_count){
             onFinish();
         }
     }, [violations])
+
+    useEffect(() => {
+        const socket = useSocket();
+
+        // TODO: Change the listener name
+        socket.on("exam-attempt-violation", (message) => {
+            console.log(message)
+            if(message.data.is_violation){
+                toast.warning(message.data.violations[0].description)
+                setViolation(message.data.violations[0].description)
+                queryClient.invalidateQueries({
+                    queryKey: ["exams", parseInt(exam_id.toString()), "attempts", parseInt(attempt.id), "violations"],
+                })
+            }
+        })
+
+        return () => {
+            socket.off("exam-attempt-violation")
+        }
+    }, [])
 
         
     function onFinish(){
@@ -92,6 +126,7 @@ function ExamContainer({ exam_id, exam_questions }: { exam_id: number, exam_ques
         <>
             {onFinishMutation.isPending && <SubmissionLoading />}
             {!isActiveTab && <ViolationAlert description='Tab Switch Violation' onClose={() => setIsActiveTab(true)} />}
+            {violation != null && <ViolationAlert description={violation as string} onClose={() => setViolation(null)} />}
             <ExamSidebar questions={exam_questions["questions"]} />
             <SidebarInset>
                 <main className='w-full'>
