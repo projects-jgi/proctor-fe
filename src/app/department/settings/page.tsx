@@ -151,19 +151,8 @@ export default function DepartmentSettingsPage() {
   };
 
   return (
-    <DepartmentLayout
-      title="Department Settings"
-      subtitle="Configure department preferences and options"
-    >
+    <DepartmentLayout title="Department Settings" subtitle="Configure your department preferences and policies">
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div>
-              <h1 className="text-3xl font-bold">Department Settings</h1>
-              <p className="text-muted-foreground">Configure your department preferences and policies</p>
-            </div>
-          </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={handleResetToDefaults}>
               <RefreshCw className="h-4 w-4 mr-2" />
@@ -844,7 +833,6 @@ export default function DepartmentSettingsPage() {
             </div>
           </TabsContent>
         </Tabs>
-      </div>
     </DepartmentLayout>
   );
 }

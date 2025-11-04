@@ -1,7 +1,6 @@
-import Header from "@/components/auth/Header";
+import { StudentLayout } from "@/components/StudentLayout";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Topbar from "@/containers/student/Topbar";
 
 function Results() {
     const results = [
@@ -20,8 +19,7 @@ function Results() {
     ];
 
     return (
-        <>
-            <Topbar />
+        <StudentLayout title="Exam Results" subtitle="View your exam performance and results">
             <div>
                 <section className="grid grid-cols-1 gap-4 mt-8">
                     {results.map((result, index) => (
@@ -42,7 +40,7 @@ function Results() {
                     ))}
                 </section>
             </div>
-        </>
+        </StudentLayout>
     );
 }
 

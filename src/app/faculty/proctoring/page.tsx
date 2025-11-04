@@ -63,6 +63,7 @@ export default function ProctoringPage() {
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [isConnected, setIsConnected] = useState(true);
   const [refreshInterval, setRefreshInterval] = useState(30); // seconds
+  const [activeTab, setActiveTab] = useState("sessions");
 
   // Mock data for demonstration - in real app this would come from API
   useEffect(() => {
@@ -410,6 +411,7 @@ export default function ProctoringPage() {
           <TabsList>
             <TabsTrigger value="sessions">Active Sessions</TabsTrigger>
             <TabsTrigger value="violations">Violation Reports</TabsTrigger>
+            <TabsTrigger value="alerts">Live Alerts</TabsTrigger>
           </TabsList>
 
           <TabsContent value="sessions" className="space-y-4">
@@ -418,110 +420,62 @@ export default function ProctoringPage() {
                 <CardTitle>Active Proctoring Sessions</CardTitle>
               </CardHeader>
               <CardContent>
-                {/* Two-column layout: left = sessions, right = continuous live alerts */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="md:col-span-2 space-y-4">
-                    {activeSessions.map((session) => (
-                      <div key={session.id} className="border rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-3">
-                            <div className={`w-3 h-3 rounded-full ${getStatusColor(session.status)}`} />
-                            {getStatusIcon(session.status)}
-                            <div>
-                              <h3 className="font-semibold">{session.studentName}</h3>
-                              <p className="text-sm text-muted-foreground">{session.examTitle}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Badge variant={session.status === 'active' ? 'default' : 'secondary'}>
-                              {session.status}
-                            </Badge>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleViewSession(session)}
-                            >
-                              <Eye className="w-4 h-4 mr-1" />
-                              Monitor
-                            </Button>
+                <div className="space-y-4">
+                  {activeSessions.map((session) => (
+                    <div key={session.id} className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-3 h-3 rounded-full ${getStatusColor(session.status)}`} />
+                          {getStatusIcon(session.status)}
+                          <div>
+                            <h3 className="font-semibold">{session.studentName}</h3>
+                            <p className="text-sm text-muted-foreground">{session.examTitle}</p>
                           </div>
                         </div>
-
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                          <div className="flex items-center gap-2">
-                            <Camera className={`w-4 h-4 ${session.cameraActive ? 'text-green-600' : 'text-red-600'}`} />
-                            <span>Camera: {session.cameraActive ? 'Active' : 'Inactive'}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Mic className={`w-4 h-4 ${session.micActive ? 'text-green-600' : 'text-red-600'}`} />
-                            <span>Mic: {session.micActive ? 'Active' : 'Inactive'}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Monitor className={`w-4 h-4 ${session.tabVisible ? 'text-green-600' : 'text-red-600'}`} />
-                            <span>Tab: {session.tabVisible ? 'Focused' : 'Unfocused'}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-blue-600" />
-                            <span>Started: {new Date(session.startTime).toLocaleTimeString()}</span>
-                          </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant={session.status === 'active' ? 'default' : 'secondary'}>
+                            {session.status}
+                          </Badge>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewSession(session)}
+                          >
+                            <Eye className="w-4 h-4 mr-1" />
+                            Monitor
+                          </Button>
                         </div>
-
-                        {session.violations.length > 0 && (
-                          <div className="mt-3 pt-3 border-t">
-                            <div className="flex items-center gap-2 text-sm text-orange-600">
-                              <AlertTriangle className="w-4 h-4" />
-                              <span>{session.violations.length} violation(s) detected</span>
-                            </div>
-                          </div>
-                        )}
                       </div>
-                    ))}
-                  </div>
 
-                  {/* Continuous Live Alerts panel */}
-                  <div className="md:col-span-1">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Live Alerts (Real-time)</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3 max-h-[60vh] overflow-auto">
-                          {activeSessions
-                            .filter(session => !session.cameraActive || !session.micActive || !session.tabVisible || session.violations.some(v => !v.resolved))
-                            .map((session) => (
-                              <Alert key={session.id}>
-                                <AlertTriangle className="h-4 w-4" />
-                                <div className="ml-2">
-                                  <div className="flex items-center justify-between">
-                                    <strong>{session.studentName}</strong>
-                                    <Badge variant={session.status === 'active' ? 'default' : 'secondary'}>{session.status}</Badge>
-                                  </div>
-                                  <div className="text-xs text-muted-foreground">{session.examTitle}</div>
-                                  <div className="mt-2 text-sm">
-                                    {!session.cameraActive && <div>• Camera is inactive</div>}
-                                    {!session.micActive && <div>• Microphone is inactive</div>}
-                                    {!session.tabVisible && <div>• Tab is not focused</div>}
-                                    {session.violations.filter(v => !v.resolved).length > 0 && (
-                                      <div>• {session.violations.filter(v => !v.resolved).length} unresolved violation(s)</div>
-                                    )}
-                                  </div>
-                                </div>
-                              </Alert>
-                            ))}
-
-                          {activeSessions.every(session =>
-                            session.cameraActive && session.micActive && session.tabVisible &&
-                            session.violations.every(v => v.resolved)
-                          ) && (
-                            <div className="text-center py-8 text-muted-foreground">
-                              <Shield className="w-12 h-12 mx-auto mb-4 text-green-600" />
-                              <p>All sessions are running smoothly. No alerts at this time.</p>
-                            </div>
-                          )}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div className="flex items-center gap-2">
+                          <Camera className={`w-4 h-4 ${session.cameraActive ? 'text-green-600' : 'text-red-600'}`} />
+                          <span>Camera: {session.cameraActive ? 'Active' : 'Inactive'}</span>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                        <div className="flex items-center gap-2">
+                          <Mic className={`w-4 h-4 ${session.micActive ? 'text-green-600' : 'text-red-600'}`} />
+                          <span>Mic: {session.micActive ? 'Active' : 'Inactive'}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Monitor className={`w-4 h-4 ${session.tabVisible ? 'text-green-600' : 'text-red-600'}`} />
+                          <span>Tab: {session.tabVisible ? 'Focused' : 'Unfocused'}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-blue-600" />
+                          <span>Started: {new Date(session.startTime).toLocaleTimeString()}</span>
+                        </div>
+                      </div>
+
+                      {session.violations.length > 0 && (
+                        <div className="mt-3 pt-3 border-t">
+                          <div className="flex items-center gap-2 text-sm text-orange-600">
+                            <AlertTriangle className="w-4 h-4" />
+                            <span>{session.violations.length} violation(s) detected</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -576,7 +530,44 @@ export default function ProctoringPage() {
             </Card>
           </TabsContent>
 
-          {/* Removed separate Live Alerts tab - live alerts are displayed inside Active Sessions view */}
+          <TabsContent value="alerts" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Live Alerts</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {activeSessions
+                    .filter(session => !session.cameraActive || !session.micActive || !session.tabVisible || session.violations.some(v => !v.resolved))
+                    .map((session) => (
+                      <Alert key={session.id}>
+                        <AlertTriangle className="h-4 w-4" />
+                        <div className="ml-2">
+                          <strong>{session.studentName}</strong> - {session.examTitle}
+                          <div className="mt-2 space-y-1">
+                            {!session.cameraActive && <p>• Camera is inactive</p>}
+                            {!session.micActive && <p>• Microphone is inactive</p>}
+                            {!session.tabVisible && <p>• Tab is not focused</p>}
+                            {session.violations.filter(v => !v.resolved).length > 0 && (
+                              <p>• {session.violations.filter(v => !v.resolved).length} unresolved violation(s)</p>
+                            )}
+                          </div>
+                        </div>
+                      </Alert>
+                    ))}
+                  {activeSessions.every(session =>
+                    session.cameraActive && session.micActive && session.tabVisible &&
+                    session.violations.every(v => v.resolved)
+                  ) && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Shield className="w-12 h-12 mx-auto mb-4 text-green-600" />
+                      <p>All sessions are running smoothly. No alerts at this time.</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
 
         {/* Session Detail Modal (improved) */}

@@ -20,7 +20,8 @@ function FacultyResultsPage() {
             grade: 'A',
             status: 'passed' as const,
             submittedAt: new Date().toISOString(),
-            examDate: new Date().toISOString()
+            examDate: new Date().toISOString(),
+            specialization: 'Computer Science'
         },
         {
             id: '2',
@@ -33,7 +34,8 @@ function FacultyResultsPage() {
             grade: 'B',
             status: 'passed' as const,
             submittedAt: new Date().toISOString(),
-            examDate: new Date().toISOString()
+            examDate: new Date().toISOString(),
+            specialization: 'Computer Science'
         },
         {
             id: '3',
@@ -46,21 +48,19 @@ function FacultyResultsPage() {
             grade: 'F',
             status: 'failed' as const,
             submittedAt: new Date().toISOString(),
-            examDate: new Date().toISOString()
+            examDate: new Date().toISOString(),
+            specialization: 'Computer Science'
         }
     ];
 
     return (
-        <FacultyLayout>
-            <div className="container mx-auto py-8">
-                <h1 className="text-3xl font-bold mb-6">Exam Results</h1>
-                <FacultyResults
-                    results={mockResults}
-                    exams={exams}
-                    onViewDetails={(result) => console.log('View details:', result)}
-                    onExport={(results) => console.log('Export:', results)}
-                />
-            </div>
+        <FacultyLayout title="Exam Results" subtitle="View and analyze student performance">
+            <FacultyResults
+                results={mockResults}
+                exams={exams}
+                onViewDetails={(result) => console.log('View details:', result)}
+                onExport={(results) => console.log('Export:', results)}
+            />
         </FacultyLayout>
     );
 }

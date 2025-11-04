@@ -23,7 +23,6 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-
 export default function StudentSettingsPage() {
   const [settings, setSettings] = useState({
     // Notification Settings
@@ -83,8 +82,11 @@ export default function StudentSettingsPage() {
   };
 
   return (
-    <StudentLayout title="Student Settings" subtitle="Customize your learning experience and account preferences">
-
+    <StudentLayout
+      title="Student Settings"
+      subtitle="Customize your learning experience and account preferences"
+    >
+      <div className="container mx-auto p-6 space-y-6">
         {/* Notifications */}
         {notifications.success && (
           <Alert className="border-green-200 bg-green-50">
@@ -584,6 +586,7 @@ export default function StudentSettingsPage() {
             </Card>
           </TabsContent>
         </Tabs>
+      </div>
     </StudentLayout>
   );
 }

@@ -85,15 +85,8 @@ export default function SchoolSettingsPage() {
   };
 
   return (
-    <SchoolLayout>
+    <SchoolLayout title="School Settings" subtitle="Configure institution-wide preferences and system settings">
       <div className="container mx-auto p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">School Settings</h1>
-            <p className="text-muted-foreground">Configure institution-wide preferences and system settings</p>
-          </div>
-        </div>
 
         {/* Notifications */}
         {notifications.success && (

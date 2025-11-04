@@ -107,15 +107,15 @@ function CompletedExams() {
               key={exam.id}
               name={exam.title}
               description={exam.description}
-              startDate={new Date(exam.startTime).toLocaleDateString()}
-              endDate={new Date(exam.endTime).toLocaleDateString()}
-              duration={exam.duration.toString()}
-              action={<Link href={`/student/results/${exam.id}`}><Button>View Results</Button></Link>}
+              startDate={exam.startTime}
+              endDate={exam.endTime}
+              duration={`${exam.duration} min`}
+              action={<Link href="/student/results"><Button>View Results</Button></Link>}
             />
           ))
         ) : (
           <div className="text-center py-8 text-gray-500">
-            No completed exams found.
+            No completed exams available for your course.
           </div>
         )}
       </div>

@@ -11,18 +11,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useProctor } from '@/contexts/ProctorContext';
 import {
-    Award,
-    BookOpen,
-    Calendar,
-    Camera,
-    Edit,
-    GraduationCap,
-    Mail,
-    MapPin,
-    Phone,
-    TrendingUp,
-    User,
-    Users
+  Award,
+  BookOpen,
+  Calendar,
+  Camera,
+  Edit,
+  GraduationCap,
+  Mail,
+  MapPin,
+  Phone,
+  TrendingUp,
+  User,
+  Users
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -79,7 +79,7 @@ export default function FacultyProfilePage() {
                 <Avatar className="w-24 h-24">
                   <AvatarImage src={undefined} alt={currentUser?.name} />
                   <AvatarFallback className="text-2xl">
-                    {currentUser?.name?.split(' ').map((n: string) => n[0]).join('') || 'F'}
+                    {currentUser?.name?.split(' ').map(n => n[0]).join('') || 'F'}
                   </AvatarFallback>
                 </Avatar>
                 <Button

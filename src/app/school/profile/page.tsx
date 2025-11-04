@@ -11,19 +11,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useProctor } from '@/contexts/ProctorContext';
 import {
-    BookOpen,
-    Building,
-    Calendar,
-    CheckCircle,
-    Edit,
-    FileText,
-    Globe,
-    GraduationCap,
-    Mail,
-    MapPin,
-    Phone,
-    TrendingUp,
-    Users
+  BookOpen,
+  Building,
+  Calendar,
+  CheckCircle,
+  Edit,
+  FileText,
+  Globe,
+  GraduationCap,
+  Mail,
+  MapPin,
+  Phone,
+  TrendingUp,
+  Users
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -44,7 +44,7 @@ export default function SchoolProfilePage() {
       ? Math.round(results.reduce((sum, r) => sum + r.percentage, 0) / results.length)
       : 0,
     passRate: results.length > 0
-      ? Math.round((results.filter(r => r.percentage >= 50).length / results.length) * 100)
+      ? Math.round((results.filter(r => r.percentage >= 40).length / results.length) * 100)
       : 0
   };
 
@@ -66,14 +66,9 @@ export default function SchoolProfilePage() {
   };
 
   return (
-    <SchoolLayout>
+    <SchoolLayout title="School Profile" subtitle="Manage your school information and view statistics">
       <div className="container mx-auto p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">School Profile</h1>
-            <p className="text-muted-foreground">Manage your school information and view institution statistics</p>
-          </div>
+        <div className="flex justify-between items-center">
           <Button onClick={() => setIsEditing(!isEditing)} variant={isEditing ? "outline" : "default"}>
             <Edit className="w-4 h-4 mr-2" />
             {isEditing ? 'Cancel' : 'Edit Profile'}

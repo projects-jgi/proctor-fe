@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarDays, Hourglass } from "lucide-react";
 import React from "react";
@@ -13,23 +14,23 @@ function ExamCard({ name, description, startDate, endDate, duration, action }: E
         <CardAction>
             { action }
         </CardAction>
+        <CardContent className="text-sm p-0">
+          <div className="flex gap-4 flex-wrap">
+            <div className="flex gap-2 items-center">
+              <span className="inline">
+                <CalendarDays size={20} />
+              </span>
+              <span className="inline">{startDate} to {endDate}</span>
+            </div>
+            <div className="flex gap-2 items-center">
+              <span className="inline">
+                <Hourglass size={20} />
+              </span>
+              <span className="inline">{duration} Minutes</span>
+            </div>
+          </div>
+        </CardContent>
       </CardHeader>
-      <CardContent className="text-sm">
-        <div className="flex gap-4 flex-wrap">
-          <div className="flex gap-2 items-center">
-            <span className="inline">
-              <CalendarDays size={20} />
-            </span>
-            <span className="inline">{startDate} to {endDate}</span>
-          </div>
-          <div className="flex gap-2 items-center">
-            <span className="inline">
-              <Hourglass size={20} />
-            </span>
-            <span className="inline">{duration} Minutes</span>
-          </div>
-        </div>
-      </CardContent>
     </Card>
   );
 }

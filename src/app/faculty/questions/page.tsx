@@ -1,17 +1,12 @@
 "use client";
 
-import { FacultyLayout } from "@/components/FacultyLayout";
-import FacultyQuestionBank from "@/containers/faculty/dashboard/FacultyQuestionBank";
+import { FacultyLayout } from '@/components/FacultyLayout';
+import FacultyQuestionBank from '@/containers/faculty/dashboard/FacultyQuestionBank';
 
-function FacultyQuestions() {
-    return (
-        <FacultyLayout>
-            <div className="container mx-auto py-8">
-                <h1 className="text-3xl font-bold mb-6">Question Bank</h1>
-                <FacultyQuestionBank />
-            </div>
-        </FacultyLayout>
-    );
+export default function FacultyQuestionsPage() {
+  return (
+    <FacultyLayout title="Question Bank" subtitle="Create and manage questions for your exams">
+      <FacultyQuestionBank />
+    </FacultyLayout>
+  );
 }
-
-export default FacultyQuestions;

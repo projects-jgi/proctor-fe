@@ -1,17 +1,14 @@
-import { Button } from '@/components/ui/button'
-import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { StudentLayout } from '@/components/StudentLayout'
+import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import CompletedExams from '@/containers/student/dashboard/CompletedExams'
 import HeroBanner from '@/containers/student/dashboard/HeroBanner'
 import OngoingExams from '@/containers/student/dashboard/OnGoingExams'
 import UpcomingExams from '@/containers/student/dashboard/UpcomingExams'
-import Topbar from '@/containers/student/Topbar'
-import { AlarmClock, AlarmClockCheck, ArrowRight, Award, CalendarDays, Hourglass, Siren, Tally1 } from 'lucide-react'
-import React from 'react'
+import { AlarmClock, AlarmClockCheck, Award, Siren } from 'lucide-react'
 
 function page() {
     return (
-        <>
-            <Topbar />
+        <StudentLayout title="Student Dashboard" subtitle="Welcome back! Here's your academic overview">
             <main className=''>
                 <HeroBanner />
                 <div className="container mx-auto">
@@ -60,8 +57,9 @@ function page() {
                     </div>
                 </div>
             </main>
-        </>
+        </StudentLayout>
     )
+
 }
 
 export default page

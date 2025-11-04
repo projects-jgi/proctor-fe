@@ -11,13 +11,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useProctor } from '@/contexts/ProctorContext';
 import {
-    Download,
-    FileText,
-    HelpCircle,
-    Plus,
-    Search,
-    Trash2,
-    Upload
+  Download,
+  FileText,
+  HelpCircle,
+  Plus,
+  Search,
+  Trash2,
+  Upload
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -220,7 +220,7 @@ export default function FacultyQuestionBank() {
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="upload-type">Upload Type</Label>
-                  <Select value={bulkUploadType} onValueChange={(value) => setBulkUploadType(value as 'csv' | 'pdf')}>
+                  <Select value={bulkUploadType} onValueChange={(value: 'csv' | 'pdf') => setBulkUploadType(value)}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>

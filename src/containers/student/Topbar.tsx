@@ -2,10 +2,10 @@
 
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { User } from "lucide-react";
 import Link from "next/link";
@@ -34,9 +34,12 @@ function Topbar() {
   };
 
   return (
-    <nav className="mb-2 w-full h-16 flex items-center justify-between px-6 border-b shadow-lg">
+    <nav className="fixed top-0 left-0 right-0 w-full h-16 flex items-center justify-between px-6 border-b shadow-lg bg-background z-50">
       <div className="flex items-center gap-2">
-        <span className="font-bold text-lg">Proctor</span>
+        {/* <span className="font-bold text-lg">Proctor</span> */}
+      <div className="max-w-[50px] rounded-full overflow-hidden"  >
+        <img src="/jgi-proc-logo.jpg" alt="JGI Proctor Logo"  className="max-w-full h-auto object-contain"/>
+      </div>
       </div>
       <div className="flex items-center gap-4">
         <ThemeToggle />

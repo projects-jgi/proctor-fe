@@ -11,20 +11,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useProctor } from '@/contexts/ProctorContext';
 import {
-    Award,
-    BookOpen,
-    Building,
-    Calendar,
-    CheckCircle,
-    Clock,
-    FileText,
-    GraduationCap,
-    Mail,
-    Phone,
-    Shield,
-    Target,
-    TrendingUp,
-    User
+  Award,
+  BookOpen,
+  Building,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Edit,
+  FileText,
+  GraduationCap,
+  Mail,
+  Phone,
+  Shield,
+  Target,
+  TrendingUp,
+  User
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -48,7 +49,7 @@ export default function StudentProfilePage() {
       ? Math.round(studentResults.reduce((sum, r) => sum + r.percentage, 0) / studentResults.length)
       : 0,
     passRate: studentResults.length > 0
-      ? Math.round((studentResults.filter(r => r.percentage >= 50).length / studentResults.length) * 100)
+      ? Math.round((studentResults.filter(r => r.percentage >= 40).length / studentResults.length) * 100)
       : 0,
     upcomingExams: studentExams.filter(e => new Date(e.startTime) > new Date()).length,
     semester: currentStudent?.semester || 1,
@@ -72,7 +73,15 @@ export default function StudentProfilePage() {
 
   return (
     <StudentLayout title="Student Profile" subtitle="Manage your personal information and view your academic progress">
-      <Tabs defaultValue="overview" className="space-y-6">
+      <div className="space-y-8">
+        <div className="flex justify-between items-center">
+          <Button onClick={() => setIsEditing(!isEditing)} variant={isEditing ? "outline" : "default"}>
+            <Edit className="w-4 h-4 mr-2" />
+            {isEditing ? 'Cancel' : 'Edit Profile'}
+          </Button>
+        </div>
+
+        <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="academic">Academic</TabsTrigger>
@@ -88,7 +97,7 @@ export default function StudentProfilePage() {
                   <Avatar className="w-20 h-20">
                     <AvatarImage src={undefined} alt={currentUser?.name} />
                     <AvatarFallback className="text-lg">
-                      {currentUser?.name?.split(' ').map((n: string) => n[0]).join('') || 'ST'}
+                      {currentUser?.name?.split(' ').map(n => n[0]).join('') || 'ST'}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
@@ -355,11 +364,11 @@ export default function StudentProfilePage() {
                       <div key={result.id} className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="flex items-center space-x-4">
                           <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                            result.percentage >= 50 ? 'bg-green-100' : 'bg-red-100'
+                            result.percentage >= 40 ? 'bg-green-100' : 'bg-red-100'
                           }`}>
-                            {result.percentage >= 50 ? (
+                            {result.percentage >= 40 ? (
                               <CheckCircle className={`w-6 h-6 ${
-                                result.percentage >= 50 ? 'text-green-600' : 'text-red-600'
+                                result.percentage >= 40 ? 'text-green-600' : 'text-red-600'
                               }`} />
                             ) : (
                               <FileText className="w-6 h-6 text-red-600" />
@@ -368,14 +377,14 @@ export default function StudentProfilePage() {
                           <div>
                             <p className="font-medium">{exam?.title}</p>
                             <p className="text-sm text-muted-foreground">
-                              {new Date(result.submittedAt || result.startedAt || new Date()).toLocaleDateString()}
+                              {result.generatedAt ? new Date(result.generatedAt).toLocaleDateString() : 'N/A'}
                             </p>
                           </div>
                         </div>
                         <div className="text-right">
                           <p className="font-medium">{result.percentage}%</p>
-                          <Badge variant={result.percentage >= 50 ? 'default' : 'destructive'}>
-                            {result.percentage >= 50 ? 'Passed' : 'Failed'}
+                          <Badge variant={result.percentage >= 40 ? 'default' : 'destructive'}>
+                            {result.grade}
                           </Badge>
                         </div>
                       </div>
@@ -419,7 +428,7 @@ export default function StudentProfilePage() {
                       <div className="text-right">
                         <p className="font-medium">{exam.duration} min</p>
                         <Badge variant="outline">
-                          {exam.status}
+                          {exam.type}
                         </Badge>
                       </div>
                     </div>
@@ -473,6 +482,7 @@ export default function StudentProfilePage() {
             </Card>
           </TabsContent>
         </Tabs>
+      </div>
     </StudentLayout>
   );
 }

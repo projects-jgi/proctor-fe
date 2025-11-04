@@ -107,15 +107,15 @@ function UpcomingExams() {
               key={exam.id}
               name={exam.title}
               description={exam.description}
-              startDate={new Date(exam.startTime).toLocaleDateString()}
-              endDate={new Date(exam.endTime).toLocaleDateString()}
+              startDate={exam.startTime}
+              endDate={exam.endTime}
               duration={exam.duration.toString()}
               action={<Button>View Details</Button>}
             />
           ))
         ) : (
           <div className="text-center py-8 text-gray-500">
-            No upcoming exams found.
+            No upcoming exams available for your course.
           </div>
         )}
       </div>
