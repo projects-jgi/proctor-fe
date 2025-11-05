@@ -1,283 +1,324 @@
 "use client";
 
+import { SchoolLayout } from "@/components/SchoolLayout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { SchoolLayout } from "@/components/SchoolLayout";
-import { useProctor } from '@/contexts/ProctorContext';
-import {
-    FileText,
-    Clock,
-    Users,
-    TrendingUp,
-    Calendar,
-    ArrowRight
-} from 'lucide-react';
-import Link from 'next/link';
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useProctor } from "@/contexts/ProctorContext";
+import { Building, Calendar, Edit, Eye, Plus, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+type SchoolExam = {
+    id: string;
+    title: string;
+    description: string;
+    department: string;
+    facultyName: string;
+    startTime: string;
+    endTime: string;
+    duration: number;
+    totalStudents: number;
+    status: 'draft' | 'published' | 'ongoing' | 'completed';
+    type: 'public' | 'private';
+    averageScore?: number;
+};
 
 function SchoolExams() {
-  const { currentUser, exams, departments, faculties } = useProctor();
+    const { exams } = useProctor();
+    const router = useRouter();
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
+    const [selectedStatus, setSelectedStatus] = useState<string>('all');
 
-  // Get department name by ID
-  const getDepartmentName = (departmentId: string) => {
-    const dept = departments.find(d => d.id === departmentId);
-    return dept ? dept.name : 'Unknown Department';
-  };
+    // Mock data for school exams
+    const mockExams: SchoolExam[] = [
+        {
+            id: '1',
+            title: 'Data Structures Final Exam',
+            description: 'Comprehensive final examination covering all data structures topics',
+            department: 'Computer Science',
+            facultyName: 'Dr. Smith',
+            startTime: new Date(Date.now() + 86400000).toISOString(),
+            endTime: new Date(Date.now() + 86400000 + 7200000).toISOString(),
+            duration: 120,
+            totalStudents: 45,
+            status: 'published',
+            type: 'public',
+            averageScore: 82
+        },
+        {
+            id: '2',
+            title: 'Algorithms Mid-term',
+            description: 'Mid-term examination on algorithm design and analysis',
+            department: 'Computer Science',
+            facultyName: 'Dr. Johnson',
+            startTime: new Date(Date.now() + 172800000).toISOString(),
+            endTime: new Date(Date.now() + 172800000 + 3600000).toISOString(),
+            duration: 60,
+            totalStudents: 42,
+            status: 'ongoing',
+            type: 'public'
+        },
+        {
+            id: '3',
+            title: 'Database Systems Quiz',
+            description: 'Weekly quiz on SQL and database concepts',
+            department: 'Information Technology',
+            facultyName: 'Dr. Brown',
+            startTime: new Date(Date.now() - 86400000).toISOString(),
+            endTime: new Date(Date.now() - 86400000 + 1800000).toISOString(),
+            duration: 30,
+            totalStudents: 38,
+            status: 'completed',
+            type: 'private',
+            averageScore: 78
+        },
+        {
+            id: '4',
+            title: 'Calculus Final Exam',
+            description: 'Advanced calculus concepts and applications',
+            department: 'Mathematics',
+            facultyName: 'Dr. Wilson',
+            startTime: new Date(Date.now() + 259200000).toISOString(),
+            endTime: new Date(Date.now() + 259200000 + 9000000).toISOString(),
+            duration: 150,
+            totalStudents: 52,
+            status: 'draft',
+            type: 'public'
+        },
+        {
+            id: '5',
+            title: 'Physics Lab Assessment',
+            description: 'Practical assessment for physics laboratory work',
+            department: 'Physics',
+            facultyName: 'Dr. Davis',
+            startTime: new Date(Date.now() + 345600000).toISOString(),
+            endTime: new Date(Date.now() + 345600000 + 7200000).toISOString(),
+            duration: 120,
+            totalStudents: 28,
+            status: 'published',
+            type: 'private'
+        }
+    ];
 
-  // Get faculty name by ID
-  const getFacultyName = (facultyId: string) => {
-    const faculty = faculties.find(f => f.id === facultyId);
-    return faculty ? faculty.employeeId : 'Unknown Faculty';
-  };
+    // Filter exams
+    const filteredExams = mockExams.filter(exam => {
+        const matchesSearch = exam.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            exam.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            exam.facultyName.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesDepartment = selectedDepartment === 'all' || exam.department === selectedDepartment;
+        const matchesStatus = selectedStatus === 'all' || exam.status === selectedStatus;
 
-  // Get upcoming exams (next 7 days)
-  const upcomingExams = exams
-    .filter(exam => {
-      const examDate = new Date(exam.startTime);
-      const now = new Date();
-      const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-      return examDate >= now && examDate <= nextWeek && exam.status !== 'completed';
-    })
-    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+        return matchesSearch && matchesDepartment && matchesStatus;
+    });
 
-  // Get recent exams (last 10)
-  const recentExams = exams
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    .slice(0, 10);
+    const departments = [
+        'Computer Science',
+        'Information Technology',
+        'Mathematics',
+        'Physics',
+        'Chemistry',
+        'Biology',
+        'English',
+        'History'
+    ];
 
-  return (
-    <SchoolLayout
-      title="Exam Monitoring"
-      subtitle="School of CS&IT - Monitor all exams and their progress"
-    >
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Exams</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{exams.length}</div>
-            <p className="text-xs text-muted-foreground">All departments</p>
-          </CardContent>
-        </Card>
+    // Button handlers
+    const handleCreateExam = () => {
+        // Navigate to create exam page - using faculty route as placeholder
+        router.push('/faculty/exams/create');
+    };
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Published Exams</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{exams.filter(e => e.status === 'published').length}</div>
-            <p className="text-xs text-muted-foreground">Available to students</p>
-          </CardContent>
-        </Card>
+    const handleViewExam = (examId: string) => {
+        // For now, navigate to faculty exams page with exam ID (could be enhanced later)
+        // TODO: Create dedicated school exam detail page
+        alert(`View exam details for exam ID: ${examId}\n\nThis feature will be implemented soon!`);
+        router.push('/faculty/exams');
+    };
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Exams</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{exams.filter(e => e.status === 'active').length}</div>
-            <p className="text-xs text-muted-foreground">Currently running</p>
-          </CardContent>
-        </Card>
+    const handleEditExam = (examId: string) => {
+        // For now, show alert as edit functionality needs to be implemented
+        // TODO: Create dedicated school exam edit page
+        alert(`Edit exam functionality for exam ID: ${examId}\n\nThis feature will be implemented soon!`);
+        router.push('/faculty/exams');
+    };
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Students</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {exams.reduce((total, exam) => total + exam.enrolledStudents.length, 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">Enrolled across exams</p>
-          </CardContent>
-        </Card>
-      </div>
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case 'draft':
+                return <Badge variant="secondary">Draft</Badge>;
+            case 'published':
+                return <Badge variant="default">Published</Badge>;
+            case 'ongoing':
+                return <Badge variant="destructive">Ongoing</Badge>;
+            case 'completed':
+                return <Badge variant="outline">Completed</Badge>;
+            default:
+                return <Badge variant="secondary">{status}</Badge>;
+        }
+    };
 
-      {/* Upcoming Exams & Recent Exams */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        {/* Upcoming Exams */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Clock className="h-5 w-5 mr-2" />
-              Upcoming Exams
-            </CardTitle>
-            <CardDescription>Exams scheduled to start in the next 7 days</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {upcomingExams.length > 0 ? (
-                upcomingExams.map((exam) => {
-                  const examDate = new Date(exam.startTime);
-                  const timeUntil = Math.ceil((examDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-
-                  return (
-                    <div key={exam.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-sm">{exam.title}</h4>
-                        <p className="text-xs text-muted-foreground">
-                          {getDepartmentName(exam.departmentId)} • {exam.questions.length} questions
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          Faculty: {getFacultyName(exam.facultyId)}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <Badge variant="outline" className="text-xs mb-1">
-                          {timeUntil === 1 ? 'Tomorrow' : `${timeUntil} days`}
-                        </Badge>
-                        <p className="text-xs text-muted-foreground">
-                          {examDate.toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="text-center py-6">
-                  <Calendar className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">No upcoming exams</p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Recent Exams */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <FileText className="h-5 w-5 mr-2" />
-              Recent Exams
-            </CardTitle>
-            <CardDescription>Latest exams created in the school</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentExams.length > 0 ? (
-                recentExams.map((exam) => (
-                  <div key={exam.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-sm">{exam.title}</h4>
-                      <p className="text-xs text-muted-foreground">
-                        {getDepartmentName(exam.departmentId)} • {exam.questions.length} questions
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Faculty: {getFacultyName(exam.facultyId)}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <Badge
-                        variant={
-                          exam.status === 'published' ? 'default' :
-                          exam.status === 'active' ? 'secondary' :
-                          exam.status === 'completed' ? 'outline' : 'destructive'
-                        }
-                        className="text-xs mb-1"
-                      >
-                        {exam.status}
-                      </Badge>
-                      <p className="text-xs text-muted-foreground">
-                        {exam.enrolledStudents.length} students
-                      </p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-6">
-                  <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">No exams yet</p>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* All Exams List */}
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle>All Exams</CardTitle>
-              <CardDescription>Complete list of all exams in School of CS&IT</CardDescription>
-            </div>
-            <Button>
-              <FileText className="h-4 w-4 mr-2" />
-              View Detailed Report
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {exams.length > 0 ? (
-              exams.map((exam) => (
-                <div key={exam.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h4 className="font-medium">{exam.title}</h4>
-                      <Badge
-                        variant={
-                          exam.status === 'published' ? 'default' :
-                          exam.status === 'active' ? 'secondary' :
-                          exam.status === 'completed' ? 'outline' : 'destructive'
-                        }
-                      >
-                        {exam.status}
-                      </Badge>
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-muted-foreground">
-                      <div>
-                        <span className="font-medium">Department:</span> {getDepartmentName(exam.departmentId)}
-                      </div>
-                      <div>
-                        <span className="font-medium">Faculty:</span> {getFacultyName(exam.facultyId)}
-                      </div>
-                      <div>
-                        <span className="font-medium">Questions:</span> {exam.questions.length}
-                      </div>
-                      <div>
-                        <span className="font-medium">Students:</span> {exam.enrolledStudents.length}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                      <span>Duration: {exam.duration} min</span>
-                      <span>•</span>
-                      <span>Marks: {exam.totalMarks}</span>
-                      <span>•</span>
-                      <span>Start: {new Date(exam.startTime).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm">
-                      View Details
+    return (
+        <SchoolLayout>
+            <div className="container mx-auto py-8">
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-3xl font-bold">School Exams</h1>
+                    <Button
+                        onClick={handleCreateExam}
+                        className="bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                    >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create Exam
                     </Button>
-                  </div>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-12">
-                <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">No exams found</h3>
-                <p className="text-muted-foreground mb-4">
-                  No exams have been created in the school yet.
-                </p>
-                <Button>
-                  Create First Exam
-                </Button>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </SchoolLayout>
-  );
+
+                {/* Filters */}
+                <Card className="mb-6">
+                    <CardHeader>
+                        <CardTitle>Filter Exams</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <div className="flex-1">
+                                <Input
+                                    placeholder="Search by exam title, description, or faculty..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full"
+                                />
+                            </div>
+                            <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                                <SelectTrigger className="w-full md:w-48">
+                                    <SelectValue placeholder="All Departments" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Departments</SelectItem>
+                                    {departments.map(dept => (
+                                        <SelectItem key={dept} value={dept}>
+                                            {dept}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                                <SelectTrigger className="w-full md:w-40">
+                                    <SelectValue placeholder="All Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Status</SelectItem>
+                                    <SelectItem value="draft">Draft</SelectItem>
+                                    <SelectItem value="published">Published</SelectItem>
+                                    <SelectItem value="ongoing">Ongoing</SelectItem>
+                                    <SelectItem value="completed">Completed</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Exams Table */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Exams ({filteredExams.length})</CardTitle>
+                        <CardDescription>
+                            Monitor and manage all exams across departments
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Exam Details</TableHead>
+                                    <TableHead>Department</TableHead>
+                                    <TableHead>Faculty</TableHead>
+                                    <TableHead>Schedule</TableHead>
+                                    <TableHead>Students</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Performance</TableHead>
+                                    <TableHead>Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {filteredExams.map((exam) => (
+                                    <TableRow key={exam.id}>
+                                        <TableCell>
+                                            <div>
+                                                <div className="font-medium">{exam.title}</div>
+                                                <div className="text-sm text-muted-foreground">{exam.description}</div>
+                                                <div className="text-xs text-muted-foreground mt-1">
+                                                    {exam.duration} minutes • {exam.type}
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2">
+                                                <Building className="w-4 h-4" />
+                                                {exam.department}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>{exam.facultyName}</TableCell>
+                                        <TableCell>
+                                            <div className="text-sm">
+                                                <div className="flex items-center gap-1">
+                                                    <Calendar className="w-3 h-3" />
+                                                    {new Date(exam.startTime).toLocaleDateString()}
+                                                </div>
+                                                <div className="text-muted-foreground">
+                                                    {new Date(exam.startTime).toLocaleTimeString()} - {new Date(exam.endTime).toLocaleTimeString()}
+                                                </div>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-1">
+                                                <Users className="w-4 h-4" />
+                                                {exam.totalStudents}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>{getStatusBadge(exam.status)}</TableCell>
+                                        <TableCell>
+                                            {exam.averageScore ? (
+                                                <div className="text-sm font-medium">
+                                                    {exam.averageScore}%
+                                                </div>
+                                            ) : (
+                                                <span className="text-muted-foreground">-</span>
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleViewExam(exam.id)}
+                                                    title="View Exam Details"
+                                                    className="hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                                                >
+                                                    <Eye className="w-4 h-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => handleEditExam(exam.id)}
+                                                    title="Edit Exam"
+                                                    className="hover:bg-green-50 hover:text-green-600 transition-colors"
+                                                >
+                                                    <Edit className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+            </div>
+        </SchoolLayout>
+    );
 }
 
 export default SchoolExams;

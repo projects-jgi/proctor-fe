@@ -1,81 +1,68 @@
 "use client";
 
-import { FacultyLayout } from '@/components/FacultyLayout';
-import FacultyResults from '@/containers/faculty/dashboard/FacultyResults';
-import { useProctor } from '@/contexts/ProctorContext';
+import { FacultyLayout } from "@/components/FacultyLayout";
+import FacultyResults from "@/containers/faculty/dashboard/FacultyResults";
+import { useProctor } from "@/contexts/ProctorContext";
 
-export default function FacultyResultsPage() {
-  const {
-    currentUser,
-    faculties,
-    exams,
-    results,
-    students,
-    getExamsForFaculty
-  } = useProctor();
+function FacultyResultsPage() {
+    const { exams } = useProctor();
 
-  // Find current faculty
-  const currentFaculty = faculties.find(f => f.userId === currentUser?.id);
-  const facultyExams = currentFaculty ? getExamsForFaculty(currentFaculty.id) : [];
+    // Mock data for faculty results
+    const mockResults = [
+        {
+            id: '1',
+            examName: 'Data Structures Final Exam',
+            studentName: 'John Doe',
+            studentRollNumber: 'CS001',
+            score: 85,
+            totalMarks: 100,
+            percentage: 85,
+            grade: 'A',
+            status: 'passed' as const,
+            submittedAt: new Date().toISOString(),
+            examDate: new Date().toISOString(),
+            specialization: 'Computer Science'
+        },
+        {
+            id: '2',
+            examName: 'Algorithms Mid-term',
+            studentName: 'Jane Smith',
+            studentRollNumber: 'CS002',
+            score: 72,
+            totalMarks: 100,
+            percentage: 72,
+            grade: 'B',
+            status: 'passed' as const,
+            submittedAt: new Date().toISOString(),
+            examDate: new Date().toISOString(),
+            specialization: 'Computer Science'
+        },
+        {
+            id: '3',
+            examName: 'Database Systems',
+            studentName: 'Bob Johnson',
+            studentRollNumber: 'CS003',
+            score: 45,
+            totalMarks: 100,
+            percentage: 45,
+            grade: 'F',
+            status: 'failed' as const,
+            submittedAt: new Date().toISOString(),
+            examDate: new Date().toISOString(),
+            specialization: 'Computer Science'
+        }
+    ];
 
-  const facultyResults = currentFaculty ? results
-    .filter(result => facultyExams.some(exam => exam.id === result.examId))
-    .map(result => {
-      const exam = exams.find(e => e.id === result.examId);
-      const student = students.find(s => s.id === result.studentId);
-      return {
-        id: result.id,
-        examName: exam?.title || 'Unknown Exam',
-        studentName: student?.userId || 'Unknown Student',
-        studentRollNumber: student?.rollNumber || 'N/A',
-        score: result.score,
-        totalMarks: result.totalMarks,
-        percentage: result.percentage,
-        grade: result.grade,
-        status: result.status,
-        feedback: result.feedback,
-        submittedAt: result.generatedAt,
-        examDate: exam?.startTime || result.generatedAt,
-        specialization: 'General'
-      };
-    }) : [];
-
-  return (
-    <FacultyLayout title="Exam Results" subtitle="View and manage student exam results">
-      <FacultyResults
-        results={facultyResults}
-        exams={facultyExams}
-        onViewDetails={(result) => {
-          // Handle view details - could open a modal with more info
-          alert(`Student: ${result.studentName}\nExam: ${result.examName}\nScore: ${result.score}/${result.totalMarks} (${result.percentage}%)\nGrade: ${result.grade}\nFeedback: ${result.feedback || 'No feedback provided'}`);
-        }}
-        onExport={(results) => {
-          const csvContent = [
-            ['Exam', 'Student', 'Roll Number', 'Score', 'Total Marks', 'Percentage', 'Grade', 'Status', 'Submitted At'],
-            ...results.map(result => [
-              result.examName,
-              result.studentName,
-              result.studentRollNumber,
-              result.score.toString(),
-              result.totalMarks.toString(),
-              result.percentage.toString(),
-              result.grade,
-              result.status,
-              result.submittedAt
-            ])
-          ].map(row => row.join(',')).join('\n');
-
-          const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-          const link = document.createElement('a');
-          const url = URL.createObjectURL(blob);
-          link.setAttribute('href', url);
-          link.setAttribute('download', `faculty_results_${new Date().toISOString().split('T')[0]}.csv`);
-          link.style.visibility = 'hidden';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }}
-      />
-    </FacultyLayout>
-  );
+    return (
+        <FacultyLayout title="Exam Results" subtitle="View and analyze student performance">
+            <FacultyResults
+                results={mockResults}
+                exams={exams}
+                onViewDetails={(result) => console.log('View details:', result)}
+                onExport={(results) => console.log('Export:', results)}
+            />
+        </FacultyLayout>
+    );
 }
+
+export default FacultyResultsPage;

@@ -7,7 +7,16 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Progress } from '@/components/ui/progress';
 import { useProctor } from '@/contexts/ProctorContext';
 import {
   Eye,
@@ -640,98 +649,124 @@ export default function SchoolProctoringPage() {
           </TabsContent>
         </Tabs>
 
-        {/* Session Detail Modal */}
+        {/* Enhanced Session Monitor Modal */}
         {selectedSession && (
           <Dialog open={!!selectedSession} onOpenChange={() => setSelectedSession(null)}>
-            <DialogContent className="max-w-4xl">
+            <DialogContent className="sm:max-w-lg">
               <DialogHeader>
-                <DialogTitle>Monitoring: {selectedSession?.studentName}</DialogTitle>
+                <DialogTitle className="flex items-center gap-2">
+                  <Eye className="w-5 h-5" />
+                  Monitor Session
+                </DialogTitle>
                 <DialogDescription>
-                  {selectedSession?.examTitle} • {selectedSession?.departmentName} • {selectedSession?.facultyName}
+                  {selectedSession.studentName} - {selectedSession.examTitle}
                 </DialogDescription>
               </DialogHeader>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Live Feed Placeholder */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Camera className="w-4 h-4" />
-                      Live Camera Feed
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
-                      <div className="text-center">
-                        <Camera className="w-12 h-12 mx-auto mb-2 text-gray-400" />
-                        <p className="text-sm text-gray-600">Camera feed would appear here</p>
-                        <p className="text-xs text-gray-500">Status: {selectedSession?.cameraActive ? 'Active' : 'Inactive'}</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
 
-                {/* Session Details */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Session Details</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <p className="font-medium">Status</p>
-                        <Badge variant={selectedSession?.status === 'active' ? 'default' : 'secondary'}>
-                          {selectedSession?.status}
-                        </Badge>
-                      </div>
-                      <div>
-                        <p className="font-medium">Duration</p>
-                        <p>{selectedSession?.duration} minutes</p>
-                      </div>
-                      <div>
-                        <p className="font-medium">Started</p>
-                        <p>{selectedSession ? new Date(selectedSession.startTime).toLocaleString() : ''}</p>
-                      </div>
-                      <div>
-                        <p className="font-medium">Last Activity</p>
-                        <p>{selectedSession ? new Date(selectedSession.lastActivity).toLocaleString() : ''}</p>
-                      </div>
+              <div className="space-y-4">
+                {/* Camera Feed */}
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium flex items-center gap-2">
+                    <Camera className="w-4 h-4" />
+                    Live Camera Feed
+                  </h4>
+                  <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-lg flex items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-600">
+                    <div className="text-center">
+                      <Camera className={`w-12 h-12 mx-auto mb-2 ${selectedSession.cameraActive ? 'text-green-500' : 'text-red-500'}`} />
+                      <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                        {selectedSession.cameraActive ? 'Camera Active' : 'Camera Inactive'}
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-500">
+                        Live feed
+                      </p>
                     </div>
+                  </div>
+                </div>
 
-                    <div className="space-y-2">
-                      <p className="font-medium">Technical Status</p>
-                      <div className="space-y-1 text-sm">
-                        <div className="flex items-center gap-2">
-                          <Camera className={`w-4 h-4 ${selectedSession?.cameraActive ? 'text-green-600' : 'text-red-600'}`} />
-                          <span>Camera: {selectedSession?.cameraActive ? 'Active' : 'Inactive'}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Mic className={`w-4 h-4 ${selectedSession?.micActive ? 'text-green-600' : 'text-red-600'}`} />
-                          <span>Microphone: {selectedSession?.micActive ? 'Active' : 'Inactive'}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Monitor className={`w-4 h-4 ${selectedSession?.tabVisible ? 'text-green-600' : 'text-red-600'}`} />
-                          <span>Tab Focus: {selectedSession?.tabVisible ? 'Focused' : 'Unfocused'}</span>
-                        </div>
-                      </div>
-                    </div>
+                {/* Session Status */}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Status</span>
+                  <Badge variant={selectedSession.status === 'active' ? 'default' : 'secondary'}>
+                    {selectedSession.status}
+                  </Badge>
+                </div>
 
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        <MessageSquare className="w-4 h-4 mr-1" />
-                        Send Message
-                      </Button>
-                      <Button variant="destructive" size="sm">
-                        <Square className="w-4 h-4 mr-1" />
-                        Terminate Session
-                      </Button>
+                {/* Technical Status */}
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium">Technical Status</h4>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="flex items-center gap-2">
+                      <Camera className={`w-4 h-4 ${selectedSession.cameraActive ? 'text-green-600' : 'text-red-600'}`} />
+                      <span className="text-xs">Camera</span>
                     </div>
-                  </CardContent>
-                </Card>
+                    <div className="flex items-center gap-2">
+                      <Mic className={`w-4 h-4 ${selectedSession.micActive ? 'text-green-600' : 'text-red-600'}`} />
+                      <span className="text-xs">Mic</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Monitor className={`w-4 h-4 ${selectedSession.tabVisible ? 'text-green-600' : 'text-red-600'}`} />
+                      <span className="text-xs">Tab</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Violations */}
+                {selectedSession.violations.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-medium">Recent Violations</h4>
+                    <div className="space-y-1">
+                      {selectedSession.violations.slice(-3).map((violation) => (
+                        <div key={violation.id} className="flex items-center justify-between text-xs">
+                          <span>{violation.type.replace('_', ' ')}</span>
+                          <Badge variant={getViolationSeverityColor(violation.severity)} className="text-xs">
+                            {violation.severity}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Progress */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Progress</span>
+                    <span>{Math.min(100, Math.round((Date.now() - new Date(selectedSession.startTime).getTime()) / (selectedSession.duration * 60 * 1000) * 100))}%</span>
+                  </div>
+                  <Progress
+                    value={Math.min(100, (Date.now() - new Date(selectedSession.startTime).getTime()) / (selectedSession.duration * 60 * 1000) * 100)}
+                    className="h-2"
+                  />
+                </div>
               </div>
+
+              <DialogFooter className="flex gap-2">
+                <Button variant="outline" onClick={() => setSelectedSession(null)}>
+                  Close
+                </Button>
+                {selectedSession.violations.some(v => !v.resolved) && (
+                  <Button
+                    variant="destructive"
+                    onClick={() => {
+                      if (window.confirm('Terminate this session?')) {
+                        setActiveSessions(prev =>
+                          prev.map(session =>
+                            session.id === selectedSession.id
+                              ? { ...session, status: 'terminated' as const }
+                              : session
+                          )
+                        );
+                        setSelectedSession(null);
+                      }
+                    }}
+                  >
+                    Terminate Session
+                  </Button>
+                )}
+              </DialogFooter>
             </DialogContent>
           </Dialog>
-        )}
-
+        )}    
         {/* Violation Action Dialog */}
         <Dialog open={showViolationDialog} onOpenChange={setShowViolationDialog}>
           <DialogContent>

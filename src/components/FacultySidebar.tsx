@@ -6,7 +6,9 @@ import {
   FileText,
   HelpCircle,
   TrendingUp,
-  Shield
+  Shield,
+  Tag,
+  Users
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -33,6 +35,18 @@ const navigationItems = [
     href: "/faculty/exams",
     icon: FileText,
     description: "Create and manage exams"
+  },
+  {
+    title: "Exam Types",
+    href: "/faculty/exam-types",
+    icon: Tag,
+    description: "Manage exam types and schedules"
+  },
+  {
+    title: "Students",
+    href: "/faculty/students",
+    icon: Users,
+    description: "Manage department students"
   },
   {
     title: "Proctoring",

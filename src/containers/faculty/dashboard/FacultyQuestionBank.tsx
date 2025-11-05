@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useProctor } from '@/contexts/ProctorContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -56,6 +57,8 @@ export default function FacultyQuestionBank() {
     updateQuestion,
     deleteQuestion
   } = useProctor();
+
+  const router = useRouter();
 
   // Find current faculty
   const currentFaculty = faculties.find(f => f.userId === currentUser?.id);
@@ -358,7 +361,7 @@ export default function FacultyQuestionBank() {
               <DialogHeader>
                 <DialogTitle>Bulk Upload Questions</DialogTitle>
                 <DialogDescription>
-                  Upload multiple questions at once using CSV or PDF format
+                  Upload questions from a CSV or PDF file.
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
@@ -369,133 +372,46 @@ export default function FacultyQuestionBank() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="csv">CSV File</SelectItem>
-                      <SelectItem value="pdf">PDF File</SelectItem>
+                      <SelectItem value="csv">CSV</SelectItem>
+                      <SelectItem value="pdf">PDF</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-
                 <div>
-                  <Label htmlFor="file-upload">Select File</Label>
+                  <Label htmlFor="upload-file">Select File</Label>
                   <Input
-                    id="file-upload"
+                    id="upload-file"
                     type="file"
                     accept={bulkUploadType === 'csv' ? '.csv' : '.pdf'}
                     onChange={(e) => setBulkUploadFile(e.target.files?.[0] || null)}
                   />
-                  {bulkUploadFile && (
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Selected: {bulkUploadFile.name}
-                    </p>
-                  )}
                 </div>
-
-                <div className="bg-accent p-4 rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium text-accent-foreground">CSV Format Requirements:</h4>
-                    <Button variant="outline" size="sm" asChild>
-                      <a href="/sample_questions.csv" download>
-                        <Download className="h-4 w-4 mr-2" />
-                        Download Template
-                      </a>
-                    </Button>
-                  </div>
-                  <ul className="text-sm text-accent-foreground space-y-1">
-                    <li>• Columns: title, type, content, option1, option2, option3, option4, correctAnswer, marks, explanation, difficulty, subject, category</li>
-                    <li>• Type values: multiple-choice, true-false, short-answer, essay</li>
-                    <li>• Difficulty values: easy, medium, hard</li>
-                    <li>• For multiple-choice: provide 4 options and correctAnswer as 0-3</li>
-                    <li>• Category should match existing category names</li>
-                  </ul>
-                </div>
-
-                <div className="bg-warning/10 p-4 rounded-lg">
-                  <h4 className="font-medium text-warning-foreground mb-2">PDF Upload Note:</h4>
-                  <p className="text-sm text-warning-foreground">
-                    PDF parsing is experimental. Ensure questions are clearly formatted with proper structure for best results.
-                  </p>
-                </div>
-
                 <div className="flex justify-end space-x-2">
-                  <Button variant="outline" onClick={() => {
-                    setIsBulkUploadOpen(false);
-                    setBulkUploadFile(null);
-                    setBulkUploadType('csv');
-                  }}>
+                  <Button variant="outline" onClick={() => setIsBulkUploadOpen(false)}>
                     Cancel
                   </Button>
                   <Button onClick={handleBulkUpload} disabled={!bulkUploadFile || isUploading}>
-                    {isUploading ? 'Uploading...' : 'Upload Questions'}
+                    {isUploading ? 'Uploading...' : 'Upload'}
                   </Button>
                 </div>
               </div>
             </DialogContent>
           </Dialog>
 
-          <Dialog open={isCreateCategoryOpen} onOpenChange={setIsCreateCategoryOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Category
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Category</DialogTitle>
-                <DialogDescription>
-                  Create a new question category (e.g., Verbal, Technical, Reasoning, Aptitude)
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="category-name">Category Name *</Label>
-                  <Input
-                    id="category-name"
-                    value={categoryForm.name}
-                    onChange={(e) => setCategoryForm({...categoryForm, name: e.target.value})}
-                    placeholder="e.g., Verbal, Technical, Reasoning"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="category-description">Description (Optional)</Label>
-                  <Textarea
-                    id="category-description"
-                    value={categoryForm.description}
-                    onChange={(e) => setCategoryForm({...categoryForm, description: e.target.value})}
-                    placeholder="Brief description of the category"
-                    rows={2}
-                  />
-                </div>
-                <div className="flex justify-end space-x-2">
-                  <Button variant="outline" onClick={() => {
-                    setIsCreateCategoryOpen(false);
-                    setCategoryForm({ name: '', description: '' });
-                  }}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleCategorySubmit}>
-                    Add Category
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button onClick={() => router.push('/faculty/questions/create')}>
+            <Plus className="h-4 w-4 mr-2" />
+            Create Question
+          </Button>
 
           <Dialog open={isCreateQuestionOpen} onOpenChange={(open) => {
             setIsCreateQuestionOpen(open);
             if (!open) resetQuestionForm();
           }}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Question
-              </Button>
-            </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>{editingQuestion ? 'Edit Question' : 'Create New Question'}</DialogTitle>
+                <DialogTitle>Edit Question</DialogTitle>
                 <DialogDescription>
-                  {editingQuestion ? 'Update the question details' : 'Add a new question to your question bank'}
+                  Update the question details
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
@@ -673,7 +589,7 @@ export default function FacultyQuestionBank() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Categories</CardTitle>
+            <CardTitle className="text-sm font-medium">Exam Types</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -723,13 +639,13 @@ export default function FacultyQuestionBank() {
               </div>
             </div>
             <div>
-              <Label htmlFor="category-filter">Category</Label>
+              <Label htmlFor="category-filter">Exam Type</Label>
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                 <SelectTrigger className="w-40">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="all">All exam types</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       {category.name}
@@ -764,7 +680,7 @@ export default function FacultyQuestionBank() {
                     ? 'Try adjusting your search or filter criteria.'
                     : 'Start by creating your first question.'}
                 </p>
-                <Button onClick={() => setIsCreateQuestionOpen(true)}>
+                <Button onClick={() => router.push('/faculty/questions/create')}>
                   <Plus className="h-4 w-4 mr-2" />
                   Create Question
                 </Button>

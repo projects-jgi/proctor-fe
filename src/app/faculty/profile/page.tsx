@@ -1,31 +1,28 @@
 "use client";
 
 import { FacultyLayout } from "@/components/FacultyLayout";
-import { useProctor } from '@/contexts/ProctorContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { useProctor } from '@/contexts/ProctorContext';
 import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  GraduationCap,
-  Building,
-  Calendar,
-  Edit,
-  Camera,
-  Shield,
-  Award,
-  BookOpen,
-  Users,
-  TrendingUp
+    Award,
+    BookOpen,
+    Calendar,
+    Camera,
+    Edit,
+    GraduationCap,
+    Mail,
+    MapPin,
+    Phone,
+    TrendingUp,
+    User,
+    Users
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -80,9 +77,9 @@ export default function FacultyProfilePage() {
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
               <div className="relative">
                 <Avatar className="w-24 h-24">
-                  <AvatarImage src="" alt={currentUser?.name} />
+                  <AvatarImage src={undefined} alt={currentUser?.name} />
                   <AvatarFallback className="text-2xl">
-                    {currentUser?.name?.split(' ').map(n => n[0]).join('') || 'F'}
+                    {currentUser?.name?.split(' ').map((n: string) => n[0]).join('') || 'F'}
                   </AvatarFallback>
                 </Avatar>
                 <Button
