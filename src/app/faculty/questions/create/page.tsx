@@ -1,274 +1,430 @@
 "use client";
 
-import React, { useState } from "react";
+import { FacultyLayout } from "@/components/FacultyLayout";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useProctor } from '@/contexts/ProctorContext';
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "@/components/ui/card";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+    ArrowLeft,
+    CheckCircle,
+    HelpCircle,
+    Save,
+    Upload,
+    X
+} from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-import {
-  LayoutDashboard,
-  HelpCircle,
-  FileText,
-  Tag,
-  Users,
-  Clock,
-  BarChart3,
-  ArrowLeft,
-  Upload,
-  X,
-  Plus,
-  Check,
-} from "lucide-react";
-import Topbar from "@/containers/student/Topbar";
-import { FacultySidebar } from "@/components/FacultySidebar";
+interface QuestionFormData {
+  title: string;
+  type: 'multiple-choice' | 'true-false' | 'short-answer' | 'essay';
+  content: string;
+  options: string[];
+  correctAnswer: string;
+  marks: number;
+  explanation: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  subject: string;
+  categoryId: string;
+}
 
 export default function CreateQuestionPage() {
-  const [questionType, setQuestionType] = useState("multiple-choice");
-  const [options, setOptions] = useState(["", "", "", ""]);
-  const [correctAnswers, setCorrectAnswers] = useState<string[]>([]);
+  const router = useRouter();
+  const {
+    currentUser,
+    faculties,
+    categories,
+    questions,
+    addQuestion
+  } = useProctor();
 
-  const handleOptionChange = (index: number, value: string) => {
-    const newOptions = [...options];
-    newOptions[index] = value;
-    setOptions(newOptions);
+  // Find current faculty
+  const currentFaculty = faculties.find(f => f.userId === currentUser?.id);
+
+  // Question form state
+  const [questionForm, setQuestionForm] = useState<QuestionFormData>({
+    title: '',
+    type: 'multiple-choice',
+    content: '',
+    options: ['', '', '', ''],
+    correctAnswer: '',
+    marks: 5,
+    explanation: '',
+    difficulty: 'medium',
+    subject: '',
+    categoryId: 'none'
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [bulkQueue, setBulkQueue] = useState<QuestionFormData[]>([]);
+
+  // Validation function
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!questionForm.title.trim()) {
+      newErrors.title = 'Question title is required';
+    }
+
+    if (!questionForm.content.trim()) {
+      newErrors.content = 'Question content is required';
+    }
+
+    if (questionForm.type === 'multiple-choice') {
+      const validOptions = questionForm.options.filter(opt => opt.trim() !== '');
+      if (validOptions.length < 2) {
+        newErrors.options = 'At least 2 options are required for multiple choice';
+      }
+      if (!questionForm.correctAnswer.trim()) {
+        newErrors.correctAnswer = 'Correct answer is required';
+      } else {
+        const correctIndex = parseInt(questionForm.correctAnswer);
+        if (isNaN(correctIndex) || correctIndex < 0 || correctIndex >= validOptions.length) {
+          newErrors.correctAnswer = 'Correct answer must be a valid option index';
+        }
+      }
+    } else if (questionForm.type === 'true-false') {
+      if (!['true', 'false'].includes(questionForm.correctAnswer.toLowerCase())) {
+        newErrors.correctAnswer = 'Correct answer must be "true" or "false"';
+      }
+    } else if (questionForm.type === 'short-answer' || questionForm.type === 'essay') {
+      if (!questionForm.correctAnswer.trim()) {
+        newErrors.correctAnswer = 'Correct answer is required';
+      }
+    }
+
+    if (questionForm.marks <= 0) {
+      newErrors.marks = 'Marks must be greater than 0';
+    }
+
+    if (!questionForm.subject.trim()) {
+      newErrors.subject = 'Subject is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const toggleCorrectAnswer = (option: string) => {
-    if (correctAnswers.includes(option)) {
-      setCorrectAnswers(correctAnswers.filter((a) => a !== option));
-    } else {
-      setCorrectAnswers([...correctAnswers, option]);
+  // Handle form submission
+  const handleSubmit = async () => {
+    if (!validateForm() || !currentFaculty) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const questionData = {
+        ...questionForm,
+        categoryId: questionForm.categoryId === 'none' ? '' : questionForm.categoryId,
+        facultyId: currentFaculty.id,
+        departmentId: currentFaculty.departmentId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      addQuestion(questionData);
+
+      // Reset form
+      setQuestionForm({
+        title: '',
+        type: 'multiple-choice',
+        content: '',
+        options: ['', '', '', ''],
+        correctAnswer: '',
+        marks: 5,
+        explanation: '',
+        difficulty: 'medium',
+        subject: '',
+        categoryId: 'none'
+      });
+
+      // Navigate back to question bank
+      router.push('/faculty/questions');
+    } catch (error) {
+      console.error('Error creating question:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleCreateQuestion = () => {
-    console.log("Question Created ✅");
+  // Handle option changes for multiple choice
+  const handleOptionChange = (index: number, value: string) => {
+    const newOptions = [...questionForm.options];
+    newOptions[index] = value;
+    setQuestionForm({...questionForm, options: newOptions});
+  };
+
+  // Handle question type change
+  const handleTypeChange = (type: string) => {
+    const newType = type as QuestionFormData['type'];
+    setQuestionForm({
+      ...questionForm,
+      type: newType,
+      options: newType === 'multiple-choice' ? ['', '', '', ''] : [],
+      correctAnswer: ''
+    });
+  };
+
+  // Handle adding question to bulk queue
+  const handleAddToBulkQueue = () => {
+    if (!validateForm()) return;
+
+    setBulkQueue(prev => [...prev, {...questionForm}]);
+    
+    // Reset form for next question
+    setQuestionForm({
+      title: '',
+      type: 'multiple-choice',
+      content: '',
+      options: ['', '', '', ''],
+      correctAnswer: '',
+      marks: 5,
+      explanation: '',
+      difficulty: 'medium',
+      subject: '',
+      categoryId: 'none'
+    });
+    
+    setErrors({});
+  };
+
+  // Handle bulk upload navigation
+  const handleBulkUpload = () => {
+    router.push('/faculty/questions/bulk-upload');
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Topbar />
-      <FacultySidebar />
-      <div className="pl-64 pt-16 min-h-screen bg-background">
-        {/* Page Header */}
-        <div className="bg-card border-b border-border px-8 py-6">
-          <div className="max-w-7xl mx-auto">
-            <h1 className="text-3xl font-bold text-foreground">Create New Question</h1>
-            <p className="mt-2 text-lg text-muted-foreground">Design a comprehensive question for your question bank</p>
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <main className="max-w-7xl mx-auto px-8 py-6">
-
-        {/* Action Buttons */}
-        <div className="flex items-center justify-between mb-6">
-          <Button variant="outline" className="gap-2">
-            <ArrowLeft className="w-4 h-4" />
+    <FacultyLayout
+      title="Create New Question"
+      subtitle="Design a comprehensive question for your question bank"
+    >
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Header Actions */}
+        <div className="flex justify-between items-center">
+          <Button
+            variant="outline"
+            onClick={() => router.push('/faculty/questions')}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
             Back to Question Bank
           </Button>
-
-          <div className="flex items-center gap-2">
-            <Button variant="outline" className="gap-2">
-              <Upload className="w-4 h-4" />
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={handleBulkUpload}
+              className="flex items-center gap-2"
+            >
+              <Upload className="h-4 w-4" />
               Bulk Upload
             </Button>
-            <Button variant="outline" className="gap-2">
-              <X className="w-4 h-4" />
+            <Button
+              variant="outline"
+              onClick={() => router.push('/faculty/questions')}
+            >
+              <X className="h-4 w-4 mr-2" />
               Cancel
             </Button>
-            <Button variant="outline" className="gap-2" disabled>
-              <Plus className="w-4 h-4" />
-              Add to Bulk Queue (0)
+            <Button
+              variant="secondary"
+              onClick={handleAddToBulkQueue}
+              disabled={isSubmitting}
+              className="flex items-center gap-2"
+            >
+              <Save className="h-4 w-4" />
+              Add to Bulk Queue ({bulkQueue.length})
             </Button>
-            <Button className="gap-2 bg-blue-700 hover:bg-blue-800">
-              <Plus className="w-4 h-4" />
-              Create Question
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="flex items-center gap-2"
+            >
+              <Save className="h-4 w-4" />
+              {isSubmitting ? 'Creating...' : 'Create Question'}
             </Button>
           </div>
         </div>
 
-        {/* Question Type Card */}
-        <Card className="mb-6">
-          <CardHeader className="border-b">
-            <div className="flex items-center gap-2">
-              <HelpCircle className="w-5 h-5" />
-              <CardTitle className="text-lg">Question Type</CardTitle>
-            </div>
-            <p className="text-sm text-gray-500 mt-1">Choose the type of question you want to create</p>
+        {/* Question Type Selection */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <HelpCircle className="h-5 w-5" />
+              Question Type
+            </CardTitle>
+            <CardDescription>
+              Choose the type of question you want to create
+            </CardDescription>
           </CardHeader>
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-2 gap-4">
-              {/* Multiple Choice */}
-              <button
-                onClick={() => setQuestionType("multiple-choice")}
-                className={`relative border rounded-lg p-4 text-left transition-all ${
-                  questionType === "multiple-choice"
-                    ? "border-blue-600 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-red-100 rounded-lg">
-                    <FileText className="w-5 h-5 text-red-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-900 mb-1">Multiple Choice</h3>
-                    <p className="text-sm text-gray-500">Students select from predefined options</p>
-                  </div>
-                </div>
-                {questionType === "multiple-choice" && (
-                  <Check className="absolute top-4 right-4 w-5 h-5 text-blue-600" />
-                )}
-              </button>
-
-              {/* True/False */}
-              <button
-                onClick={() => setQuestionType("true-false")}
-                className={`relative border rounded-lg p-4 text-left transition-all ${
-                  questionType === "true-false"
-                    ? "border-blue-600 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <Check className="w-5 h-5 text-green-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-900 mb-1">True/False</h3>
-                    <p className="text-sm text-gray-500">Simple true or false questions</p>
-                  </div>
-                </div>
-                {questionType === "true-false" && (
-                  <Check className="absolute top-4 right-4 w-5 h-5 text-blue-600" />
-                )}
-              </button>
-
-              {/* Short Answer */}
-              <button
-                onClick={() => setQuestionType("short-answer")}
-                className={`relative border rounded-lg p-4 text-left transition-all ${
-                  questionType === "short-answer"
-                    ? "border-blue-600 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-orange-100 rounded-lg">
-                    <FileText className="w-5 h-5 text-orange-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-900 mb-1">Short Answer</h3>
-                    <p className="text-sm text-gray-500">Brief text responses from students</p>
-                  </div>
-                </div>
-                {questionType === "short-answer" && (
-                  <Check className="absolute top-4 right-4 w-5 h-5 text-blue-600" />
-                )}
-              </button>
-
-              {/* Essay */}
-              <button
-                onClick={() => setQuestionType("essay")}
-                className={`relative border rounded-lg p-4 text-left transition-all ${
-                  questionType === "essay"
-                    ? "border-blue-600 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <FileText className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-gray-900 mb-1">Essay</h3>
-                    <p className="text-sm text-gray-500">Long-form written responses</p>
-                  </div>
-                </div>
-                {questionType === "essay" && (
-                  <Check className="absolute top-4 right-4 w-5 h-5 text-blue-600" />
-                )}
-              </button>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                {
+                  type: 'multiple-choice',
+                  title: 'Multiple Choice',
+                  description: 'Students select from predefined options',
+                  icon: '📝'
+                },
+                {
+                  type: 'true-false',
+                  title: 'True/False',
+                  description: 'Simple true or false questions',
+                  icon: '✓✗'
+                },
+                {
+                  type: 'short-answer',
+                  title: 'Short Answer',
+                  description: 'Brief text responses from students',
+                  icon: '📝'
+                },
+                {
+                  type: 'essay',
+                  title: 'Essay',
+                  description: 'Long-form written responses',
+                  icon: '📄'
+                }
+              ].map((option) => (
+                <Card
+                  key={option.type}
+                  className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+                    questionForm.type === option.type
+                      ? 'ring-2 ring-primary bg-primary/5 border-primary/20'
+                      : 'hover:bg-accent/50'
+                  }`}
+                  onClick={() => handleTypeChange(option.type)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="text-2xl">{option.icon}</div>
+                      <div className="flex-1">
+                        <h3 className="font-medium">{option.title}</h3>
+                        <p className="text-sm text-muted-foreground">{option.description}</p>
+                      </div>
+                      {questionForm.type === option.type && (
+                        <CheckCircle className="h-5 w-5 text-primary" />
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </CardContent>
         </Card>
 
-        {/* Basic Information Card */}
-        <Card className="mb-6">
-          <CardHeader className="border-b">
-            <CardTitle className="text-lg">Basic Information</CardTitle>
-            <p className="text-sm text-gray-500 mt-1">Provide the core details for your question</p>
+        {/* Basic Information */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Basic Information</CardTitle>
+            <CardDescription>
+              Provide the core details for your question
+            </CardDescription>
           </CardHeader>
-          <CardContent className="pt-6 space-y-4">
-            {/* Question Title */}
-            <div>
-              <Label className="text-sm font-medium">Question Title *</Label>
-              <Input placeholder="Brief title for the question" className="mt-1.5" />
-            </div>
-
-            {/* Subject and Difficulty */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm font-medium">Subject *</Label>
-                <Input placeholder="e.g., Mathematics, Physics" className="mt-1.5" />
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <Label htmlFor="title">Question Title *</Label>
+                <Input
+                  id="title"
+                  value={questionForm.title}
+                  onChange={(e) => setQuestionForm({...questionForm, title: e.target.value})}
+                  placeholder="Brief title for the question"
+                  className={errors.title ? 'border-red-500' : ''}
+                />
+                {errors.title && <p className="text-sm text-red-500 mt-1">{errors.title}</p>}
               </div>
+
               <div>
-                <Label className="text-sm font-medium">Difficulty Level</Label>
-                <Select defaultValue="medium">
-                  <SelectTrigger className="mt-1.5">
+                <Label htmlFor="subject">Subject *</Label>
+                <Input
+                  id="subject"
+                  value={questionForm.subject}
+                  onChange={(e) => setQuestionForm({...questionForm, subject: e.target.value})}
+                  placeholder="e.g., Mathematics, Physics"
+                  className={errors.subject ? 'border-red-500' : ''}
+                />
+                {errors.subject && <p className="text-sm text-red-500 mt-1">{errors.subject}</p>}
+              </div>
+
+              <div>
+                <Label htmlFor="difficulty">Difficulty Level</Label>
+                <Select
+                  value={questionForm.difficulty}
+                  onValueChange={(value) =>
+                    setQuestionForm({...questionForm, difficulty: value as 'easy' | 'medium' | 'hard'})
+                  }
+                >
+                  <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="easy">Easy</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="hard">Hard</SelectItem>
+                    <SelectItem value="easy">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="bg-green-100 text-green-800">Easy</Badge>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="medium">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Medium</Badge>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="hard">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="bg-red-100 text-red-800">Hard</Badge>
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
-            {/* Question Content */}
             <div>
-              <Label className="text-sm font-medium">Question Content *</Label>
-              <Textarea 
-                placeholder="Enter the full question text here..." 
-                className="mt-1.5 min-h-[120px]"
+              <Label htmlFor="content">Question Content *</Label>
+              <Textarea
+                id="content"
+                value={questionForm.content}
+                onChange={(e) => setQuestionForm({...questionForm, content: e.target.value})}
+                placeholder="Enter the full question text here..."
+                rows={4}
+                className={errors.content ? 'border-red-500' : ''}
               />
+              {errors.content && <p className="text-sm text-red-500 mt-1">{errors.content}</p>}
             </div>
 
-            {/* Marks and Exam Type */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label className="text-sm font-medium">Marks *</Label>
-                <Input type="number" placeholder="5" className="mt-1.5" />
+                <Label htmlFor="marks">Marks *</Label>
+                <Input
+                  id="marks"
+                  type="number"
+                  value={questionForm.marks}
+                  onChange={(e) => setQuestionForm({...questionForm, marks: parseInt(e.target.value) || 0})}
+                  min="1"
+                  className={errors.marks ? 'border-red-500' : ''}
+                />
+                {errors.marks && <p className="text-sm text-red-500 mt-1">{errors.marks}</p>}
               </div>
+
               <div>
-                <Label className="text-sm font-medium">Exam Type</Label>
-                <Select defaultValue="none">
-                  <SelectTrigger className="mt-1.5">
-                    <SelectValue />
+                <Label htmlFor="examType">Exam Type (Optional)</Label>
+                <Select
+                  value={questionForm.categoryId}
+                  onValueChange={(value) => setQuestionForm({...questionForm, categoryId: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select exam type (optional)" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">No Exam Type</SelectItem>
-                    <SelectItem value="logical">Logical</SelectItem>
-                    <SelectItem value="reasoning">Reasoning</SelectItem>
-                    <SelectItem value="aptitude">Aptitude</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -276,66 +432,190 @@ export default function CreateQuestionPage() {
           </CardContent>
         </Card>
 
-        {/* Answer Configuration Card */}
-        <Card className="mb-6">
-          <CardHeader className="border-b">
-            <CardTitle className="text-lg">Answer Configuration</CardTitle>
-            <p className="text-sm text-gray-500 mt-1">Set up the correct answer and options for this question</p>
+        {/* Answer Configuration */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Answer Configuration</CardTitle>
+            <CardDescription>
+              Set up the correct answer and options for this question
+            </CardDescription>
           </CardHeader>
-          <CardContent className="pt-6">
-            <div>
-              <Label className="text-sm font-medium mb-3 block">Answer Options *</Label>
-              <div className="space-y-3">
-                {["Option 1", "Option 2", "Option 3", "Option 4"].map((label, idx) => (
-                  <div key={idx} className="flex items-center gap-3">
-                    <Input 
-                      placeholder={label}
-                      value={options[idx]}
-                      onChange={(e) => handleOptionChange(idx, e.target.value)}
-                      className="flex-1"
+          <CardContent className="space-y-4">
+            {questionForm.type === 'multiple-choice' && (
+              <div className="space-y-4">
+                <Label>Answer Options *</Label>
+                {questionForm.options.map((option, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <Input
+                      value={option}
+                      onChange={(e) => handleOptionChange(index, e.target.value)}
+                      placeholder={`Option ${index + 1}`}
+                      className={errors.options ? 'border-red-500' : ''}
                     />
                     <Button
-                      variant={correctAnswers.includes(`option-${idx}`) ? "default" : "outline"}
+                      type="button"
+                      variant={questionForm.correctAnswer === index.toString() ? "default" : "outline"}
                       size="sm"
-                      onClick={() => toggleCorrectAnswer(`option-${idx}`)}
-                      className="whitespace-nowrap"
+                      onClick={() => setQuestionForm({...questionForm, correctAnswer: index.toString()})}
                     >
-                      Mark Correct
+                      {questionForm.correctAnswer === index.toString() ? 'Correct' : 'Mark Correct'}
                     </Button>
                   </div>
                 ))}
+                {errors.options && <p className="text-sm text-red-500">{errors.options}</p>}
+                {errors.correctAnswer && <p className="text-sm text-red-500">{errors.correctAnswer}</p>}
               </div>
-            </div>
+            )}
+
+            {questionForm.type === 'true-false' && (
+              <div className="space-y-4">
+                <Label>Correct Answer *</Label>
+                <div className="flex gap-4">
+                  <Button
+                    type="button"
+                    variant={questionForm.correctAnswer === 'true' ? "default" : "outline"}
+                    onClick={() => setQuestionForm({...questionForm, correctAnswer: 'true'})}
+                  >
+                    True
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={questionForm.correctAnswer === 'false' ? "default" : "outline"}
+                    onClick={() => setQuestionForm({...questionForm, correctAnswer: 'false'})}
+                  >
+                    False
+                  </Button>
+                </div>
+                {errors.correctAnswer && <p className="text-sm text-red-500">{errors.correctAnswer}</p>}
+              </div>
+            )}
+
+            {(questionForm.type === 'short-answer' || questionForm.type === 'essay') && (
+              <div>
+                <Label htmlFor="correctAnswer">Correct Answer *</Label>
+                <Textarea
+                  id="correctAnswer"
+                  value={questionForm.correctAnswer}
+                  onChange={(e) => setQuestionForm({...questionForm, correctAnswer: e.target.value})}
+                  placeholder={questionForm.type === 'short-answer' ? 'Expected short answer' : 'Model answer or key points'}
+                  rows={questionForm.type === 'essay' ? 4 : 2}
+                  className={errors.correctAnswer ? 'border-red-500' : ''}
+                />
+                {errors.correctAnswer && <p className="text-sm text-red-500 mt-1">{errors.correctAnswer}</p>}
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Explanation Card */}
-        <Card className="mb-6">
-          <CardHeader className="border-b">
-            <CardTitle className="text-lg">Explanation (Optional)</CardTitle>
-            <p className="text-sm text-gray-500 mt-1">Provide an explanation to help students understand the correct answer</p>
+        {/* Explanation */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Explanation (Optional)</CardTitle>
+            <CardDescription>
+              Provide an explanation to help students understand the correct answer
+            </CardDescription>
           </CardHeader>
-          <CardContent className="pt-6">
-            <Textarea 
-              placeholder="Explain why this is the correct answer and provide additional context..." 
-              className="min-h-[120px]"
+          <CardContent>
+            <Textarea
+              value={questionForm.explanation}
+              onChange={(e) => setQuestionForm({...questionForm, explanation: e.target.value})}
+              placeholder="Explain why this is the correct answer and provide additional context..."
+              rows={4}
             />
           </CardContent>
         </Card>
 
-        {/* Bottom Actions */}
-        <div className="flex items-center justify-end gap-2">
-          <Button variant="outline" className="gap-2">
-            <X className="w-4 h-4" />
+        {/* Submit Actions */}
+        <div className="flex justify-end gap-4 pt-6 border-t">
+          <Button
+            variant="outline"
+            onClick={() => router.push('/faculty/questions')}
+            className="flex items-center gap-2"
+          >
+            <X className="h-4 w-4" />
             Cancel
           </Button>
-          <Button onClick={handleCreateQuestion} className="gap-2 bg-blue-700 hover:bg-blue-800">
-            <Plus className="w-4 h-4" />
-            Create Question
+          <Button
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className="flex items-center gap-2"
+          >
+            <Save className="h-4 w-4" />
+            {isSubmitting ? 'Creating Question...' : 'Create Question'}
           </Button>
         </div>
-        </main>
+
+        {/* Bulk Queue Section */}
+        {bulkQueue.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Upload className="h-5 w-5" />
+                Bulk Queue ({bulkQueue.length} questions)
+              </CardTitle>
+              <CardDescription>
+                Questions ready for bulk processing
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {bulkQueue.map((question, index) => (
+                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex-1">
+                      <div className="font-medium">{question.title || `Question ${index + 1}`}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {question.type} • {question.subject} • {question.marks} marks
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setBulkQueue(prev => prev.filter((_, i) => i !== index));
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    onClick={() => {
+                      // Process bulk queue - add all questions
+                      bulkQueue.forEach(question => {
+                        if (currentFaculty) {
+                          const questionData = {
+                            ...question,
+                            facultyId: currentFaculty.id,
+                            departmentId: currentFaculty.departmentId,
+                            createdAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString()
+                          };
+                          addQuestion(questionData);
+                        }
+                      });
+                      setBulkQueue([]);
+                      router.push('/faculty/questions');
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <Upload className="h-4 w-4" />
+                    Process Bulk Queue
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setBulkQueue([])}
+                  >
+                    Clear All
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
-    </div>
+    </FacultyLayout>
   );
 }

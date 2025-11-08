@@ -1,9 +1,31 @@
+"use client";
+
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { User } from 'lucide-react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 function Topbar() {
+  const pathname = usePathname()
+
+  // Determine user type based on pathname
+  const getUserType = () => {
+    if (!pathname) return 'student'
+    if (pathname.startsWith('/student')) return 'student'
+    if (pathname.startsWith('/faculty')) return 'faculty'
+    if (pathname.startsWith('/department')) return 'department'
+    if (pathname.startsWith('/school')) return 'school'
+    return 'student' // default fallback
+  }
+
+  const userType = getUserType()
+
+  // Generate URLs based on user type
+  const profileUrl = `/${userType}/profile`
+  const settingsUrl = `/${userType}/settings`
+  const loginUrl = `/${userType}/login`
+
   return (
     <nav className="fixed top-0 left-0 right-0 w-full h-16 flex items-center justify-between px-6 border-b shadow-lg bg-background z-50">
       <div className="flex items-center gap-2">
@@ -19,10 +41,14 @@ function Topbar() {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="bottom" sideOffset={8} className="w-48">
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href="/student/login" className="text-destructive">Logout</Link>
+              <Link href={profileUrl} className="w-full">Profile</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={settingsUrl} className="w-full">Settings</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href={loginUrl} className="text-destructive w-full">Logout</Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
