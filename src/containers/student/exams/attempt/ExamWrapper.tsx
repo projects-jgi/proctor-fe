@@ -33,6 +33,27 @@ function ExamWrapper({ exam_id, exam_questions }: { exam_id: number, exam_questi
     })
 
     useEffect(() => {
+        const local_storage = JSON.parse(localStorage.getItem("user_answers") || "{}");
+        let data: object = {};
+        for ( const question of Object.values(exam_questions.questions)){
+            for(const q of Object.keys(question)){
+                if(local_storage.hasOwnProperty(q) === false){
+                    data = {
+                        ...data,
+                        [q]: []
+                    }
+                }else{
+                    data = {
+                        ...data,
+                        [q]: local_storage[q]
+                    }
+                }
+            }
+        }
+        localStorage.setItem("user_answers", JSON.stringify(data));
+    }, [])
+
+    useEffect(() => {
         if(violationQuery.isSuccess){
             dispatch(setViolations(violationQuery.data.data))
         }
