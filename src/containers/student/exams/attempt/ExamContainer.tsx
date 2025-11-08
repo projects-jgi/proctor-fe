@@ -13,7 +13,7 @@ import useTabActive from '@/hooks/useTabActive';
 import { RootState } from '@/lib/redux/store';
 import ViolationAlert from './ViolationAlert';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { exam_camera_upload, save_student_exam_attempt } from '@/lib/server_api/student';
+import { create_attempt_violation, exam_camera_upload, save_student_exam_attempt } from '@/lib/server_api/student';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import SubmissionLoading from './SubmissionLoading';
@@ -22,12 +22,15 @@ import useCameraCapture from '@/hooks/useCameraCapture';
 import useVideoPermission from '@/hooks/browser_permissions/useVideoPermission';
 
 function ExamContainer({ exam_id, exam_questions }: { exam_id: number, exam_questions: any }) {
+    // listen for active tab violation
     const [isActiveTab, setIsActiveTab] = useTabActive();
+
     const questionCounter = useSelector((state: RootState) => state.exam_attempt.questionCounter);
     const totalQuestions = useSelector((state: RootState) => state.exam_attempt.questionsLength);
     const currentQuestion = useSelector((state: RootState) => state.exam_attempt.currentQuestion);
     const violations = useSelector((state: RootState) => state.exam_attempt.violations);
     const attempt = useSelector((state: RootState) => state.exam_attempt.attempt);
+    const attempt_id = useSelector((state: RootState) => state.exam_attempt.attempt.id)
     const [violation, setViolation] = useState<string | null>(null);
     const video_permission = useVideoPermission();
 
@@ -35,6 +38,33 @@ function ExamContainer({ exam_id, exam_questions }: { exam_id: number, exam_ques
 
     const router = useRouter()
     const dispatch = useDispatch();
+
+    const store_violation_mutation = useMutation({
+        mutationFn: create_attempt_violation,
+        onSuccess: (data, variables, context) => {
+            queryClient.invalidateQueries({
+                queryKey: ["exams", parseInt(variables.exam_id.toString()), "attempts", attempt.id, "violations"],
+            })
+            // violation_count = violations.length
+        }
+    })
+
+    async function store_violation(){
+        const params = {
+            description: "Tab switch",
+            exam_id: exam_id,
+            attempt_id: attempt_id,
+        }
+        store_violation_mutation.mutate({...params})
+    }
+
+    useEffect(() => {
+        console.log("Active tab changed: ", isActiveTab === false)   
+        if(isActiveTab === false){
+            store_violation()
+        }     
+    }, [isActiveTab])
+    
 
     async function onImageCapture(image: string){
         const res = await exam_camera_upload({ exam_id, attempt_id: attempt.id, file: image})
@@ -49,6 +79,7 @@ function ExamContainer({ exam_id, exam_questions }: { exam_id: number, exam_ques
         }
     }, [violations])
 
+    // listen for proctoring violation
     useEffect(() => {
         const socket = useSocket();
 
@@ -116,10 +147,6 @@ function ExamContainer({ exam_id, exam_questions }: { exam_id: number, exam_ques
             }
         }
     }, [questionCounter])
-
-    useEffect(() => {
-        console.log("Active tab changed: ", isActiveTab === false)        
-    }, [isActiveTab])
 
 
     return (
