@@ -36,7 +36,7 @@ function ExamWrapper({ exam_id, exam_questions }: { exam_id: number, exam_questi
         const local_storage = JSON.parse(localStorage.getItem("user_answers") || "{}");
         let data: object = {};
         for ( const question of Object.values(exam_questions.questions)){
-            for(const q of Object.keys(question)){
+            for(const q of Object.keys(question as object)){
                 if(local_storage.hasOwnProperty(q) === false){
                     data = {
                         ...data,
