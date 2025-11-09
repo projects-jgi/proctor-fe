@@ -16,7 +16,9 @@ import {
     Lock,
     Globe,
     PlayCircle,
-    Clock
+    Clock,
+    Edit,
+    Trash2
 } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -28,6 +30,7 @@ export default function FacultyExamsPage() {
     exams,
     addExam,
     updateExam,
+    deleteExam,
     publishExam,
     unpublishExam,
     getExamsForFaculty
@@ -41,10 +44,29 @@ export default function FacultyExamsPage() {
 
   const [isViewExamOpen, setIsViewExamOpen] = useState(false);
   const [viewingExam, setViewingExam] = useState<any>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [examToDelete, setExamToDelete] = useState<any>(null);
 
   const handleViewExam = (exam: any) => {
     setViewingExam(exam);
     setIsViewExamOpen(true);
+  };
+
+  const handleEditExam = (exam: any) => {
+    router.push(`/faculty/exams/edit/${exam.id}`);
+  };
+
+  const handleDeleteExam = (exam: any) => {
+    setExamToDelete(exam);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteExam = () => {
+    if (examToDelete) {
+      deleteExam(examToDelete.id);
+      setIsDeleteDialogOpen(false);
+      setExamToDelete(null);
+    }
   };
 
   const stats = {
@@ -243,6 +265,17 @@ export default function FacultyExamsPage() {
                     <Button variant="outline" size="sm" onClick={() => handleViewExam(exam)}>
                       <Eye className="h-4 w-4" />
                     </Button>
+                    <Button variant="outline" size="sm" onClick={() => handleEditExam(exam)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => handleDeleteExam(exam)}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               </CardContent>
@@ -269,6 +302,26 @@ export default function FacultyExamsPage() {
               <p><strong>Questions:</strong> {viewingExam.questions.length}</p>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Exam</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{examToDelete?.title}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteExam}>
+              Delete
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </FacultyLayout>

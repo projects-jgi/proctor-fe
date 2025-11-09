@@ -334,6 +334,7 @@ export default function CreateQuestionPage() {
                   onChange={(e) => setQuestionForm({...questionForm, title: e.target.value})}
                   placeholder="Brief title for the question"
                   className={errors.title ? 'border-red-500' : ''}
+                  suppressHydrationWarning
                 />
                 {errors.title && <p className="text-sm text-red-500 mt-1">{errors.title}</p>}
               </div>
@@ -346,6 +347,7 @@ export default function CreateQuestionPage() {
                   onChange={(e) => setQuestionForm({...questionForm, subject: e.target.value})}
                   placeholder="e.g., Mathematics, Physics"
                   className={errors.subject ? 'border-red-500' : ''}
+                  suppressHydrationWarning
                 />
                 {errors.subject && <p className="text-sm text-red-500 mt-1">{errors.subject}</p>}
               </div>
@@ -391,6 +393,7 @@ export default function CreateQuestionPage() {
                 placeholder="Enter the full question text here..."
                 rows={4}
                 className={errors.content ? 'border-red-500' : ''}
+                suppressHydrationWarning
               />
               {errors.content && <p className="text-sm text-red-500 mt-1">{errors.content}</p>}
             </div>
@@ -405,6 +408,7 @@ export default function CreateQuestionPage() {
                   onChange={(e) => setQuestionForm({...questionForm, marks: parseInt(e.target.value) || 0})}
                   min="1"
                   className={errors.marks ? 'border-red-500' : ''}
+                  suppressHydrationWarning
                 />
                 {errors.marks && <p className="text-sm text-red-500 mt-1">{errors.marks}</p>}
               </div>
@@ -451,6 +455,7 @@ export default function CreateQuestionPage() {
                       onChange={(e) => handleOptionChange(index, e.target.value)}
                       placeholder={`Option ${index + 1}`}
                       className={errors.options ? 'border-red-500' : ''}
+                      suppressHydrationWarning
                     />
                     <Button
                       type="button"
@@ -500,6 +505,7 @@ export default function CreateQuestionPage() {
                   placeholder={questionForm.type === 'short-answer' ? 'Expected short answer' : 'Model answer or key points'}
                   rows={questionForm.type === 'essay' ? 4 : 2}
                   className={errors.correctAnswer ? 'border-red-500' : ''}
+                  suppressHydrationWarning
                 />
                 {errors.correctAnswer && <p className="text-sm text-red-500 mt-1">{errors.correctAnswer}</p>}
               </div>
@@ -521,6 +527,7 @@ export default function CreateQuestionPage() {
               onChange={(e) => setQuestionForm({...questionForm, explanation: e.target.value})}
               placeholder="Explain why this is the correct answer and provide additional context..."
               rows={4}
+              suppressHydrationWarning
             />
           </CardContent>
         </Card>

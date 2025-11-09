@@ -13,16 +13,18 @@ import {
     Globe,
     Lock,
     PlayCircle,
-    Plus,
+    Save,
     Settings,
     Shield,
     X
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
-export default function CreateExamPage() {
-  const { addExam, currentUser, faculties } = useProctor();
+export default function EditExamPage() {
+  const params = useParams();
+  const examId = params?.examId as string;
+  const { updateExam, currentUser, faculties, exams } = useProctor();
   const router = useRouter();
 
   // Find current faculty
@@ -44,7 +46,38 @@ export default function CreateExamPage() {
     }
   });
 
-  const handleCreateExam = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load exam data
+  useEffect(() => {
+    if (examId && currentFaculty) {
+      const exam = exams.find(e => e.id === examId && e.facultyId === currentFaculty.id);
+      if (exam) {
+        setExamForm({
+          title: exam.title,
+          description: exam.description,
+          type: exam.type,
+          duration: exam.duration,
+          startTime: exam.startTime ? new Date(exam.startTime).toISOString().slice(0, 16) : '',
+          endTime: exam.endTime ? new Date(exam.endTime).toISOString().slice(0, 16) : '',
+          instructions: exam.instructions || '',
+          settings: exam.settings || {
+            allowTabSwitch: true,
+            allowCopyPaste: true,
+            showResults: true,
+            maxViolations: 3
+          }
+        });
+      } else {
+        // Exam not found or doesn't belong to current faculty
+        router.push('/faculty/exams');
+      }
+      setIsLoading(false);
+    }
+  }, [examId, currentFaculty, exams, router]);
+
+  const handleUpdateExam = () => {
     // Basic validation
     if (!examForm.title || !examForm.description || !examForm.startTime || !examForm.endTime) {
       alert('Please fill in all required fields');
@@ -56,48 +89,41 @@ export default function CreateExamPage() {
       return;
     }
 
-    // Create exam object
-    const newExam = {
-      id: Date.now().toString(),
-      title: examForm.title,
-      description: examForm.description,
-      type: examForm.type,
-      duration: examForm.duration,
-      startTime: examForm.startTime,
-      endTime: examForm.endTime,
-      instructions: examForm.instructions,
-      settings: examForm.settings,
-      status: 'draft',
-      totalMarks: 0,
-      questions: [],
-      facultyId: currentFaculty.id,
-      departmentId: currentFaculty.departmentId,
-      enrolledStudents: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
+    setIsSubmitting(true);
 
-    addExam(newExam);
-    router.push('/faculty/exams');
+    try {
+      // Update exam object
+      const updatedExam = {
+        title: examForm.title,
+        description: examForm.description,
+        type: examForm.type,
+        duration: examForm.duration,
+        startTime: examForm.startTime,
+        endTime: examForm.endTime,
+        instructions: examForm.instructions,
+        settings: examForm.settings,
+        updatedAt: new Date().toISOString()
+      };
+
+      updateExam(examId as string, updatedExam);
+      router.push('/faculty/exams');
+    } catch (error) {
+      console.error('Error updating exam:', error);
+      alert('Failed to update exam. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const resetExamForm = () => {
-    setExamForm({
-      title: '',
-      description: '',
-      type: 'private',
-      duration: 60,
-      startTime: '',
-      endTime: '',
-      instructions: '',
-      settings: {
-        allowTabSwitch: true,
-        allowCopyPaste: true,
-        showResults: true,
-        maxViolations: 3
-      }
-    });
-  };
+  if (isLoading) {
+    return (
+      <FacultyLayout>
+        <div className="flex justify-center items-center h-64">
+          <div className="text-lg">Loading exam...</div>
+        </div>
+      </FacultyLayout>
+    );
+  }
 
   return (
     <FacultyLayout>
@@ -105,8 +131,8 @@ export default function CreateExamPage() {
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground">Create New Exam</h1>
-            <p className="text-muted-foreground mt-2">Create a new exam for your department</p>
+            <h1 className="text-3xl font-bold text-foreground">Edit Exam</h1>
+            <p className="text-muted-foreground mt-2">Modify exam details and settings</p>
           </div>
 
           <div className="space-y-6">
@@ -462,9 +488,9 @@ export default function CreateExamPage() {
                 <X className="h-4 w-4 mr-2" />
                 Cancel
               </Button>
-              <Button onClick={handleCreateExam} suppressHydrationWarning>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Exam
+              <Button onClick={handleUpdateExam} disabled={isSubmitting} suppressHydrationWarning>
+                <Save className="h-4 w-4 mr-2" />
+                {isSubmitting ? 'Updating...' : 'Update Exam'}
               </Button>
             </div>
           </div>

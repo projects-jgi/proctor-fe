@@ -36,7 +36,11 @@ function Topbar() {
         <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className='bg-primary text-primary-foreground rounded-full aspect-square p-3 inline-flex items-center justify-center transition-none hover:bg-primary/90' aria-label="Open profile menu">
+            <button 
+              className='bg-primary text-primary-foreground rounded-full aspect-square p-3 inline-flex items-center justify-center transition-none hover:bg-primary/90' 
+              aria-label="Open profile menu"
+              suppressHydrationWarning
+            >
               <User className="w-5 h-5" />
             </button>
           </DropdownMenuTrigger>

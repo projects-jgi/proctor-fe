@@ -386,7 +386,7 @@ export default function ProctoringPage() {
                   <div className="flex items-center gap-2 px-3 py-1 bg-red-100 dark:bg-red-900 rounded-full">
                     <AlertTriangle className="w-4 h-4 text-red-600" />
                     <span className="text-sm font-medium text-red-700 dark:text-red-300">
-                      {highSeverityViolations} Critical Alert{highSeverityViolations > 1 ? 's' : ''}
+                      {highSeverityViolations} Critical Violation{highSeverityViolations > 1 ? 's' : ''}
                     </span>
                   </div>
                 )}
@@ -597,23 +597,23 @@ export default function ProctoringPage() {
           </Card>
 
           <Card className="relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-16 h-16 bg-red-500/10 rounded-bl-3xl" />
+            <div className="absolute top-0 right-0 w-16 h-16 bg-purple-500/10 rounded-bl-3xl" />
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Issues</CardTitle>
-              <div className="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
-                <ShieldAlert className="h-4 w-4 text-red-600" />
+              <CardTitle className="text-sm font-medium">Critical Alerts</CardTitle>
+              <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
+                <ShieldAlert className="h-4 w-4 text-purple-600" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">
-                {activeSessions.filter(s => !s.cameraActive || !s.micActive || !s.tabVisible).length}
+              <div className="text-2xl font-bold text-purple-600">
+                {activeSessions.filter(s => s.violations.some(v => !v.resolved && v.severity === 'high')).length}
               </div>
               <p className="text-xs text-muted-foreground">
-                Technical issues detected
+                Sessions with unresolved high-severity violations
               </p>
               <div className="flex items-center gap-2 mt-2">
-                <TrendingUp className="w-3 h-3 text-muted-foreground" />
-                <span className="text-xs">+12% from last hour</span>
+                <Shield className="w-3 h-3 text-purple-500" />
+                <span className="text-xs">Requires immediate attention</span>
               </div>
             </CardContent>
           </Card>
@@ -677,8 +677,8 @@ export default function ProctoringPage() {
                     : "space-y-4"
                   }>
                     {filteredSessions.map((session) => {
-                      // Check for alerts
-                      const hasAlerts = !session.cameraActive || !session.micActive || !session.tabVisible || session.violations.some(v => !v.resolved);
+                      // Check for alerts - only based on violations now
+                      const hasAlerts = session.violations.some(v => !v.resolved);
                       const unresolvedViolations = session.violations.filter(v => !v.resolved);
                       const highSeverityViolations = unresolvedViolations.filter(v => v.severity === 'high');
 
@@ -701,14 +701,12 @@ export default function ProctoringPage() {
                               </div>
                             </div>
                             <div className="flex items-center gap-2 flex-shrink-0">
-                              {hasAlerts && (
+                              {session.violations.length > 0 && (
                                 <div className="flex items-center gap-1">
-                                  <AlertTriangle className="w-4 h-4 text-red-600" />
-                                  {highSeverityViolations.length > 0 && (
-                                    <Badge variant="destructive" className="text-xs px-1 py-0 h-5">
-                                      {highSeverityViolations.length}
-                                    </Badge>
-                                  )}
+                                  <AlertTriangle className="w-4 h-4 text-orange-600" />
+                                  <Badge variant="destructive" className="text-xs px-1 py-0 h-5">
+                                    {session.violations.length}
+                                  </Badge>
                                 </div>
                               )}
                               <Badge
@@ -719,71 +717,6 @@ export default function ProctoringPage() {
                               </Badge>
                             </div>
                           </div>
-
-                          {/* Technical Status Grid */}
-                          <div className="grid grid-cols-2 gap-2 text-xs mb-3">
-                            <div className="flex items-center gap-2">
-                              <Camera className={`w-3 h-3 flex-shrink-0 ${session.cameraActive ? 'text-green-600' : 'text-red-600'}`} />
-                              <span className={`truncate ${session.cameraActive ? 'text-green-600' : 'text-red-600'}`}>
-                                {session.cameraActive ? 'Active' : 'Inactive'}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Mic className={`w-3 h-3 flex-shrink-0 ${session.micActive ? 'text-green-600' : 'text-red-600'}`} />
-                              <span className={`truncate ${session.micActive ? 'text-green-600' : 'text-red-600'}`}>
-                                {session.micActive ? 'Active' : 'Inactive'}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Monitor className={`w-3 h-3 flex-shrink-0 ${session.tabVisible ? 'text-green-600' : 'text-red-600'}`} />
-                              <span className={`truncate ${session.tabVisible ? 'text-green-600' : 'text-red-600'}`}>
-                                {session.tabVisible ? 'Focused' : 'Unfocused'}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Clock className="w-3 h-3 text-blue-600 flex-shrink-0" />
-                              <span className="text-blue-600 truncate">
-                                {new Date(session.startTime).toLocaleTimeString()}
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Alert details section */}
-                          {hasAlerts && (
-                            <div className="mb-3 p-2 bg-red-50 dark:bg-red-950/50 rounded border border-red-200 dark:border-red-800">
-                              <div className="space-y-1">
-                                {!session.cameraActive && (
-                                  <div className="flex items-center gap-2 text-xs text-red-600">
-                                    <Camera className="w-3 h-3 flex-shrink-0" />
-                                    <span className="truncate">Camera inactive</span>
-                                  </div>
-                                )}
-                                {!session.micActive && (
-                                  <div className="flex items-center gap-2 text-xs text-red-600">
-                                    <Mic className="w-3 h-3 flex-shrink-0" />
-                                    <span className="truncate">Microphone inactive</span>
-                                  </div>
-                                )}
-                                {!session.tabVisible && (
-                                  <div className="flex items-center gap-2 text-xs text-red-600">
-                                    <Monitor className="w-3 h-3 flex-shrink-0" />
-                                    <span className="truncate">Tab unfocused</span>
-                                  </div>
-                                )}
-                                {unresolvedViolations.length > 0 && (
-                                  <div className="flex items-center gap-2 text-xs text-red-600">
-                                    <AlertTriangle className="w-3 h-3 flex-shrink-0" />
-                                    <span className="truncate">{unresolvedViolations.length} unresolved violation{unresolvedViolations.length > 1 ? 's' : ''}</span>
-                                    {highSeverityViolations.length > 0 && (
-                                      <Badge variant="destructive" className="text-xs px-1 py-0 h-4 ml-1 flex-shrink-0">
-                                        {highSeverityViolations.length} high
-                                      </Badge>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          )}
 
                           {/* Violations section */}
                           {session.violations.length > 0 && (
@@ -802,21 +735,17 @@ export default function ProctoringPage() {
                                 }}
                               >
                                 <Eye className="w-3 h-3 mr-1" />
-                                Monitor
+                                View
                               </Button>
                             </div>
                           )}
 
-                          {/* Progress bar - always at bottom */}
+                          {/* Session info - always at bottom */}
                           <div className="mt-auto">
-                            <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                              <span>Progress</span>
-                              <span>{Math.min(100, Math.round((Date.now() - new Date(session.startTime).getTime()) / (session.duration * 60 * 1000) * 100))}%</span>
+                            <div className="flex justify-between text-xs text-muted-foreground">
+                              <span>Started</span>
+                              <span>{new Date(session.startTime).toLocaleTimeString()}</span>
                             </div>
-                            <Progress
-                              value={Math.min(100, (Date.now() - new Date(session.startTime).getTime()) / (session.duration * 60 * 1000) * 100)}
-                              className="h-1"
-                            />
                           </div>
                         </div>
                       );
@@ -881,103 +810,152 @@ export default function ProctoringPage() {
         {/* Simple Session Monitor Modal */}
         {selectedSession && (
           <Dialog open={!!selectedSession} onOpenChange={() => setSelectedSession(null)}>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent className="sm:max-w-4xl">
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
-                  <Eye className="w-5 h-5" />
-                  Monitor Session
+                  <AlertTriangle className="w-5 h-5" />
+                  Violations for {selectedSession.examTitle}
                 </DialogTitle>
                 <DialogDescription>
-                  {selectedSession.studentName} - {selectedSession.examTitle}
+                  Student: {selectedSession.studentName} • Started: {new Date(selectedSession.startTime).toLocaleString()}
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="space-y-4">
-                {/* Camera Feed */}
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium flex items-center gap-2">
-                    <Camera className="w-4 h-4" />
-                    Live Camera Feed
-                  </h4>
-                  <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-lg flex items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-600">
-                    <div className="text-center">
-                      <Camera className={`w-12 h-12 mx-auto mb-2 ${selectedSession.cameraActive ? 'text-green-500' : 'text-red-500'}`} />
-                      <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                        {selectedSession.cameraActive ? 'Camera Active' : 'Camera Inactive'}
-                      </p>
-                      <p className="text-xs text-slate-500 dark:text-slate-500">
-                        Live feed
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
+              <div className="space-y-6">
                 {/* Session Status */}
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Status</span>
-                  <Badge variant={selectedSession.status === 'active' ? 'default' : 'secondary'}>
-                    {selectedSession.status}
-                  </Badge>
-                </div>
-
-                {/* Technical Status */}
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium">Technical Status</h4>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="flex items-center gap-2">
-                      <Camera className={`w-4 h-4 ${selectedSession.cameraActive ? 'text-green-600' : 'text-red-600'}`} />
-                      <span className="text-xs">Camera</span>
+                <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-3 h-3 rounded-full ${getStatusColor(selectedSession.status)}`} />
+                    <div>
+                      <p className="font-medium">Session Status</p>
+                      <p className="text-sm text-muted-foreground capitalize">{selectedSession.status}</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Mic className={`w-4 h-4 ${selectedSession.micActive ? 'text-green-600' : 'text-red-600'}`} />
-                      <span className="text-xs">Mic</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Monitor className={`w-4 h-4 ${selectedSession.tabVisible ? 'text-green-600' : 'text-red-600'}`} />
-                      <span className="text-xs">Tab</span>
-                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-muted-foreground">Duration</p>
+                    <p className="font-medium">
+                      {Math.floor((Date.now() - new Date(selectedSession.startTime).getTime()) / (1000 * 60))}m
+                    </p>
                   </div>
                 </div>
 
-                {/* Violations */}
-                {selectedSession.violations.length > 0 && (
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium">Recent Violations</h4>
-                    <div className="space-y-1">
-                      {selectedSession.violations.slice(-3).map((violation) => (
-                        <div key={violation.id} className="flex items-center justify-between text-xs">
-                          <span>{violation.type.replace('_', ' ')}</span>
-                          <Badge variant={getViolationSeverityColor(violation.severity)} className="text-xs">
-                            {violation.severity}
-                          </Badge>
+                {/* Violations List */}
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold flex items-center gap-2">
+                    <ShieldAlert className="w-5 h-5" />
+                    Violations ({selectedSession.violations.length})
+                  </h4>
+
+                  {selectedSession.violations.length === 0 ? (
+                    <div className="text-center py-8">
+                      <CheckCircle className="w-12 h-12 mx-auto mb-4 text-green-500" />
+                      <p className="text-lg font-medium text-green-700 dark:text-green-300">No violations detected</p>
+                      <p className="text-sm text-muted-foreground">This session is running smoothly</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                      {selectedSession.violations.map((violation) => (
+                        <div
+                          key={violation.id}
+                          className={`p-4 border rounded-lg ${
+                            violation.resolved
+                              ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800'
+                              : violation.severity === 'high'
+                                ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800'
+                                : violation.severity === 'medium'
+                                  ? 'bg-yellow-50 dark:bg-yellow-950/20 border-yellow-200 dark:border-yellow-800'
+                                  : 'bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <AlertTriangle className={`w-4 h-4 ${
+                                  violation.severity === 'high' ? 'text-red-600' :
+                                  violation.severity === 'medium' ? 'text-yellow-600' : 'text-blue-600'
+                                }`} />
+                                <h5 className="font-medium capitalize">
+                                  {violation.type.replace('_', ' ')}
+                                </h5>
+                                <Badge
+                                  variant={
+                                    violation.severity === 'high' ? 'destructive' :
+                                    violation.severity === 'medium' ? 'default' : 'secondary'
+                                  }
+                                  className="text-xs"
+                                >
+                                  {violation.severity}
+                                </Badge>
+                                {violation.resolved && (
+                                  <Badge variant="outline" className="text-xs bg-green-100 text-green-800 border-green-300">
+                                    Resolved
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground mb-2">
+                                {violation.description}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {new Date(violation.timestamp).toLocaleString()}
+                              </p>
+                            </div>
+
+                            {!violation.resolved && (
+                              <div className="flex gap-2 ml-4">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedViolation(violation);
+                                    setShowViolationDialog(true);
+                                  }}
+                                  className="text-xs"
+                                >
+                                  Take Action
+                                </Button>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
+                  )}
+                </div>
+
+                {/* Summary Stats */}
+                {selectedSession.violations.length > 0 && (
+                  <div className="grid grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-red-600">
+                        {selectedSession.violations.filter(v => v.severity === 'high').length}
+                      </p>
+                      <p className="text-xs text-muted-foreground">High Severity</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-yellow-600">
+                        {selectedSession.violations.filter(v => v.severity === 'medium').length}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Medium Severity</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-blue-600">
+                        {selectedSession.violations.filter(v => v.severity === 'low').length}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Low Severity</p>
+                    </div>
                   </div>
                 )}
-
-                {/* Progress */}
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Progress</span>
-                    <span>{Math.min(100, Math.round((Date.now() - new Date(selectedSession.startTime).getTime()) / (selectedSession.duration * 60 * 1000) * 100))}%</span>
-                  </div>
-                  <Progress
-                    value={Math.min(100, (Date.now() - new Date(selectedSession.startTime).getTime()) / (selectedSession.duration * 60 * 1000) * 100)}
-                    className="h-2"
-                  />
-                </div>
               </div>
 
               <DialogFooter className="flex gap-2">
                 <Button variant="outline" onClick={() => setSelectedSession(null)}>
                   Close
                 </Button>
-                {selectedSession.violations.some(v => !v.resolved) && (
+                {selectedSession.violations.some(v => !v.resolved && v.severity === 'high') && (
                   <Button
                     variant="destructive"
                     onClick={() => {
-                      if (window.confirm('Terminate this session?')) {
+                      if (window.confirm('Terminate this session due to critical violations?')) {
                         setActiveSessions(prev =>
                           prev.map(session =>
                             session.id === selectedSession.id

@@ -383,15 +383,21 @@ export const ProctorProvider: React.FC<{ children: ReactNode }> = ({ children })
     // Mock auth check - in real app this would verify token
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('authToken');
+        let token = localStorage.getItem('authToken');
+        if (!token) {
+          // Auto-login as faculty for demo purposes
+          token = 'mock-faculty-token';
+          localStorage.setItem('authToken', token);
+        }
+
         if (token) {
           // Mock user data - replace with actual user data structure
           const mockUser: User = {
-            id: '1',
-            email: 'student@jainuniversity.ac.in',
+            id: 'user-fac-mca-1', // Use faculty user ID to match faculty data
+            email: 'faculty@cs.com',
             password: '', // Not stored in state
-            role: 'student',
-            name: 'John Doe',
+            role: 'faculty',
+            name: 'Dr. Rajesh Kumar',
             phone: '+91 9876543210',
             isActive: true,
             createdAt: new Date().toISOString(),

@@ -19,7 +19,9 @@ import {
     Lock,
     PlayCircle,
     Plus,
-    Users
+    Users,
+    Edit,
+    Trash2
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -30,6 +32,8 @@ export default function FacultyExamTypesPage() {
     exams,
     categories,
     addCategory,
+    updateCategory,
+    deleteCategory,
     getExamsForFaculty
   } = useProctor();
 
@@ -39,6 +43,10 @@ export default function FacultyExamTypesPage() {
 
   const [selectedExamType, setSelectedExamType] = useState<string>('all');
   const [isCreateExamTypeOpen, setIsCreateExamTypeOpen] = useState(false);
+  const [isEditExamTypeOpen, setIsEditExamTypeOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<any>(null);
   const [examTypeForm, setExamTypeForm] = useState({
     name: '',
     description: ''
@@ -104,6 +112,54 @@ export default function FacultyExamTypesPage() {
     setIsCreateExamTypeOpen(false);
   };
 
+  // Handle exam type editing
+  const handleEditExamType = (category: any) => {
+    setEditingCategory(category);
+    setExamTypeForm({
+      name: category.name,
+      description: category.description || ''
+    });
+    setIsEditExamTypeOpen(true);
+  };
+
+  // Handle exam type update
+  const handleUpdateExamType = () => {
+    if (!examTypeForm.name.trim()) {
+      alert('Please enter an exam type name.');
+      return;
+    }
+
+    // Check if name conflicts with other categories (excluding current one)
+    if (categories.some(cat => cat.id !== editingCategory.id && cat.name.toLowerCase() === examTypeForm.name.toLowerCase())) {
+      alert('An exam type with this name already exists.');
+      return;
+    }
+
+    updateCategory(editingCategory.id, {
+      name: examTypeForm.name.trim(),
+      description: examTypeForm.description.trim()
+    });
+
+    setExamTypeForm({ name: '', description: '' });
+    setIsEditExamTypeOpen(false);
+    setEditingCategory(null);
+  };
+
+  // Handle exam type deletion
+  const handleDeleteExamType = (category: any) => {
+    setCategoryToDelete(category);
+    setIsDeleteDialogOpen(true);
+  };
+
+  // Confirm exam type deletion
+  const confirmDeleteExamType = () => {
+    if (categoryToDelete) {
+      deleteCategory(categoryToDelete.id);
+      setIsDeleteDialogOpen(false);
+      setCategoryToDelete(null);
+    }
+  };
+
   return (
     <FacultyLayout
       title="Exam Types & Schedules"
@@ -156,29 +212,10 @@ export default function FacultyExamTypesPage() {
         </Card>
       </div>
 
-      {/* Exam Type Filter */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">Exam Schedules by Type</h2>
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-muted-foreground">Filter by type:</span>
-            <select
-              value={selectedExamType}
-              onChange={(e) => setSelectedExamType(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="all">All Types</option>
-              {examTypes.map(type => {
-                const typeInfo = getExamTypeInfo(type);
-                return (
-                  <option key={type} value={type}>
-                    {typeInfo.label}
-                  </option>
-                );
-              })}
-            </select>
-          </div>
-
+      {/* Exam Types Management */}
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold">Manage Exam Types</h2>
           <Dialog open={isCreateExamTypeOpen} onOpenChange={setIsCreateExamTypeOpen}>
             <DialogTrigger asChild>
               <Button>
@@ -201,6 +238,7 @@ export default function FacultyExamTypesPage() {
                     value={examTypeForm.name}
                     onChange={(e) => setExamTypeForm({...examTypeForm, name: e.target.value})}
                     placeholder="e.g., Verbal, Technical, Reasoning"
+                    suppressHydrationWarning
                   />
                 </div>
                 <div>
@@ -211,6 +249,7 @@ export default function FacultyExamTypesPage() {
                     onChange={(e) => setExamTypeForm({...examTypeForm, description: e.target.value})}
                     placeholder="Brief description of the exam type"
                     rows={3}
+                    suppressHydrationWarning
                   />
                 </div>
                 <div className="flex justify-end space-x-2">
@@ -227,6 +266,83 @@ export default function FacultyExamTypesPage() {
               </div>
             </DialogContent>
           </Dialog>
+        </div>
+
+        {/* Exam Types List */}
+        <div className="grid gap-4">
+          {categories.length === 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">No exam types found</CardTitle>
+                <CardDescription>
+                  Create your first exam type to get started.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          ) : (
+            categories.map((category) => (
+              <Card key={category.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">{category.name}</CardTitle>
+                      {category.description && (
+                        <CardDescription className="mt-2">
+                          {category.description}
+                        </CardDescription>
+                      )}
+                      <div className="mt-3 flex items-center space-x-4 text-sm text-muted-foreground">
+                        <span>Created: {new Date(category.createdAt || Date.now()).toLocaleDateString()}</span>
+                        <span>Status: {category.isActive ? 'Active' : 'Inactive'}</span>
+                      </div>
+                    </div>
+                    <div className="flex space-x-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditExamType(category)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeleteExamType(category)}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Exam Type Filter */}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-semibold">Exam Schedules by Type</h2>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-muted-foreground">Filter by type:</span>
+            <select
+              value={selectedExamType}
+              onChange={(e) => setSelectedExamType(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Types</option>
+              {examTypes.map(type => {
+                const typeInfo = getExamTypeInfo(type);
+                return (
+                  <option key={type} value={type}>
+                    {typeInfo.label}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -340,6 +456,73 @@ export default function FacultyExamTypesPage() {
           })
         )}
       </div>
+
+      {/* Edit Exam Type Dialog */}
+      <Dialog open={isEditExamTypeOpen} onOpenChange={setIsEditExamTypeOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Exam Type</DialogTitle>
+            <DialogDescription>
+              Modify the exam type details
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="edit-category-name">Exam Type Name *</Label>
+              <Input
+                id="edit-category-name"
+                value={examTypeForm.name}
+                onChange={(e) => setExamTypeForm({...examTypeForm, name: e.target.value})}
+                placeholder="e.g., Verbal, Technical, Reasoning"
+                suppressHydrationWarning
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-category-description">Description (Optional)</Label>
+              <Textarea
+                id="edit-category-description"
+                value={examTypeForm.description}
+                onChange={(e) => setExamTypeForm({...examTypeForm, description: e.target.value})}
+                placeholder="Brief description of the exam type"
+                rows={3}
+                suppressHydrationWarning
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => {
+                setIsEditExamTypeOpen(false);
+                setExamTypeForm({ name: '', description: '' });
+                setEditingCategory(null);
+              }}>
+                Cancel
+              </Button>
+              <Button onClick={handleUpdateExamType}>
+                Update Exam Type
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Exam Type</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{categoryToDelete?.name}"? This action cannot be undone and may affect existing questions and exams.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDeleteExamType}>
+              Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </FacultyLayout>
   );
 }
