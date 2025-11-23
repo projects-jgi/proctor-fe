@@ -115,9 +115,9 @@ function ExamContainer({
   // listen for proctoring violation
   useEffect(() => {
     const socket = useSocket();
-
-    // TODO: Change the listener name
-    socket.on("exam-attempt-violation", (message) => {
+    const emit_name =
+      "exam-attempt-violation_exam-" + exam_id + "_attempt-" + attempt.id;
+    socket.on(emit_name, (message) => {
       console.log(message);
       if (message.data.is_violation) {
         toast.warning(message.data.violations[0].description);
@@ -135,7 +135,7 @@ function ExamContainer({
     });
 
     return () => {
-      socket.off("exam-attempt-violation");
+      socket.off(emit_name);
     };
   }, []);
 
