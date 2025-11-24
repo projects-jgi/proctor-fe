@@ -120,22 +120,23 @@ export async function get_student_attempt_result({
 }: {
   exam_id: number;
 }) {
-  return Request({
-    url:
-      process.env.BACKEND_HOST +
-      `/api/students/exams/${exam_id}/attempts/1/result`,
-    isAuthorized: true,
-    method: "GET",
-  })
-    .then(function (response) {
-      return response.data;
-    })
-    .catch(function (error) {
-      if (error.response) {
-        return Promise.reject(error.response.data.message);
-      }
-      return Promise.reject("Unable to load exam results");
+  try {
+    const response = await Request({
+      url:
+        process.env.BACKEND_HOST +
+        `/api/students/exams/${exam_id}/attempts/1/result`,
+      isAuthorized: true,
+      method: "GET",
     });
+    return response.data;
+  } catch (error: any) {
+    const error_message =
+      error.response?.data?.message || "Unable to load exam results";
+    return {
+      status: false,
+      message: error_message,
+    };
+  }
 }
 
 export async function create_attempt_violation({
