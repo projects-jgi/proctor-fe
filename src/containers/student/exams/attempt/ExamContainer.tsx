@@ -89,8 +89,8 @@ function ExamContainer({
   }
 
   useEffect(() => {
-    console.log("Active tab changed: ", isActiveTab === false);
     if (isActiveTab === false) {
+      setViolation("Tab Switch Violation");
       store_violation();
     }
   }, [isActiveTab]);
@@ -118,7 +118,7 @@ function ExamContainer({
     const emit_name =
       "exam-attempt-violation_exam-" + exam_id + "_attempt-" + attempt.id;
     socket.on(emit_name, (message) => {
-      console.log(message);
+      // console.log(message);
       if (message.data.is_violation) {
         toast.warning(message.data.violations[0].description);
         setViolation(message.data.violations[0].description);
@@ -201,12 +201,6 @@ function ExamContainer({
   return (
     <>
       {onFinishMutation.isPending && <SubmissionLoading />}
-      {!isActiveTab && (
-        <ViolationAlert
-          description="Tab Switch Violation"
-          onClose={() => setIsActiveTab(true)}
-        />
-      )}
       {violation != null && (
         <ViolationAlert
           description={violation as string}

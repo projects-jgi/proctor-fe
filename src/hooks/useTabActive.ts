@@ -1,26 +1,45 @@
-'use client';
+"use client";
 
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 
-function useTabActive(): [boolean, Dispatch<SetStateAction<boolean>>]{
-    const [isTabActive, setIsTabActive] = useState(true);
+function useTabActive(): [boolean, Dispatch<SetStateAction<boolean>>] {
+  const [isTabActive, setIsTabActive] = useState(true);
 
-    const handleVisibilityChange = useCallback(() => {
-        setIsTabActive(document.visibilityState !== "visible");
-    }, []);
+  const handleVisibilityChange = useCallback(() => {
+    setIsTabActive(document.visibilityState === "visible");
+  }, []);
 
-    useEffect(() => {
-        if(typeof window != undefined){
-            window.addEventListener('visibilitychange', handleVisibilityChange);
-            window.addEventListener('blur', handleVisibilityChange);
-        }
-        return () => {
-            window.removeEventListener('visibilitychange', handleVisibilityChange);
-            window.removeEventListener('blur', handleVisibilityChange);
-        };
-    }, []);
+  const handleBlur = useCallback(() => {
+    setIsTabActive(false);
+  }, []);
 
-    return [isTabActive, setIsTabActive];
+  const handleFocus = useCallback(() => {
+    setIsTabActive(true);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.addEventListener("visibilitychange", handleVisibilityChange);
+      window.addEventListener("blur", handleBlur);
+      window.addEventListener("focus", handleFocus);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("visibilitychange", handleVisibilityChange);
+        window.removeEventListener("blur", handleBlur);
+        window.removeEventListener("focus", handleFocus);
+      }
+    };
+  }, [handleVisibilityChange, handleBlur, handleFocus]);
+
+  return [isTabActive, setIsTabActive];
 }
 
 export default useTabActive;
