@@ -1,45 +1,56 @@
-'use server';
+"use server";
 
 import { SessionTypes } from "@/types/users";
 import { getIronSession, IronSession } from "iron-session";
 import { cookies } from "next/headers";
 
 interface SessionData {
-    user: {
-        token: {
-            access_token: string
-        }
-    }
+  user: {
+    token: {
+      access_token: string;
+    };
+  };
 }
 
-const PASSWORD = "hR7Wcv5@W#C)rbU%2LZuR]-e:.gu7Rd+!pT?9a77Rj6Qecs0K12)g6Q8-4!40.:uH@RwRto_kFC_DYgk?D,DwCC4TDLppDZDqD7G"
+const PASSWORD =
+  "hR7Wcv5@W#C)rbU%2LZuR]-e:.gu7Rd+!pT?9a77Rj6Qecs0K12)g6Q8-4!40.:uH@RwRto_kFC_DYgk?D,DwCC4TDLppDZDqD7G";
 
-export async function loginSession(data: {access_token: string}){
-    // TODO: set the ttl as the backend authorization ttl
-    const session = await getIronSession<SessionData>(await cookies(), { password: PASSWORD, cookieName: SessionTypes.USER_SESSION, ttl: 3600})
-    session.user = {
-        token: data
-    }
-    await session.save()
+export async function loginSession(data: { access_token: string }) {
+  // TODO: set the ttl as the backend authorization ttl
+  const session = await getIronSession<SessionData>(await cookies(), {
+    password: PASSWORD,
+    cookieName: SessionTypes.USER_SESSION,
+    ttl: 3600 * 24,
+  });
+  session.user = {
+    token: data,
+  };
+  await session.save();
 
-    return session
+  return session;
 }
 
-export async function logoutSession(){
-    const session = await getIronSession(await cookies(), { password: PASSWORD, cookieName: SessionTypes.USER_SESSION})
+export async function logoutSession() {
+  const session = await getIronSession(await cookies(), {
+    password: PASSWORD,
+    cookieName: SessionTypes.USER_SESSION,
+  });
 
-    session.destroy()
+  session.destroy();
 
-    return true;
+  return true;
 }
 
-export async function getSession(): Promise<IronSession<SessionData>>{
-    const session = await getIronSession<SessionData>(await cookies(), { password: PASSWORD, cookieName: SessionTypes.USER_SESSION})
-    return session;
+export async function getSession(): Promise<IronSession<SessionData>> {
+  const session = await getIronSession<SessionData>(await cookies(), {
+    password: PASSWORD,
+    cookieName: SessionTypes.USER_SESSION,
+  });
+  return session;
 }
 
-export async function isAuthorized(): Promise<boolean>{
-    const session = await getSession();
+export async function isAuthorized(): Promise<boolean> {
+  const session = await getSession();
 
-    return session.user ? true : false
+  return session.user ? true : false;
 }
