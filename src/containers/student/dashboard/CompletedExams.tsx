@@ -14,50 +14,52 @@ import ExamCompletedCard from "../../../components/exam/ExamCompletedCard";
 const card_count = 2;
 
 function CompletedExams() {
-    const completed_exams = useQuery({
-        queryKey: ["exams", { status: ExamStatus.COMPLETED }],
-        queryFn: async ({ queryKey }) =>{
-            const [, { status }] = queryKey as [string, { status: string }]
-            return await get_student_exams({ status })
-        },
-    });
+  const completed_exams = useQuery({
+    queryKey: ["exams", { status: ExamStatus.COMPLETED }],
+    queryFn: async ({ queryKey }) => {
+      const [, { status }] = queryKey as [string, { status: string }];
+      return await get_student_exams({ status });
+    },
+  });
 
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-    useEffect(() => {
-        if(completed_exams.data){
-            dispatch(setCompletedExams(completed_exams.data))
-        }
-    }, [completed_exams.isSuccess])
+  useEffect(() => {
+    if (completed_exams.data) {
+      dispatch(setCompletedExams(completed_exams.data));
+    }
+  }, [completed_exams.isSuccess]);
 
-    if (
-        completed_exams.isLoading ||
-        completed_exams.isError ||
-        completed_exams.data.length == 0
-    ) {
-        return <></>;
-    }    
+  if (
+    completed_exams.isLoading ||
+    completed_exams.isError ||
+    completed_exams.data.length == 0
+  ) {
+    return <></>;
+  }
 
-    return (
-        <section className="mt-8">
-            <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold">Completed Exams</h2>
-                <Link href="/student/exams/status/completed">
-                    <Button variant={"outline"}>
-                        View All
-                        <span>
-                        <ArrowRight />
-                        </span>
-                    </Button>
-                </Link>
-            </div>
-            <div className="grid grid-cols-1 gap-4 mt-4">
-                {completed_exams.data.slice(0, card_count).map((exam: any, index: number) => (
-                    <ExamCompletedCard exam={exam} key={index} />
-                ))}
-            </div>
-        </section>
-    );
+  return (
+    <section className="mt-8">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold">Completed Exams</h2>
+        <Link href="/student/exams/status/completed">
+          <Button variant={"outline"}>
+            View All
+            <span>
+              <ArrowRight />
+            </span>
+          </Button>
+        </Link>
+      </div>
+      <div className="grid grid-cols-1 gap-4 mt-4">
+        {completed_exams.data
+          .slice(0, card_count)
+          .map((exam: any, index: number) => (
+            <ExamCompletedCard exam={exam} key={index} />
+          ))}
+      </div>
+    </section>
+  );
 }
 
 export default CompletedExams;

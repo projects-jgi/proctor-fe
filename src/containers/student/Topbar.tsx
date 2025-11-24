@@ -64,10 +64,14 @@ function Topbar() {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+            {/* <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem>Settings</DropdownMenuItem> */}
             <DropdownMenuItem asChild>
-              <Button variant={"link"} className="text-destructive" onClick={handleLogout}>
+              <Button
+                variant="link"
+                className="text-destructive w-full"
+                onClick={handleLogout}
+              >
                 Logout
               </Button>
             </DropdownMenuItem>
