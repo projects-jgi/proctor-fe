@@ -1,12 +1,15 @@
-import { ThemeToggle } from '@/components/ThemeToggle'
-import React from 'react'
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { redirect } from "next/navigation";
+import React from "react";
 
 function Home() {
-    return (
-        <div>
-            <ThemeToggle />
-        </div>
-    )
+  redirect("/student/dashboard");
+
+  return (
+    <div>
+      <ThemeToggle />
+    </div>
+  );
 }
 
-export default Home
+export default Home;
