@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { ExamSidebar } from "./ExamSidebar";
-import { ExamQuestion } from "@/types/exam";
+import { ExamQuestion, ExamStatus } from "@/types/exam";
 import Topbar from "./Topbar";
 import { Badge } from "@/components/ui/badge";
 import QuestionCard from "./QuestionCard";
@@ -157,6 +157,18 @@ function ExamContainer({
       if (document.fullscreenElement) {
         await document.exitFullscreen();
       }
+
+      queryClient.invalidateQueries({
+        queryKey: ["exams", { status: ExamStatus.COMPLETED }],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["exams", { status: ExamStatus.ONGOING }],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["exams", { status: ExamStatus.UPCOMING }],
+      });
 
       router.push("/student/dashboard");
     },
