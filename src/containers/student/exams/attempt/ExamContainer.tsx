@@ -30,9 +30,11 @@ import useCameraCapture from "@/hooks/useCameraCapture";
 import useVideoPermission from "@/hooks/browser_permissions/useVideoPermission";
 
 function ExamContainer({
+  isProctored,
   exam_id,
   exam_questions,
 }: {
+  isProctored: boolean;
   exam_id: number;
   exam_questions: any;
 }) {
@@ -40,20 +42,20 @@ function ExamContainer({
   const [isActiveTab, setIsActiveTab] = useTabActive();
 
   const questionCounter = useSelector(
-    (state: RootState) => state.exam_attempt.questionCounter
+    (state: RootState) => state.exam_attempt.questionCounter,
   );
   const totalQuestions = useSelector(
-    (state: RootState) => state.exam_attempt.questionsLength
+    (state: RootState) => state.exam_attempt.questionsLength,
   );
   const currentQuestion = useSelector(
-    (state: RootState) => state.exam_attempt.currentQuestion
+    (state: RootState) => state.exam_attempt.currentQuestion,
   );
   const violations = useSelector(
-    (state: RootState) => state.exam_attempt.violations
+    (state: RootState) => state.exam_attempt.violations,
   );
   const attempt = useSelector((state: RootState) => state.exam_attempt.attempt);
   const attempt_id = useSelector(
-    (state: RootState) => state.exam_attempt.attempt.id
+    (state: RootState) => state.exam_attempt.attempt.id,
   );
   const [violation, setViolation] = useState<string | null>(null);
   const video_permission = useVideoPermission();
@@ -104,16 +106,18 @@ function ExamContainer({
     console.log(res);
   }
 
-  useCameraCapture(video_permission, onImageCapture);
-
   useEffect(() => {
     if (violations.length >= attempt.exam.max_violation_count) {
       onFinish();
     }
   }, [violations]);
 
+  if (isProctored) useCameraCapture(video_permission, onImageCapture);
+
   // listen for proctoring violation
   useEffect(() => {
+    if (!isProctored) return;
+
     const socket = useSocket();
     const emit_name =
       "exam-attempt-violation_exam-" + exam_id + "_attempt-" + attempt.id;
@@ -137,7 +141,7 @@ function ExamContainer({
     return () => {
       socket.off(emit_name);
     };
-  }, []);
+  }, [isProctored]);
 
   function onFinish() {
     const local_storage = localStorage.getItem("user_answers");
@@ -186,9 +190,9 @@ function ExamContainer({
       dispatch(
         setQuestionsLength(
           Object.values(
-            Object.assign({}, ...Object.values(exam_questions.questions))
-          ).length
-        )
+            Object.assign({}, ...Object.values(exam_questions.questions)),
+          ).length,
+        ),
       );
     }
   }, [exam_questions]);
@@ -196,7 +200,7 @@ function ExamContainer({
   useEffect(() => {
     if (questionCounter != null && questionCounter > 0) {
       let current_ele: HTMLElement | null = document.querySelector(
-        `[data-question-counter='${questionCounter}']`
+        `[data-question-counter='${questionCounter}']`,
       );
       let question_id: string | undefined = current_ele?.dataset.questionId;
       if (question_id != undefined) {
