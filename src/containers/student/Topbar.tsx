@@ -19,7 +19,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { logout } from "@/lib/server_api/auth";
-import { User } from "lucide-react";
+import { Power, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -47,7 +47,7 @@ function Topbar() {
             </BreadcrumbItem>
             <BreadcrumbSeparator className="hidden md:block" /> */}
             <BreadcrumbItem>
-              <BreadcrumbPage>Dashboard</BreadcrumbPage>
+              <BreadcrumbPage>Student Dashboard</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -67,13 +67,12 @@ function Topbar() {
             {/* <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem> */}
             <DropdownMenuItem asChild>
-              <Button
-                variant="link"
-                className="text-destructive w-full"
-                onClick={handleLogout}
-              >
-                Logout
-              </Button>
+              <Link href={"/student/profile"}>
+                <User /> Profile
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
+              <Power /> Sign Out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -54,7 +54,7 @@ function AppSidebar() {
   const pathname = usePathname();
 
   return (
-    <Sidebar variant="inset">
+    <Sidebar variant="sidebar">
       <SidebarHeader className="h-16 inline-flex items-center justify-center">
         <Link href={"/student"} className="">
           <Image
