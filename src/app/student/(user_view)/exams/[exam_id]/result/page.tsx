@@ -12,6 +12,10 @@ interface PageParams {
   exam_id: string;
 }
 
+export const metadata = {
+  title: "Exam Result",
+};
+
 async function page({ params }: { params: PageParams }) {
   const { exam_id } = await params;
 
