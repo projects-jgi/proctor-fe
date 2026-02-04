@@ -16,23 +16,35 @@ import LoginForm from "@/components/auth/LoginForm";
 import OTPForm from "@/components/auth/OTPForm";
 import { login } from "@/lib/server_api/auth";
 import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 function Login() {
   const [isFormValidated, setIsFormValidated] = useState(false);
-  const [loginError, setLoginError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const login_mutate = useMutation({
+    mutationFn: login,
+  });
 
   const handleLogin = async (values: LoginSchema) => {
-    setIsLoading(true);
-    const res = await login(values);
-    if (res.status) {
-      router.push("/student/dashboard");
-      setLoginError("");
-    } else {
-      setLoginError(res.message || "Unable to login. Please try again!");
-    }
-    setIsLoading(false);
+    toast.promise(
+      () =>
+        login_mutate.mutateAsync(values).then((response) => {
+          if (response.status) {
+            return response.message;
+          }
+
+          return new Error(response.message);
+        }),
+      {
+        loading: "Logging in...",
+        success: (data) => {
+          router.push("/student/dashboard");
+          return data;
+        },
+        error: (err) => err.message,
+      },
+    );
   };
 
   const handleOtpSubmit = (e: OtpSchema) => {
@@ -50,9 +62,9 @@ function Login() {
         </CardHeader>
         <CardContent>
           <LoginForm
-            isValidating={isLoading}
+            isValidating={login_mutate.isPending}
             handleLogin={handleLogin}
-            error={loginError}
+            error={""}
           />
           {isFormValidated && <OTPForm handleOtpSubmit={handleOtpSubmit} />}
         </CardContent>

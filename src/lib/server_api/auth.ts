@@ -24,6 +24,7 @@ export async function login({
     await loginSession(response.data);
     return {
       status: true,
+      message: "Login successful",
     };
   } catch (error: any) {
     const error_message = error.response?.data?.message || "Unable to login";
