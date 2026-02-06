@@ -143,19 +143,25 @@ export async function create_attempt_violation({
   exam_id,
   attempt_id,
   description,
-  reference_url,
+  reference_file,
 }: {
   exam_id: number;
   attempt_id: number;
   description?: string;
-  reference_url?: string;
+  reference_file?: Blob;
 }) {
+  const formData = new FormData();
+  formData.append("description", description || "Proctoring Violation");
+  if (reference_file) {
+    formData.append("reference_file", reference_file);
+  }
+
   try {
     const response = await Request({
       url: `${process.env.BACKEND_HOST}/api/students/exams/${exam_id}/attempts/${attempt_id}/violations`,
       isAuthorized: true,
       method: "POST",
-      body: { description, reference_url },
+      body: formData,
     });
 
     return response.data;
@@ -190,6 +196,7 @@ export async function get_attempt_violation({
   }
 }
 
+// TODO: Change exam_id to student_id
 export async function exam_camera_upload({
   exam_id,
   attempt_id,
@@ -197,26 +204,30 @@ export async function exam_camera_upload({
 }: {
   exam_id: number;
   attempt_id: number;
-  file: string;
+  file: Blob;
 }) {
   try {
-    const body = {
-      file,
-    };
+    const body = new FormData();
+    body.append("file", file);
+    body.append("exam_id", exam_id.toString());
+    body.append("user_id", attempt_id.toString());
 
     const response = await Request({
-      url: `${process.env.BACKEND_HOST}/api/students/exams/${exam_id}/attempts/${attempt_id}/camera_upload`,
+      // url: `${process.env.BACKEND_HOST}/api/students/exams/${exam_id}/attempts/${attempt_id}/camera_upload`,
+      url: `http://localhost:8000/api/v1/frame`,
       method: "POST",
-      isAuthorized: true,
+      // isAuthorized: true,
       body,
     });
 
-    if (response.data.success) {
-      return { status: true };
-    } else {
-      return { status: false };
-    }
-  } catch (err) {
-    return { status: false };
+    return {
+      status: true,
+      data: response.data,
+    };
+  } catch (err: any) {
+    return {
+      status: false,
+      message: err.response?.data?.message || "Unable to upload camera image",
+    };
   }
 }

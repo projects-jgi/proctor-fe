@@ -97,13 +97,28 @@ function ExamContainer({
     }
   }, [isActiveTab]);
 
-  async function onImageCapture(image: string) {
+  async function onImageCapture(image: Blob) {
     const res = await exam_camera_upload({
       exam_id,
       attempt_id: attempt.id,
       file: image,
     });
-    console.log(res);
+
+    if (res.status) {
+      console.log("Image res: ", res.data.action);
+      if (res.data.action != "none") {
+        console.log("Violation detected: ", res.data);
+        setViolation("Violation: " + res.data.event);
+        // const response = create_attempt_violation({
+        //   exam_id,
+        //   attempt_id: attempt.id,
+        //   description: "Proctoring Violation - " + res.data.event,
+        //   reference_file: image,
+        // });
+
+        // console.log(response);
+      }
+    }
   }
 
   useEffect(() => {
