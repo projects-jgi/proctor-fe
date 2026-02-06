@@ -20,7 +20,7 @@ import { RootState } from "@/lib/redux/store";
 import useCameraCapture from "@/hooks/useCameraCapture";
 import { useQuery } from "@tanstack/react-query";
 import {
-  exam_camera_upload,
+  exam_proctor_analysis_frame,
   get_attempt_violation,
 } from "@/lib/server_api/student";
 import { setAttempt, setViolations } from "@/lib/redux/state/ExamAttempt";

@@ -19,7 +19,9 @@ import ViolationAlert from "./ViolationAlert";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   create_attempt_violation,
-  exam_camera_upload,
+  exam_proctor_analysis_frame,
+  exam_proctor_analysis_start,
+  exam_proctor_analysis_stop,
   save_student_exam_attempt,
 } from "@/lib/server_api/student";
 import { useRouter } from "next/navigation";
@@ -28,6 +30,7 @@ import SubmissionLoading from "./SubmissionLoading";
 import { useSocket } from "@/hooks/useSocket";
 import useCameraCapture from "@/hooks/useCameraCapture";
 import useVideoPermission from "@/hooks/browser_permissions/useVideoPermission";
+import { current } from "@reduxjs/toolkit";
 
 function ExamContainer({
   isProctored,
@@ -40,6 +43,12 @@ function ExamContainer({
 }) {
   // listen for active tab violation
   const [isActiveTab, setIsActiveTab] = useTabActive();
+  const [violationQueue, setViolationQueue] = useState<{
+    [key: string]: [string, object];
+  }>({});
+  const [currentViolation, setCurrentViolation] = useState<string | undefined>(
+    undefined,
+  );
 
   const questionCounter = useSelector(
     (state: RootState) => state.exam_attempt.questionCounter,
@@ -57,7 +66,6 @@ function ExamContainer({
   const attempt_id = useSelector(
     (state: RootState) => state.exam_attempt.attempt.id,
   );
-  const [violation, setViolation] = useState<string | null>(null);
   const video_permission = useVideoPermission();
 
   const queryClient = useQueryClient();
@@ -87,36 +95,54 @@ function ExamContainer({
       exam_id: exam_id,
       attempt_id: attempt_id,
     };
-    store_violation_mutation.mutate({ ...params });
+
+    // store_violation_mutation.mutate({ ...params });
+    setViolationQueue((prev) => ({
+      ...prev,
+      tab_switch: ["Tab Switch Violation", params],
+    }));
   }
 
   useEffect(() => {
     if (isActiveTab === false) {
-      setViolation("Tab Switch Violation");
       store_violation();
     }
   }, [isActiveTab]);
 
+  useEffect(() => {
+    if (Object.keys(violationQueue).length > 0) {
+      const first_value = Object.values(violationQueue)[0];
+      if (currentViolation === first_value[0]) {
+        return;
+      }
+      store_violation_mutation.mutate(first_value[1] as any);
+      setCurrentViolation(first_value[0]);
+    } else {
+      setCurrentViolation(undefined);
+    }
+  }, [violationQueue]);
+
   async function onImageCapture(image: Blob) {
-    const res = await exam_camera_upload({
+    const res = await exam_proctor_analysis_frame({
       exam_id,
       attempt_id: attempt.id,
       file: image,
     });
 
     if (res.status) {
-      console.log("Image res: ", res.data.action);
       if (res.data.action != "none") {
         console.log("Violation detected: ", res.data);
-        setViolation("Violation: " + res.data.event);
-        // const response = create_attempt_violation({
-        //   exam_id,
-        //   attempt_id: attempt.id,
-        //   description: "Proctoring Violation - " + res.data.event,
-        //   reference_file: image,
-        // });
-
-        // console.log(response);
+        const params = {
+          exam_id,
+          attempt_id: attempt.id,
+          description: res.data.event,
+          reference_file: image,
+        };
+        // store_violation_mutation.mutate({ ...params });
+        setViolationQueue((prev) => ({
+          ...prev,
+          [res.data.event]: [res.data.event, params],
+        }));
       }
     }
   }
@@ -129,32 +155,51 @@ function ExamContainer({
 
   if (isProctored) useCameraCapture(video_permission, onImageCapture);
 
+  async function startProctoring() {
+    const res = await exam_proctor_analysis_start({
+      exam_id,
+      attempt_id,
+    });
+    console.log("Exam proctoring started: ", res);
+  }
+
+  async function stopProctoring() {
+    const res = await exam_proctor_analysis_stop({
+      exam_id,
+      attempt_id,
+    });
+    console.log("Exam proctoring stopped: ", res);
+  }
+
   // listen for proctoring violation
   useEffect(() => {
     if (!isProctored) return;
 
-    const socket = useSocket();
-    const emit_name =
-      "exam-attempt-violation_exam-" + exam_id + "_attempt-" + attempt.id;
-    socket.on(emit_name, (message) => {
-      // console.log(message);
-      if (message.data.is_violation) {
-        toast.warning(message.data.violations[0].description);
-        setViolation(message.data.violations[0].description);
-        queryClient.invalidateQueries({
-          queryKey: [
-            "exams",
-            parseInt(exam_id.toString()),
-            "attempts",
-            parseInt(attempt.id),
-            "violations",
-          ],
-        });
-      }
-    });
+    startProctoring();
+
+    // const socket = useSocket();
+    // const emit_name =
+    //   "exam-attempt-violation_exam-" + exam_id + "_attempt-" + attempt.id;
+    // socket.on(emit_name, (message) => {
+    //   // console.log(message);
+    //   if (message.data.is_violation) {
+    //     toast.warning(message.data.violations[0].description);
+    //     setViolation(message.data.violations[0].description);
+    //     queryClient.invalidateQueries({
+    //       queryKey: [
+    //         "exams",
+    //         parseInt(exam_id.toString()),
+    //         "attempts",
+    //         parseInt(attempt.id),
+    //         "violations",
+    //       ],
+    //     });
+    //   }
+    // });
 
     return () => {
-      socket.off(emit_name);
+      // socket.off(emit_name);
+      stopProctoring();
     };
   }, [isProctored]);
 
@@ -232,11 +277,21 @@ function ExamContainer({
   return (
     <>
       {onFinishMutation.isPending && <SubmissionLoading />}
-      {violation != null && (
-        <ViolationAlert
-          description={violation as string}
-          onClose={() => setViolation(null)}
-        />
+      {currentViolation != null && (
+        <>
+          <ViolationAlert
+            description={currentViolation as string}
+            onClose={() => {
+              setViolationQueue((prev) => {
+                const new_queue = { ...prev };
+                delete new_queue[Object.keys(prev)[0]];
+                return new_queue;
+              });
+
+              setCurrentViolation(undefined);
+            }}
+          />
+        </>
       )}
       <ExamSidebar questions={exam_questions["questions"]} />
       <SidebarInset>

@@ -55,7 +55,7 @@ export default function useCameraCapture(
               canvas.toBlob(resolve, "image/jpeg", 0.7),
             );
             onCapture(blob);
-          }, 3000);
+          }, 600);
         });
       });
 

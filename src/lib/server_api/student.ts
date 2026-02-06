@@ -147,11 +147,11 @@ export async function create_attempt_violation({
 }: {
   exam_id: number;
   attempt_id: number;
-  description?: string;
+  description: string;
   reference_file?: Blob;
 }) {
   const formData = new FormData();
-  formData.append("description", description || "Proctoring Violation");
+  formData.append("description", description);
   if (reference_file) {
     formData.append("reference_file", reference_file);
   }
@@ -197,7 +197,61 @@ export async function get_attempt_violation({
 }
 
 // TODO: Change exam_id to student_id
-export async function exam_camera_upload({
+export async function exam_proctor_analysis_start({
+  exam_id,
+  attempt_id,
+}: {
+  exam_id: number;
+  attempt_id: number;
+}) {
+  try {
+    const response = await Request({
+      url: `${process.env.PROCTOR_HOST}/api/v1/session/start?exam_id=${exam_id}&user_id=${attempt_id}`,
+      method: "POST",
+    });
+
+    return {
+      status: true,
+      data: response.data,
+    };
+  } catch (err: any) {
+    return {
+      status: false,
+      message:
+        err.response?.data?.message || "Unable to start proctoring session",
+    };
+  }
+}
+
+// TODO: Change exam_id to student_id
+export async function exam_proctor_analysis_stop({
+  exam_id,
+  attempt_id,
+}: {
+  exam_id: number;
+  attempt_id: number;
+}) {
+  try {
+    const response = await Request({
+      url: `${process.env.PROCTOR_HOST}/api/v1/session/end?exam_id=${exam_id}&user_id=${attempt_id}`,
+      method: "POST",
+    });
+
+    return {
+      status: true,
+      data: response.data,
+    };
+  } catch (err: any) {
+    return {
+      status: false,
+      message:
+        err.response?.data?.message || "Unable to stop proctoring session",
+    };
+  }
+}
+
+// TODO: Change exam_id to student_id
+export async function exam_proctor_analysis_frame({
   exam_id,
   attempt_id,
   file,
@@ -214,7 +268,7 @@ export async function exam_camera_upload({
 
     const response = await Request({
       // url: `${process.env.BACKEND_HOST}/api/students/exams/${exam_id}/attempts/${attempt_id}/camera_upload`,
-      url: `http://localhost:8000/api/v1/frame`,
+      url: `${process.env.PROCTOR_HOST}/api/v1/frame`,
       method: "POST",
       // isAuthorized: true,
       body,
