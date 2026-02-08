@@ -66,6 +66,9 @@ function ExamContainer({
   const attempt_id = useSelector(
     (state: RootState) => state.exam_attempt.attempt.id,
   );
+  const selected_answers_count = useSelector(
+    (state: RootState) => state.exam_attempt.selectedAnswersCount,
+  );
   const video_permission = useVideoPermission();
 
   const queryClient = useQueryClient();
@@ -222,7 +225,7 @@ function ExamContainer({
       localStorage.removeItem("user_answers");
 
       if (document.fullscreenElement) {
-        await document.exitFullscreen();
+        document.exitFullscreen();
       }
 
       queryClient.invalidateQueries({
@@ -238,6 +241,7 @@ function ExamContainer({
       });
 
       router.push("/student/dashboard");
+      return;
     },
     onError: (error) => {
       toast.error("Unable to submit exam answers", {
@@ -311,13 +315,17 @@ function ExamContainer({
                 Questions: <Badge>{totalQuestions}</Badge>
               </div>
               <div className="text-md font-bold">
-                Answered: <Badge variant="success">30</Badge>
+                Answered:{" "}
+                <Badge variant="success">{selected_answers_count}</Badge>
               </div>
               <div className="text-md font-bold">
-                Skipped: <Badge variant="destructive">05</Badge>
+                Not Answered:{" "}
+                <Badge variant="destructive">
+                  {totalQuestions - selected_answers_count}
+                </Badge>
               </div>
               <div className="text-md font-bold">
-                Marked for Review: <Badge variant="warning">05</Badge>
+                Marked for Review: <Badge variant="warning">0</Badge>
               </div>
             </div>
             <section className="mt-4">
