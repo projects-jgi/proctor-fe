@@ -26,8 +26,8 @@ function ViolationAlert({
     (state: RootState) => state.exam_attempt.violations,
   );
   let violation_count = useCallback(() => {
-    return violations.length;
-  }, [violations]);
+    return violations.length + 1;
+  }, []);
 
   return (
     <>

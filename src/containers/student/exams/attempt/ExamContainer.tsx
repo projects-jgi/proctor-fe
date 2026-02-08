@@ -122,7 +122,11 @@ function ExamContainer({
         return;
       }
       store_violation_mutation.mutate(first_value[1] as any);
+      console.log("Violation detected: ", first_value[0]);
       setCurrentViolation(first_value[0]);
+      if (violations.length + 1 >= attempt.exam.max_violation_count) {
+        onFinish();
+      }
     } else {
       setCurrentViolation(undefined);
     }
@@ -137,7 +141,7 @@ function ExamContainer({
 
     if (res.status) {
       if (res.data.action != "none") {
-        console.log("Violation detected: ", res.data);
+        console.log("Violation detected from server: ", res.data);
         const params = {
           exam_id,
           attempt_id: attempt.id,
@@ -152,12 +156,6 @@ function ExamContainer({
       }
     }
   }
-
-  useEffect(() => {
-    if (violations.length >= attempt.exam.max_violation_count) {
-      onFinish();
-    }
-  }, [violations]);
 
   if (isProctored) useCameraCapture(video_permission, onImageCapture);
 
@@ -216,7 +214,23 @@ function ExamContainer({
       data = JSON.parse(local_storage);
     }
 
-    onFinishMutation.mutate({ exam_id, answers: data });
+    toast.promise(
+      () =>
+        onFinishMutation
+          .mutateAsync({ exam_id, answers: data })
+          .then((response) => {
+            if (response.status) {
+              return response.message;
+            } else {
+              throw new Error(response.message);
+            }
+          }),
+      {
+        loading: "Submitting exam...",
+        success: (msg) => msg,
+        error: (err) => err.message,
+      },
+    );
   }
 
   const onFinishMutation = useMutation({
@@ -242,11 +256,6 @@ function ExamContainer({
 
       router.push("/student/dashboard");
       return;
-    },
-    onError: (error) => {
-      toast.error("Unable to submit exam answers", {
-        description: error.message,
-      });
     },
   });
 
@@ -310,23 +319,36 @@ function ExamContainer({
             duration={exam_questions.attempt.exam.duration_in_minutes}
           />
           <div className="m-8">
-            <div className="flex flex-wrap gap-12 items-center">
-              <div className="text-md font-bold">
-                Questions: <Badge>{totalQuestions}</Badge>
+            <div className="flex items-center justify-between">
+              <div className="flex flex-wrap gap-12 items-center">
+                <div className="text-md font-bold">
+                  Questions: <Badge>{totalQuestions}</Badge>
+                </div>
+                <div className="text-md font-bold">
+                  Answered:{" "}
+                  <Badge variant="success">{selected_answers_count}</Badge>
+                </div>
+                <div className="text-md font-bold">
+                  Not Answered:{" "}
+                  <Badge variant="destructive">
+                    {totalQuestions - selected_answers_count}
+                  </Badge>
+                </div>
+                <div className="text-md font-bold">
+                  Marked for Review: <Badge variant="warning">0</Badge>
+                </div>
               </div>
-              <div className="text-md font-bold">
-                Answered:{" "}
-                <Badge variant="success">{selected_answers_count}</Badge>
-              </div>
-              <div className="text-md font-bold">
-                Not Answered:{" "}
+              <p className="text-sm">
+                Violations Left:{" "}
                 <Badge variant="destructive">
-                  {totalQuestions - selected_answers_count}
+                  {Math.max(
+                    0,
+                    attempt.exam.max_violation_count - violations.length,
+                  ) +
+                    "/" +
+                    attempt.exam.max_violation_count}
                 </Badge>
-              </div>
-              <div className="text-md font-bold">
-                Marked for Review: <Badge variant="warning">0</Badge>
-              </div>
+              </p>
             </div>
             <section className="mt-4">
               {currentQuestion && <QuestionCard />}

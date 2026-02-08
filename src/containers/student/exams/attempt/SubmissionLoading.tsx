@@ -8,6 +8,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import Loading from "@/components/Loading";
+import { useEffect } from "react";
 
 export default function SubmissionLoading() {
   return (

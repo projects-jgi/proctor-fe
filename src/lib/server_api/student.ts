@@ -70,26 +70,31 @@ export async function save_student_exam_attempt({
   exam_id: number;
   answers: object;
 }) {
-  return Request({
-    url:
-      process.env.BACKEND_HOST +
-      `/api/students/exams/${exam_id}/attempts/answers`,
-    method: "POST",
-    isAuthorized: true,
-    body: {
-      is_auto_submitted: false,
-      answer: JSON.stringify(answers),
-    },
-  })
-    .then(function (response) {
-      return response.data;
-    })
-    .catch(function (error) {
-      if (error.response) {
-        return Promise.reject(error.response.data.message);
-      }
-      return Promise.reject("Unknown error occured while starting exam");
+  try {
+    const response = await Request({
+      url:
+        process.env.BACKEND_HOST +
+        `/api/students/exams/${exam_id}/attempts/answers`,
+      method: "POST",
+      isAuthorized: true,
+      body: {
+        is_auto_submitted: false,
+        answer: JSON.stringify(answers),
+      },
     });
+    return {
+      status: true,
+      data: response.data.data,
+      message: response.data.message || "Exam attempt submitted successfully",
+    };
+  } catch (error: any) {
+    return {
+      status: false,
+      message:
+        error.response?.data?.message ||
+        "Unknown error occured while submitting exam attempt",
+    };
+  }
 }
 
 export async function get_student_attempt_answers({
