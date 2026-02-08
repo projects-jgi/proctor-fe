@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ExamSidebar } from "./ExamSidebar";
 import { ExamQuestion, ExamStatus } from "@/types/exam";
 import Topbar from "./Topbar";
@@ -28,9 +28,10 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import SubmissionLoading from "./SubmissionLoading";
 import { useSocket } from "@/hooks/useSocket";
-import useCameraCapture from "@/hooks/useCameraCapture";
+import useCameraCaptureFrame from "@/hooks/useCameraCaptureFrame";
 import useVideoPermission from "@/hooks/browser_permissions/useVideoPermission";
 import { current } from "@reduxjs/toolkit";
+import { useMediaPipeClassifier } from "@/hooks/useMediaPipeClassifier";
 
 function ExamContainer({
   isProctored,
@@ -49,6 +50,8 @@ function ExamContainer({
   const [currentViolation, setCurrentViolation] = useState<string | undefined>(
     undefined,
   );
+  const detectorWarmupFramesRef = useRef(0);
+  const WARMUP_FRAMES = 30; // ~1 second at 30fps
 
   const questionCounter = useSelector(
     (state: RootState) => state.exam_attempt.questionCounter,
@@ -157,7 +160,83 @@ function ExamContainer({
     }
   }
 
-  if (isProctored) useCameraCapture(video_permission, onImageCapture);
+  const { classifierRef, isReady: isClassifierReady } =
+    useMediaPipeClassifier();
+  if (isProctored)
+    useCameraCaptureFrame(
+      video_permission && isClassifierReady,
+      (result, getFrameBlob) => {
+        // Warmup period: skip checks until detector has processed enough frames
+        if (detectorWarmupFramesRef.current < WARMUP_FRAMES) {
+          console.log(
+            `Warming up detector: frame ${detectorWarmupFramesRef.current + 1}/${WARMUP_FRAMES}`,
+          );
+          detectorWarmupFramesRef.current += 1;
+          return;
+        }
+
+        const minScore = 0.8;
+        const detections = (result?.detections ?? []) as Array<{
+          categories?: Array<{ categoryName: string; score: number }>;
+        }>;
+
+        // Skip validation if no detections yet (still initializing)
+        // if (!detections || detections.length === 0) {
+        //   return;
+        // }
+
+        const enqueueViolation = async (key: string, description: string) => {
+          const image = await getFrameBlob();
+          if (!image) return;
+
+          const params = {
+            exam_id,
+            attempt_id: attempt.id,
+            description,
+            reference_file: image,
+          };
+
+          setViolationQueue((prev) => {
+            if (prev[key]) return prev;
+            return {
+              ...prev,
+              [key]: [description, params],
+            };
+          });
+        };
+
+        const personDetections = detections.filter((detection) =>
+          (detection.categories ?? []).some(
+            (category) =>
+              category.categoryName === "person" && category.score >= 0.4,
+          ),
+        );
+
+        const hasCellPhone = detections.some((detection) =>
+          (detection.categories ?? []).some(
+            (category) =>
+              category.categoryName === "cell phone" && category.score >= 0.6,
+          ),
+        );
+
+        if (hasCellPhone) {
+          console.error("Cell phone detected");
+          // console.log(hasCellPhone);
+          void enqueueViolation("cell_phone", "Cell phone detected");
+        }
+
+        if (personDetections.length === 0) {
+          console.error("No person detected");
+          // console.log(personDetections);
+          void enqueueViolation("no_person", "No person detected");
+        } else if (personDetections.length > 1) {
+          console.error("Multiple people detected");
+          // console.log(personDetections);
+          void enqueueViolation("multiple_people", "Multiple people detected");
+        }
+      },
+      classifierRef,
+    );
 
   async function startProctoring() {
     const res = await exam_proctor_analysis_start({
