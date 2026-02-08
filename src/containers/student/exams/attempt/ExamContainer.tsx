@@ -87,6 +87,9 @@ function ExamContainer({
       });
       // violation_count = violations.length
     },
+    onError: (error) => {
+      console.log(error);
+    },
   });
 
   async function store_violation() {
